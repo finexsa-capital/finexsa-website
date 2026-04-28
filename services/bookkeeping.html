@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مسك الدفاتر المحاسبية — FINEXSA Capital</title>
+<meta name="description" content="الركيزة الأساسية لأي منشأة تسعى إلى النمو المستدام والامتثال التنظيمي — نظّم سجلاتك المالية وحرّر وقتك للتركيز على ما يهم فعلاً.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="../index.html" class="brand">
+      <div class="brand-mark">⚖</div>
+      <div class="brand-text">
+        <span class="brand-name">FINEXSA</span>
+        <span class="brand-sub">Capital</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">الرئيسية</a></li>
+      <li><a href="../index.html#services" class="active">خدماتنا</a></li>
+      <li><a href="../index.html#about">من نحن</a></li>
+      <li><a href="../index.html#contact">اتصل بنا</a></li>
+    </ul>
+    <a href="../login.html" class="nav-cta">
+      <span>🔐</span>
+      <span>دخول العملاء</span>
+    </a>
+    <button class="burger-btn" id="burger-btn" aria-label="القائمة" type="button">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer Menu -->
+<div class="mobile-drawer-overlay" id="drawer-overlay"></div>
+<aside class="mobile-drawer" id="mobile-drawer">
+  <ul class="mobile-drawer-links">
+    <li><a href="../index.html#home">الرئيسية</a></li>
+    <li><a href="../index.html#about">من نحن</a></li>
+    <li><a href="../index.html#services">خدماتنا</a></li>
+    <li><a href="../index.html#team">فريقنا</a></li>
+    <li><a href="../index.html#finexsa-one">FINEXSA One</a></li>
+    <li><a href="../index.html#hosting">الاستضافة السحابية</a></li>
+    <li><a href="../index.html#contact">اتصل بنا</a></li>
+  </ul>
+  <a href="../login.html" class="mobile-drawer-cta">🔐 دخول العملاء</a>
+
+  <div class="mobile-drawer-contact">
+    <div class="mobile-drawer-contact-label">تواصل سريع</div>
+    <a href="https://wa.me/905362323310" target="_blank" rel="noopener">💬 واتساب — تركيا</a>
+    <a href="tel:+963994470219">📞 هاتف — دمشق</a>
+    <a href="mailto:info@finexsacapitalnet.com">📧 info@finexsacapitalnet.com</a>
+  </div>
+</aside>
+
+<!-- Burger Toggle Script -->
+<script>
+(function() {
+  const burger = document.getElementById('burger-btn');
+  const drawer = document.getElementById('mobile-drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const links = drawer ? drawer.querySelectorAll('a') : [];
+
+  function toggle() {
+    burger.classList.toggle('is-open');
+    drawer.classList.toggle('is-open');
+    overlay.classList.toggle('is-open');
+    document.body.classList.toggle('drawer-open');
+  }
+
+  function close() {
+    burger.classList.remove('is-open');
+    drawer.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.classList.remove('drawer-open');
+  }
+
+  if (burger) burger.addEventListener('click', toggle);
+  if (overlay) overlay.addEventListener('click', close);
+  links.forEach(a => a.addEventListener('click', close));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+  });
+})();
+</script>
+
+
+<!-- SERVICE HERO -->
+<section class="service-hero">
+  <div class="container">
+    <a href="../index.html#services" class="back-link">
+      <span>→</span> رجوع إلى كل الخدمات
+    </a>
+
+    <div class="service-hero-grid">
+      <div class="service-hero-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 4v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6H6c-1.1 0-2 .9-2 2z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+      </div>
+      <div>
+        <div class="service-hero-meta">
+          <span>01 / 06</span>
+          <span class="dot"></span>
+          <span>خدمة محاسبية متكاملة</span>
+        </div>
+        <h1 class="service-hero-title">مسك الدفاتر المحاسبية</h1>
+        <p class="service-hero-tagline">الركيزة الأساسية لأي منشأة تسعى إلى النمو المستدام والامتثال التنظيمي — نظّم سجلاتك المالية وحرّر وقتك للتركيز على ما يهم فعلاً.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<section class="section">
+  <div class="container">
+    <div class="fade-in">
+      <span class="section-label">نظرة عامة</span>
+      <h2 class="section-title">حلول محاسبية <span class="italic">متكاملة</span> مصمّمة لتطوّر أعمالك</h2>
+    </div>
+    <div class="fade-in">
+      <p class="section-lead">تُعدّ الدفاتر المحاسبية الذاكرة المؤسسية لأي شركة، وهي اللبنة التي تُبنى عليها كل القرارات المالية لاحقاً. في FINEXSA Capital نتولّى مهمة تسجيل ومتابعة كافة العمليات المالية اليومية لشركتك بدقة متناهية وفق أحدث المعايير المحاسبية الدولية (IFRS) والمعايير المحلية المعتمدة.</p>
+      <p class="section-lead">سواء كنت شركة ناشئة تبدأ رحلتها أو منشأة قائمة تبحث عن الانتظام والوضوح، يوفّر فريقنا المتخصص حلولاً مرنة تحرّرك من التعقيدات المحاسبية، وتمنحك صورة واضحة ومستمرة عن الوضع المالي لشركتك في كل لحظة.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE OFFER -->
+<section class="section compact" style="background: linear-gradient(180deg, transparent, rgba(20, 24, 39, 0.4), transparent);">
+  <div class="container">
+    <div class="fade-in">
+      <span class="section-label">ما نقدّمه</span>
+      <h2 class="section-title">خدمات <span class="italic">تفصيلية</span> ضمن هذا المجال</h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-item fade-in">
+        <div class="feature-check">✓</div>
+        <div class="feature-text"><strong>تسجيل القيود اليومية</strong> — تسجيل دقيق لجميع العمليات المالية اليومية (Journal Entries) وتصنيفها وفق دليل الحسابات المعتمد.</div>
+      </div>
+      <div class="feature-item fade-in">
+        <div class="feature-check">✓</div>
+        <div class="feature-text"><strong>إدارة دفاتر الأستاذ</strong> — متابعة دفتر الأستاذ العام ودفاتر الأستاذ المساعد بشكل منتظم مع ضمان توازن الأرصدة.</div>
+      </div>
+      <div class="feature-item fade-in">
+        <div class="feature-check">✓</div>
+        <div class="feature-text"><strong>التسوية البنكية الشهرية</strong> — مطابقة كشوف الحساب البنكية مع السجلات المحاسبية (Bank Reconciliation) واكتشاف الفروقات.</div>
+      </div>
+      <div class="feature-item fade-in">
+        <div class="feature-check">✓</div>
+        <div class="feature-text"><strong>إدارة حسابات العملاء والموردين</strong> — متابعة الذمم المدينة والدائنة (AR/AP) وإعداد تقارير أعمار الديون.</div>
+      </div>
+      <div class="feature-item fade-in">
+        <div class="feature-check">✓</div>
+        <div class="feature-text"><strong>أرصدة المراجعة والإقفالات</strong> — إعداد ميزان المراجعة الشهري وتنفيذ قيود الإقفال والتسويات الدورية.</div>
+      </div>
+      <div class="feature-item fade-in">
+        <div class="feature-check">✓</div>
+        <div class="feature-text"><strong>الامتثال الضريبي</strong> — إدارة السجلات الضريبية، إعداد الإقرارات، والامتثال الكامل لمتطلبات الجهات التنظيمية.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO BENEFITS -->
+<section class="section compact">
+  <div class="container">
+    <div class="fade-in">
+      <span class="section-label">لمن هذه الخدمة</span>
+      <h2 class="section-title">الخدمة الأنسب <span class="italic">لك</span> إذا كنت من</h2>
+    </div>
+
+    <div class="audience-list">
+      <div class="audience-item fade-in">الشركات الصغيرة والمتوسطة (SMEs)</div>
+      <div class="audience-item fade-in">الشركات الناشئة في مراحلها الأولى</div>
+      <div class="audience-item fade-in">الشركات متعددة الفروع والأنشطة</div>
+      <div class="audience-item fade-in">المهنيون والمكاتب الاستشارية</div>
+      <div class="audience-item fade-in">الشركات التي تخضع للتدقيق السنوي</div>
+      <div class="audience-item fade-in">الفروع الأجنبية والشركات العابرة للحدود</div>
+    </div>
+  </div>
+</section>
+
+<!-- OUR PROCESS -->
+<section class="section compact">
+  <div class="container">
+    <div class="fade-in">
+      <span class="section-label">منهجية العمل</span>
+      <h2 class="section-title">كيف <span class="italic">نعمل</span> معك خطوة بخطوة</h2>
+    </div>
+
+    <div class="process-grid">
+      <div class="process-step fade-in">
+        <div class="process-num">01</div>
+        <h3 class="process-title">التقييم الأولي</h3>
+        <p class="process-desc">جلسة تشخيصية لفهم طبيعة نشاطك، حجم العمليات، والمتطلبات التنظيمية الخاصة بك.</p>
+      </div>
+      <div class="process-step fade-in">
+        <div class="process-num">02</div>
+        <h3 class="process-title">إعداد دليل الحسابات</h3>
+        <p class="process-desc">تصميم دليل محاسبي مخصص يعكس هيكل شركتك وأقسامها ومراكز تكلفتها.</p>
+      </div>
+      <div class="process-step fade-in">
+        <div class="process-num">03</div>
+        <h3 class="process-title">التسجيل والمراجعة الدورية</h3>
+        <p class="process-desc">تسجيل يومي للقيود، مراجعة أسبوعية، وإقفال شهري كامل وفق جدول زمني واضح.</p>
+      </div>
+      <div class="process-step fade-in">
+        <div class="process-num">04</div>
+        <h3 class="process-title">التقارير والمتابعة</h3>
+        <p class="process-desc">تسليم تقارير شهرية منتظمة مع جلسة مراجعة لمناقشة النتائج والمستجدات.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="container">
+  <div class="cta-banner fade-in">
+    <h2 class="cta-title">
+      هل أنت جاهز <span class="italic">لنبدأ سويّاً؟</span>
+    </h2>
+    <p class="cta-text">
+      احجز استشارة مجانية مع فريقنا لمناقشة احتياجات شركتك ومعرفة كيف يمكننا مساعدتك على تحقيق أهدافك المالية
+    </p>
+    <div class="hero-cta-group">
+      <a href="https://wa.me/905362323310?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%20FINEXSA%20Capital" target="_blank" rel="noopener" class="btn-primary">💬 احجز استشارة مجانية</a>
+      <a href="../index.html#services" class="btn-secondary">← خدمات أخرى</a>
+    </div>
+  </div>
+</section>
+
+<!-- RELATED SERVICES -->
+<section class="section compact">
+  <div class="container">
+    <div class="fade-in">
+      <span class="section-label">خدمات ذات صلة</span>
+      <h2 class="section-title">قد تُهمّك <span class="italic">هذه الخدمات</span> أيضاً</h2>
+    </div>
+
+    <div class="related-grid">
+      <a href="reports.html" class="related-card">
+        <div class="related-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 4 5-7"/><circle cx="7" cy="15" r="1.2"/><circle cx="11" cy="9" r="1.2"/><circle cx="15" cy="13" r="1.2"/><circle cx="20" cy="6" r="1.2"/></svg></div>
+        <div>
+          <div class="related-title">التقارير المالية</div>
+          <div class="related-link">عرض التفاصيل ←</div>
+        </div>
+      </a>
+      <a href="feasibility.html" class="related-card">
+        <div class="related-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/><path d="M8 14l3-3"/></svg></div>
+        <div>
+          <div class="related-title">دراسات الجدوى الاقتصادية</div>
+          <div class="related-link">عرض التفاصيل ←</div>
+        </div>
+      </a>
+      <a href="management.html" class="related-card">
+        <div class="related-icon"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v2"/><path d="M12 12v4M9 14h6"/></svg></div>
+        <div>
+          <div class="related-title">الإدارة المالية</div>
+          <div class="related-link">عرض التفاصيل ←</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="../index.html" class="brand">
+          <div class="brand-mark">⚖</div>
+          <div class="brand-text">
+            <span class="brand-name">FINEXSA</span>
+            <span class="brand-sub">Capital</span>
+          </div>
+        </a>
+        <p class="footer-brand-text">
+          شركة متخصصة في التحليل المالي والمحاسبة، تقدّم حلولاً احترافية تساعد الشركات على النمو باتخاذ قرارات مبنية على البيانات.
+        </p>
+      </div>
+
+      <div>
+        <h4>روابط سريعة</h4>
+        <ul class="footer-links">
+          <li><a href="../index.html">الرئيسية</a></li>
+          <li><a href="../index.html#services">خدماتنا</a></li>
+          <li><a href="../index.html#about">من نحن</a></li>
+          <li><a href="../login.html">دخول العملاء</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>خدماتنا</h4>
+        <ul class="footer-links">
+          <li><a href="reports.html">التقارير المالية</a></li>
+          <li><a href="audit.html">التدقيق والمراجعة</a></li>
+          <li><a href="feasibility.html">دراسات الجدوى</a></li>
+          <li><a href="accounting.html">المحاسبة المالية</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>تواصل معنا</h4>
+        <div class="footer-contact">
+          <div style="margin-bottom: 14px;">
+            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:13px;">الفرع الرئيسي</strong>
+            <div>📍 إسطنبول — تركيا — ماتر</div>
+            <div style="direction: ltr; text-align: right;">📱 <a href="tel:+905362323310">+90 536 232 3310</a></div>
+            <div style="direction: ltr; text-align: right;">📱 <a href="tel:+905360652643">+90 536 065 2643</a></div>
+          </div>
+          <div style="margin-bottom: 14px;">
+            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:13px;">الفرع الثاني</strong>
+            <div>📍 دمشق — سوريا — الحجاز</div>
+            <div style="direction: ltr; text-align: right;">☎ <a href="tel:+963112224394">+963 11 222 4394</a></div>
+            <div style="direction: ltr; text-align: right;">📱 <a href="tel:+963994470219">+963 994 470 219</a></div>
+          </div>
+          <div>📧 <a href="mailto:info@finexsacapitalnet.com">info@finexsacapitalnet.com</a></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Partner + Social Row -->
+    <div class="partner-row">
+      <div class="partner-block">
+        <div>
+          <span class="partner-label">الشريك التقني</span>
+          <a href="https://hadarasoft.net" target="_blank" rel="noopener" class="partner-link">
+            <div class="partner-logo">
+              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <!-- Center post -->
+                <line x1="32" y1="10" x2="32" y2="54" stroke="#C9A227" stroke-width="3" stroke-linecap="round"/>
+                <!-- Top crossbar -->
+                <line x1="10" y1="18" x2="54" y2="18" stroke="#C9A227" stroke-width="3" stroke-linecap="round"/>
+                <!-- Center pivot -->
+                <circle cx="32" cy="18" r="3.5" fill="#C9A227"/>
+                <!-- Strings to pans -->
+                <line x1="14" y1="18" x2="14" y2="32" stroke="#C9A227" stroke-width="1.5"/>
+                <line x1="50" y1="18" x2="50" y2="32" stroke="#C9A227" stroke-width="1.5"/>
+                <!-- Left pan -->
+                <path d="M 5 32 L 23 32 L 19 40 Q 14 44 9 40 Z" fill="#C9A227" opacity="0.95"/>
+                <!-- Right pan -->
+                <path d="M 41 32 L 59 32 L 55 40 Q 50 44 45 40 Z" fill="#C9A227" opacity="0.95"/>
+                <!-- Base -->
+                <rect x="22" y="52" width="20" height="3" rx="1.5" fill="#C9A227"/>
+                <!-- Top decoration -->
+                <circle cx="32" cy="9" r="2" fill="#C9A227"/>
+              </svg>
+            </div>
+            <div class="partner-info">
+              <span class="partner-title">تحميل برنامج الميزان دوت نت</span>
+              <span class="partner-subtitle">للمحاسبة والمستودعات ↓</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-block">
+        <span class="partner-label">تابعنا</span>
+        <div class="social-icons">
+          <a href="#" target="_blank" rel="noopener" class="social-icon" title="Facebook" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" class="social-icon" title="Instagram" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.849.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.849.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" class="social-icon" title="LinkedIn" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" class="social-icon" title="YouTube" aria-label="YouTube">
+            <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 <strong style="color:var(--text-primary)">FINEXSA Capital</strong>. جميع الحقوق محفوظة.</div>
+      <div><a href="../privacy.html">سياسة الخصوصية</a> · <a href="../terms.html">الشروط والأحكام</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
