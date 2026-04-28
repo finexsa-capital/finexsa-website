@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الشروط والأحكام — FINEXSA Capital</title>
+<meta name="description" content="الشروط والأحكام الخاصة باستخدام موقع وخدمات FINEXSA Capital">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">⚖</div>
+      <div class="brand-text">
+        <span class="brand-name">FINEXSA</span>
+        <span class="brand-sub">Capital</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="index.html#about">من نحن</a></li>
+      <li><a href="index.html#services">خدماتنا</a></li>
+      <li><a href="index.html#team">فريقنا</a></li>
+      <li><a href="index.html#finexsa-one">FINEXSA One</a></li>
+      <li><a href="index.html#hosting">الاستضافة السحابية</a></li>
+      <li><a href="index.html#contact">اتصل بنا</a></li>
+    </ul>
+    <a href="index.html#login" class="nav-cta">
+      <span>🔐</span>
+      <span>دخول العملاء</span>
+    </a>
+    <button class="burger-btn" id="burger-btn" aria-label="القائمة" type="button">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer Menu -->
+<div class="mobile-drawer-overlay" id="drawer-overlay"></div>
+<aside class="mobile-drawer" id="mobile-drawer">
+  <ul class="mobile-drawer-links">
+    <li><a href="index.html#home">الرئيسية</a></li>
+    <li><a href="index.html#about">من نحن</a></li>
+    <li><a href="index.html#services">خدماتنا</a></li>
+    <li><a href="index.html#team">فريقنا</a></li>
+    <li><a href="index.html#finexsa-one">FINEXSA One</a></li>
+    <li><a href="index.html#hosting">الاستضافة السحابية</a></li>
+    <li><a href="index.html#contact">اتصل بنا</a></li>
+  </ul>
+  <a href="login.html" class="mobile-drawer-cta">🔐 دخول العملاء</a>
+
+  <div class="mobile-drawer-contact">
+    <div class="mobile-drawer-contact-label">تواصل سريع</div>
+    <a href="https://wa.me/905362323310" target="_blank" rel="noopener">💬 واتساب — تركيا</a>
+    <a href="tel:+963994470219">📞 هاتف — دمشق</a>
+    <a href="mailto:info@finexsacapitalnet.com">📧 info@finexsacapitalnet.com</a>
+  </div>
+</aside>
+
+<!-- Burger Toggle Script -->
+<script>
+(function() {
+  const burger = document.getElementById('burger-btn');
+  const drawer = document.getElementById('mobile-drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const links = drawer ? drawer.querySelectorAll('a') : [];
+
+  function toggle() {
+    burger.classList.toggle('is-open');
+    drawer.classList.toggle('is-open');
+    overlay.classList.toggle('is-open');
+    document.body.classList.toggle('drawer-open');
+  }
+
+  function close() {
+    burger.classList.remove('is-open');
+    drawer.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.classList.remove('drawer-open');
+  }
+
+  if (burger) burger.addEventListener('click', toggle);
+  if (overlay) overlay.addEventListener('click', close);
+  links.forEach(a => a.addEventListener('click', close));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+  });
+})();
+</script>
+
+
+<!-- HERO -->
+<section class="legal-hero">
+  <div class="container fade-in">
+    <span class="section-label">وثيقة قانونية</span>
+    <h1 class="section-title" style="margin-inline: auto;">الشروط والأحكام</h1>
+    <p class="section-lead" style="margin-inline: auto;">
+      الشروط المنظّمة لاستخدام خدمات FINEXSA Capital والعلاقة التعاقدية مع عملائنا
+    </p>
+    <nav class="breadcrumb">
+      <a href="index.html">الرئيسية</a>
+      <span class="sep">▸</span>
+      <span class="current">الشروط والأحكام</span>
+    </nav>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section class="legal-content">
+  <div class="container">
+    <div class="legal-wrap fade-in">
+      <span class="legal-date">آخر تحديث: أبريل 2026</span>
+
+      <h2>١. المقدمة والقبول</h2>
+      <p>
+        تحكم هذه الشروط والأحكام (يُشار إليها بـ"الشروط") استخدامك لموقع <strong>FINEXSA Capital</strong> الإلكتروني وللخدمات التي نقدّمها، بما فيها منصة <strong>FINEXSA One</strong> لعملائنا. باستخدامك للموقع أو الخدمات، فإنك توافق على الالتزام بهذه الشروط كاملةً.
+      </p>
+      <p>
+        إذا كنت تتصرف نيابةً عن شركة أو مؤسسة، فإنك تقرّ بأن لديك الصلاحية لإلزام هذه الجهة بهذه الشروط.
+      </p>
+
+      <h2>٢. تعريفات</h2>
+      <ul>
+        <li><strong>"الشركة" / "نحن":</strong> تشير إلى FINEXSA Capital وفروعها في تركيا وسوريا.</li>
+        <li><strong>"العميل" / "أنت":</strong> أي شخص طبيعي أو اعتباري يستفيد من خدمات الشركة.</li>
+        <li><strong>"الخدمات":</strong> جميع الخدمات المحاسبية والاستشارية والتقنية التي نقدّمها.</li>
+        <li><strong>"المنصة":</strong> أداة FINEXSA One للتحليل المالي المتاحة للعملاء.</li>
+      </ul>
+
+      <h2>٣. نطاق الخدمات</h2>
+      <p>تقدّم FINEXSA Capital مجموعة من الخدمات المحاسبية والاستشارية تشمل:</p>
+      <ul>
+        <li>مسك الدفاتر المحاسبية وإدارة السجلات المالية</li>
+        <li>إعداد التقارير المالية الدورية</li>
+        <li>دراسات الجدوى الاقتصادية</li>
+        <li>الإدارة المالية والاستشارات</li>
+        <li>التدقيق والمراجعة المحاسبية</li>
+        <li>المحاسبة المالية وفق المعايير الدولية (IFRS)</li>
+        <li>الوصول إلى منصة FINEXSA One للعملاء المشتركين</li>
+      </ul>
+      <p>
+        نطاق الخدمات التفصيلي لكل عميل يُحدَّد في عقد خدمة مستقل يُوقَّع بين الطرفين قبل بدء العمل.
+      </p>
+
+      <h2>٤. مسؤوليات العميل</h2>
+      <p>لضمان تقديم خدماتنا بأفضل جودة، يتعهّد العميل بالآتي:</p>
+      <ul>
+        <li>تزويدنا بالبيانات والوثائق اللازمة بشكل دقيق وكامل وفي الوقت المناسب</li>
+        <li>ضمان صحة المعلومات والمستندات المقدّمة ومطابقتها للواقع</li>
+        <li>التعاون مع فريقنا والرد على استفساراتنا بسرعة معقولة</li>
+        <li>الالتزام بمواعيد السداد المتّفق عليها</li>
+        <li>الحفاظ على سرية بيانات الدخول إلى FINEXSA One وعدم مشاركتها مع الغير</li>
+        <li>استخدام الخدمات لأغراض مشروعة فقط</li>
+      </ul>
+
+      <h2>٥. التزاماتنا</h2>
+      <p>تتعهّد FINEXSA Capital بما يلي:</p>
+      <ul>
+        <li>تقديم خدماتنا بمهنية عالية ووفق المعايير المحاسبية المعتمدة</li>
+        <li>الحفاظ التام على سرية بيانات العميل المالية والشخصية</li>
+        <li>إعداد التقارير والخدمات ضمن المدد المتّفق عليها</li>
+        <li>إعلام العميل بأي تعديلات جوهرية على الخدمة أو الرسوم</li>
+        <li>توفير الدعم الفني والمهني اللازم طوال فترة التعاقد</li>
+      </ul>
+
+      <h2>٦. الأتعاب والدفع</h2>
+      <p>
+        تُحدَّد أتعاب خدماتنا وفق طبيعة كل خدمة وحجم العمل، وتُسجَّل في عقد الخدمة الموقّع مع العميل. قد تكون الأتعاب:
+      </p>
+      <ul>
+        <li>رسوماً شهرية ثابتة للخدمات المستمرة (مسك دفاتر، تقارير دورية)</li>
+        <li>أتعاباً لمرة واحدة للمشاريع المحدّدة (دراسات جدوى، تدقيق)</li>
+        <li>اشتراكات سنوية لمنصة FINEXSA One</li>
+      </ul>
+      <p>
+        في حال التأخر عن السداد لأكثر من 30 يوماً، يحقّ للشركة تعليق الخدمات دون إشعار مسبق، مع الاحتفاظ بحق المطالبة بالمستحقّات القانونية.
+      </p>
+
+      <h2>٧. السرية المهنية</h2>
+      <p>
+        جميع البيانات والمعلومات التي نتلقاها من عملائنا تُعامَل بسرية تامة. موظفونا ملتزمون بمواثيق سرية صارمة، ولا نفصح عن أي معلومات لأطراف ثالثة إلا بموافقة كتابية من العميل أو امتثالاً لأمر قضائي.
+      </p>
+
+      <h2>٨. الملكية الفكرية</h2>
+      <h3>محتوى الموقع والمنصة</h3>
+      <p>
+        جميع المحتويات على موقعنا — بما فيها التصميم، الشعارات، النصوص، الأيقونات، وكذلك منصة FINEXSA One وأنظمتها — مملوكة لـ FINEXSA Capital ومحميّة بموجب قوانين حقوق التأليف والنشر. لا يجوز نسخها أو استخدامها بدون إذن كتابي مسبق.
+      </p>
+      <h3>التقارير والأعمال</h3>
+      <p>
+        التقارير والمستندات المعدّة للعميل تصبح ملكاً له بعد سداد كامل الأتعاب المستحقة. نحتفظ بنسخ احتياطية من هذه الأعمال لأغراض الرجوع المهني وفق متطلبات القانون.
+      </p>
+
+      <h2>٩. حدود المسؤولية</h2>
+      <p>
+        نبذل قصارى جهدنا لتقديم خدماتنا بأعلى مستوى من الدقة والاحترافية. ومع ذلك:
+      </p>
+      <ul>
+        <li>لا نتحمّل مسؤولية نتائج البيانات غير الدقيقة أو غير الكاملة التي يقدّمها العميل</li>
+        <li>لا نتحمّل مسؤولية القرارات التجارية التي يتّخذها العميل بناءً على تقاريرنا</li>
+        <li>لا نتحمّل أي أضرار غير مباشرة أو تبعية (Indirect/Consequential Damages)</li>
+        <li>تقتصر مسؤوليتنا في كل الأحوال على قيمة الأتعاب المدفوعة للخدمة محل النزاع</li>
+      </ul>
+
+      <h2>١٠. إنهاء التعاقد</h2>
+      <p>يجوز لأي من الطرفين إنهاء التعاقد وفق الشروط التالية:</p>
+      <ul>
+        <li>تقديم إشعار خطّي مسبق بـ 30 يوماً على الأقل</li>
+        <li>تسوية جميع الالتزامات المالية المتبادلة</li>
+        <li>تسليم العميل جميع مستنداته وبياناته الأصلية</li>
+        <li>الحفاظ على السرية المهنية حتى بعد انتهاء التعاقد</li>
+      </ul>
+      <p>
+        في حال الإخلال الجسيم بالالتزامات، يحقّ للطرف المتضرّر إنهاء التعاقد فوراً.
+      </p>
+
+      <h2>١١. القانون المعمول به</h2>
+      <p>
+        تخضع هذه الشروط للقوانين المعمول بها في:
+      </p>
+      <ul>
+        <li><strong>تركيا</strong> — للعملاء والعمليات في فرع إسطنبول</li>
+        <li><strong>سوريا</strong> — للعملاء والعمليات في فرع دمشق</li>
+      </ul>
+
+      <h2>١٢. حلّ النزاعات</h2>
+      <p>
+        نسعى دائماً لحلّ أي خلافات وديّاً من خلال الحوار المباشر. في حال تعذّر ذلك، يُلجَأ إلى:
+      </p>
+      <ul>
+        <li>الوساطة عبر جهة محايدة يتّفق عليها الطرفان</li>
+        <li>التحكيم التجاري وفق القوانين المعمول بها</li>
+        <li>القضاء المختص في الدولة ذات العلاقة كملاذ أخير</li>
+      </ul>
+
+      <h2>١٣. التعديل على الشروط</h2>
+      <p>
+        نحتفظ بالحق في تعديل هذه الشروط في أي وقت. أي تعديلات ستُنشر على هذه الصفحة مع تحديث تاريخ "آخر تحديث". استمرار استخدامك للخدمات بعد التعديل يُعتبر موافقة ضمنية على الشروط الجديدة.
+      </p>
+
+      <h2>١٤. التواصل</h2>
+      <p>لأي استفسار بخصوص هذه الشروط أو خدماتنا، يُرجى التواصل معنا عبر:</p>
+      <ul>
+        <li>📧 البريد الإلكتروني: <a href="mailto:info@finexsacapitalnet.com" style="color:var(--gold);">info@finexsacapitalnet.com</a></li>
+        <li>📍 المقر الرئيسي: إسطنبول — تركيا — ماتر</li>
+        <li>📞 الهاتف: <a href="tel:+905362323310" style="color:var(--gold); direction:ltr; display:inline-block;">+90 536 232 3310</a></li>
+        <li>📍 الفرع: دمشق — سوريا — الحجاز</li>
+        <li>☎ الأرضي: <a href="tel:+963112224394" style="color:var(--gold); direction:ltr; display:inline-block;">+963 11 222 4394</a></li>
+        <li>📱 الموبايل: <a href="tel:+963994470219" style="color:var(--gold); direction:ltr; display:inline-block;">+963 994 470 219</a></li>
+      </ul>
+
+      <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; text-align: center; color: var(--text-dim);">
+        بتصفّحك لموقعنا واستخدامك لخدماتنا، فإنك تقرّ بأنك قرأت هذه الشروط وفهمتها ووافقت عليها.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (simplified) -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom" style="padding-top:0; border:none;">
+      <div>© 2026 <strong style="color:var(--text-primary)">FINEXSA Capital</strong>. جميع الحقوق محفوظة.</div>
+      <div><a href="privacy.html">سياسة الخصوصية</a> · <a href="terms.html" style="color:var(--gold);">الشروط والأحكام</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
