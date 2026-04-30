@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — FINEXSA Capital</title>
+<meta name="description" content="FINEXSA Capital Privacy Policy — how we collect, use, and protect your personal data.">
+
+<link rel="alternate" hreflang="ar" href="https://finexsacapital.com/privacy.html">
+<link rel="alternate" hreflang="en" href="https://finexsacapital.com/en/privacy.html">
+<link rel="alternate" hreflang="x-default" href="https://finexsacapital.com/privacy.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<script src="/js/i18n.js" defer></script>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="/en/index.html" class="brand">
+      <div class="brand-mark">⚖</div>
+      <div class="brand-text">
+        <span class="brand-name">FINEXSA</span>
+        <span class="brand-sub">Capital</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/en/index.html">Home</a></li>
+      <li><a href="/en/index.html#about">About</a></li>
+      <li><a href="/en/index.html#services">Services</a></li>
+      <li><a href="/en/index.html#team">Team</a></li>
+      <li><a href="/en/index.html#finexsa-one">FINEXSA One</a></li>
+      <li><a href="/en/index.html#hosting">Cloud Hosting</a></li>
+      <li><a href="/en/index.html#contact">Contact</a></li>
+    </ul>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-switch="ar">AR</button>
+      <button type="button" data-lang-switch="en">EN</button>
+    </div>
+    <a href="/en/login.html" class="nav-cta">
+      <span>🔐</span>
+      <span>Client Portal</span>
+    </a>
+    <button class="burger-btn" id="burger-btn" aria-label="Menu" type="button">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer Menu -->
+<div class="mobile-drawer-overlay" id="drawer-overlay"></div>
+<aside class="mobile-drawer" id="mobile-drawer">
+  <ul class="mobile-drawer-links">
+    <li><a href="/en/index.html#home">Home</a></li>
+    <li><a href="/en/index.html#about">About</a></li>
+    <li><a href="/en/index.html#services">Services</a></li>
+    <li><a href="/en/index.html#team">Team</a></li>
+    <li><a href="/en/index.html#finexsa-one">FINEXSA One</a></li>
+    <li><a href="/en/index.html#hosting">Cloud Hosting</a></li>
+    <li><a href="/en/index.html#contact">Contact</a></li>
+  </ul>
+  <a href="/en/login.html" class="mobile-drawer-cta">🔐 Client Portal</a>
+
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang-switch="ar">العربية</button>
+    <button type="button" data-lang-switch="en">English</button>
+  </div>
+
+  <div class="mobile-drawer-contact">
+    <div class="mobile-drawer-contact-label">Quick Contact</div>
+    <a href="https://wa.me/905362323310" target="_blank" rel="noopener">💬 WhatsApp — Türkiye</a>
+    <a href="tel:+963994470219">📞 Phone — Damascus</a>
+    <a href="mailto:info@finexsacapitalnet.com">📧 info@finexsacapitalnet.com</a>
+  </div>
+</aside>
+
+<script>
+(function() {
+  const burger = document.getElementById('burger-btn');
+  const drawer = document.getElementById('mobile-drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const links = drawer ? drawer.querySelectorAll('a') : [];
+  function toggle() {
+    burger.classList.toggle('is-open');
+    drawer.classList.toggle('is-open');
+    overlay.classList.toggle('is-open');
+    document.body.classList.toggle('drawer-open');
+  }
+  function close() {
+    burger.classList.remove('is-open');
+    drawer.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.classList.remove('drawer-open');
+  }
+  if (burger) burger.addEventListener('click', toggle);
+  if (overlay) overlay.addEventListener('click', close);
+  links.forEach(a => a.addEventListener('click', close));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+  });
+})();
+</script>
+
+<!-- HERO -->
+<section class="legal-hero">
+  <div class="container fade-in">
+    <span class="section-label">Legal Document</span>
+    <h1 class="section-title" style="margin-inline: auto;">Privacy Policy</h1>
+    <p class="section-lead" style="margin-inline: auto;">
+      At FINEXSA Capital, protecting the privacy of our clients and visitors is a top priority.
+    </p>
+    <nav class="breadcrumb">
+      <a href="/en/index.html">Home</a>
+      <span class="sep">▸</span>
+      <span class="current">Privacy Policy</span>
+    </nav>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section class="legal-content">
+  <div class="container">
+    <div class="legal-wrap fade-in">
+      <span class="legal-date">Last updated: April 2026</span>
+
+      <p style="background: rgba(201, 162, 39, 0.06); border: 1px solid var(--border); padding: 16px 20px; border-radius: 12px; margin-bottom: 32px; font-size: 14px;">
+        <strong>Notice on language:</strong> This English version is provided for the convenience of our international clients. The Arabic version of this Privacy Policy is the authoritative legal text. In the event of any discrepancy or conflict in interpretation between the two versions, the Arabic version shall prevail.
+      </p>
+
+      <h2>1. Introduction</h2>
+      <p>
+        Welcome to <strong>FINEXSA Capital</strong>. We are an accounting and financial advisory firm that values your privacy highly and is committed to protecting your personal data to the highest standards. This Policy explains how we collect, use, and protect your data when you interact with our website or services.
+      </p>
+      <p>
+        By using our website or services, you consent to the practices described in this Policy. If you do not agree with any of its terms, please do not use the website.
+      </p>
+
+      <h2>2. Data We Collect</h2>
+      <p>We may collect the following categories of information:</p>
+
+      <h3>Contact information</h3>
+      <ul>
+        <li>Full name</li>
+        <li>Email address</li>
+        <li>Phone number</li>
+        <li>Company name and position</li>
+      </ul>
+
+      <h3>Account information (for FINEXSA One clients)</h3>
+      <ul>
+        <li>Login credentials (email and encrypted password)</li>
+        <li>Accounting and financial data shared by the client for analysis purposes</li>
+        <li>Usage and activity logs within the platform</li>
+      </ul>
+
+      <h3>Technical information</h3>
+      <ul>
+        <li>IP address, browser type, and operating system</li>
+        <li>Pages visited and browsing duration</li>
+        <li>Cookies — see the dedicated section below</li>
+      </ul>
+
+      <h2>3. How We Use Your Data</h2>
+      <p>We use the data we collect solely for the following purposes:</p>
+      <ul>
+        <li>Delivering our accounting and advisory services and performing our contracts with you</li>
+        <li>Responding to your inquiries and requests, and communicating with you about our services</li>
+        <li>Improving the user experience on our website and on the FINEXSA One platform</li>
+        <li>Preparing internal reports and performance analytics (in aggregated, anonymized form)</li>
+        <li>Complying with legal and regulatory obligations in Türkiye and Syria</li>
+      </ul>
+
+      <h2>4. Confidentiality of Accounting Data</h2>
+      <p>
+        <strong>We treat our clients' accounting and financial data as strictly confidential.</strong> All our staff are bound by a rigorous professional confidentiality charter. We do not share any client's financial data with any third party except in the following limited cases:
+      </p>
+      <ul>
+        <li>Upon a written and explicit request from the client</li>
+        <li>In compliance with a court order or a mandatory legal requirement</li>
+        <li>With trusted technical service providers (servers, information security) who are subject to the same confidentiality obligations</li>
+      </ul>
+
+      <h2>5. Data Protection</h2>
+      <p>
+        We apply rigorous technical and organizational measures to protect your data from unauthorized access, loss, or damage:
+      </p>
+      <ul>
+        <li>Data encryption in transit via HTTPS</li>
+        <li>Encryption of sensitive databases</li>
+        <li>Strict access controls limited to authorized personnel only</li>
+        <li>Regular secure backups</li>
+        <li>Periodic security reviews</li>
+      </ul>
+
+      <h2>6. Cookies</h2>
+      <p>
+        Our website uses cookies to improve your experience. These small files help us remember your preferences and analyze site performance. You may disable them at any time through your browser settings, noting that doing so may affect certain site functions.
+      </p>
+
+      <h2>7. Your Rights</h2>
+      <p>You have the right at any time to:</p>
+      <ul>
+        <li><strong>Access</strong> the data we hold about you</li>
+        <li><strong>Request correction</strong> of any inaccurate data</li>
+        <li><strong>Request deletion</strong> of your data (within the limits of our legal obligations)</li>
+        <li><strong>Withdraw your consent</strong> to data processing at any time</li>
+        <li><strong>File a complaint</strong> with the competent regulatory authorities</li>
+      </ul>
+      <p>To exercise any of these rights, contact us at: <a href="mailto:info@finexsacapitalnet.com" style="color:var(--gold);">info@finexsacapitalnet.com</a></p>
+
+      <h2>8. Data Retention</h2>
+      <p>
+        We retain your data for the duration of our service to you, and for a subsequent period dictated by the legal requirements for retaining accounting records (typically 5 to 10 years depending on the local regime). After that period, the data is securely and permanently deleted.
+      </p>
+
+      <h2>9. Amendments to This Policy</h2>
+      <p>
+        We may update this Policy from time to time to reflect changes in our practices or in legal requirements. Any amendments will be published on this page together with an updated "Last updated" date at the top of the document. We recommend reviewing it periodically.
+      </p>
+
+      <h2>10. Contact Us</h2>
+      <p>
+        For any inquiry regarding this Policy or how we handle your data, please contact us at:
+      </p>
+      <ul>
+        <li>📧 Email: <a href="mailto:info@finexsacapitalnet.com" style="color:var(--gold);">info@finexsacapitalnet.com</a></li>
+        <li>📍 Headquarters: Istanbul — Türkiye — Merter</li>
+        <li>📞 Phone: <a href="tel:+905362323310" style="color:var(--gold); direction:ltr; display:inline-block;">+90 536 232 3310</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (simplified) -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom" style="padding-top:0; border:none;">
+      <div>© 2026 <strong style="color:var(--text-primary)">FINEXSA Capital</strong>. All rights reserved.</div>
+      <div><a href="/en/privacy.html" style="color:var(--gold);">Privacy Policy</a> · <a href="/en/terms.html">Terms &amp; Conditions</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

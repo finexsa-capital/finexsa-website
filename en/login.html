@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal — FINEXSA Capital</title>
+<meta name="description" content="FINEXSA Capital client portal — secure access to the advanced financial reporting system.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="alternate" hreflang="ar" href="https://finexsacapital.com/login.html">
+<link rel="alternate" hreflang="en" href="https://finexsacapital.com/en/login.html">
+<link rel="alternate" hreflang="x-default" href="https://finexsacapital.com/login.html">
+
+<link rel="stylesheet" href="/styles.css">
+<script src="/js/i18n.js" defer></script>
+
+<style>
+/* ============================================
+   FINEXSA — Login / Dashboard / Viewer
+   Additions specific to the internal system pages
+   ============================================ */
+
+/* ===== Page switcher ===== */
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ===== LOGIN PAGE ===== */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at top right, rgba(201, 162, 39, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(30, 42, 90, 0.5) 0%, transparent 50%),
+    var(--bg-void);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-page::before {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.login-card {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-deep));
+  border: 1px solid var(--border-strong);
+  border-radius: 22px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow:
+    0 30px 80px -10px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(201, 162, 39, 0.1) inset;
+  position: relative;
+  z-index: 5;
+}
+
+.login-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+.login-back:hover {
+  color: var(--gold);
+  border-color: var(--border-strong);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo-mark {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  border: 1px solid var(--border-strong);
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 38px;
+  color: var(--gold);
+  margin: 0 auto 18px;
+  box-shadow: 0 12px 30px -10px var(--gold-muted);
+}
+
+.login-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+  display: block;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg-void);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text-primary);
+  direction: ltr;
+  text-align: right;
+  transition: all 0.3s ease;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: var(--bg-deep);
+  box-shadow: 0 0 0 4px var(--gold-muted);
+}
+.form-input::placeholder { color: var(--text-dim); }
+
+.btn-login {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  color: var(--bg-void);
+  margin-top: 6px;
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+}
+.btn-login:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px -10px var(--gold-muted);
+}
+.btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.login-help {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.login-help a {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.error-msg {
+  background: rgba(222, 53, 11, 0.1);
+  color: #FF6B6B;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(222, 53, 11, 0.3);
+  display: none;
+}
+.error-msg.show { display: block; }
+
+/* ===== DASHBOARD ===== */
+.app-shell { min-height: 100vh; background: var(--bg-void); }
+
+.app-bar {
+  background: rgba(15, 18, 32, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-bar-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.app-bar-brand .brand-mark { width: 40px; height: 40px; font-size: 20px; }
+.app-bar-brand .brand-name { font-size: 18px; }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info-text {
+  text-align: left;
+  line-height: 1.4;
+}
+.user-info-name {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.user-info-email {
+  color: var(--text-muted);
+  font-size: 12px;
+  direction: ltr;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 9px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+.btn-logout:hover {
+  background: rgba(222, 53, 11, 0.1);
+  color: #FF6B6B;
+  border-color: rgba(222, 53, 11, 0.4);
+}
+
+.dashboard-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 32px;
+}
+
+.company-header {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-deep));
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  padding: 40px 36px;
+  border-radius: 20px;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.company-header::before {
+  content: "";
+  position: absolute;
+  top: -50%; right: -20%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.15) 0%, transparent 60%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.company-badge {
+  display: inline-block;
+  background: var(--gold-muted);
+  color: var(--gold);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  border: 1px solid var(--border-strong);
+  position: relative;
+  z-index: 1;
+}
+
+.company-name {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.company-desc {
+  color: var(--text-muted);
+  font-size: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.year-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.year-tab {
+  padding: 11px 22px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: all 0.25s ease;
+}
+.year-tab:hover {
+  border-color: var(--border-strong);
+  color: var(--gold);
+}
+.year-tab.active {
+  background: var(--gold);
+  color: var(--bg-void);
+  border-color: var(--gold);
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.report-card {
+  background: var(--bg-card);
+  padding: 26px 24px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--border);
+  text-align: right;
+  position: relative;
+  overflow: hidden;
+}
+.report-card::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  width: 3px; height: 100%;
+  background: var(--gold);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.report-card:hover {
+  transform: translateY(-4px);
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
+  box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.4);
+}
+.report-card:hover::before { opacity: 1; }
+
+.report-icon { font-size: 36px; margin-bottom: 14px; }
+.report-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.report-year {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+/* ===== VIEWER ===== */
+.viewer-shell { min-height: 100vh; background: var(--bg-void); }
+
+.viewer-header {
+  background: rgba(15, 18, 32, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.btn-back {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+.btn-back:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.viewer-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.viewer-tools { display: flex; gap: 8px; }
+
+.btn-tool {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+.btn-tool:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.viewer-container {
+  padding: 28px;
+  display: flex;
+  justify-content: center;
+}
+
+.viewer-paper {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.report-table-wrapper { overflow-x: auto; padding: 0; }
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-arabic);
+  font-size: 13px;
+  table-layout: auto;
+  color: #1e293b;
+}
+.report-table td {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  vertical-align: middle;
+  white-space: nowrap;
+  min-width: 80px;
+}
+.report-table td.num {
+  font-family: 'Inter', sans-serif;
+  direction: ltr;
+  font-variant-numeric: tabular-nums;
+}
+
+.zoom-controls {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.6);
+  display: flex;
+  gap: 4px;
+  z-index: 50;
+}
+
+.zoom-btn {
+  width: 38px; height: 38px;
+  border: none;
+  background: var(--bg-deep);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold);
+  transition: all 0.2s ease;
+}
+.zoom-btn:hover { background: var(--gold); color: var(--bg-void); }
+
+.zoom-level {
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 13px;
+  min-width: 56px;
+  justify-content: center;
+}
+
+/* ===== Loading & Empty ===== */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+  gap: 18px;
+}
+
+.spinner {
+  width: 50px; height: 50px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-muted);
+}
+.empty-state-icon { font-size: 56px; margin-bottom: 14px; opacity: 0.5; }
+
+/* ===== Print ===== */
+@media print {
+  .viewer-header, .zoom-controls { display: none !important; }
+  .viewer-container { padding: 0; }
+  .viewer-paper { box-shadow: none; border-radius: 0; max-width: 100%; }
+  .report-table { font-size: 11px; }
+  .report-table td { padding: 4px 8px; }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .login-card { padding: 36px 24px; }
+  .app-bar { padding: 14px 18px; }
+  .user-info-text { display: none; }
+  .dashboard-content { padding: 28px 18px; }
+  .company-header { padding: 28px 22px; }
+  .company-name { font-size: 22px; }
+  .viewer-header { padding: 12px 16px; flex-wrap: wrap; }
+  .viewer-title { font-size: 14px; flex-basis: 100%; order: -1; }
+  .viewer-container { padding: 16px; }
+  .zoom-controls { bottom: 18px; left: 18px; }
+}
+</style>
+</head>
+<body>
+
+  <!-- ============================================
+       LOGIN PAGE
+       ============================================ -->
+  <div id="page-login" class="page active">
+    <div class="login-page">
+      <div class="login-card">
+        <a href="index.html" class="login-back">
+          <span>→</span> Back to home
+        </a>
+
+        <div class="login-logo">
+          <div class="login-logo-mark">⚖</div>
+          <h1 class="login-title">FINEXSA Capital</h1>
+          <p class="login-subtitle">Client Login Portal</p>
+        </div>
+
+        <div id="login-error" class="error-msg"></div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label">📧 Email Address</label>
+            <input type="email" id="email" class="form-input" placeholder="email@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">🔒 Password</label>
+            <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" id="btn-login" class="btn-login">Sign in</button>
+        </form>
+
+        <div class="login-help">
+          Don't have an account? <a href="https://wa.me/905362323310?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%A7%D9%84%D8%AD%D8%B5%D9%88%D9%84%20%D8%B9%D9%84%D9%89%20%D8%AD%D8%B3%D8%A7%D8%A8%20%D9%81%D9%8A%20FINEXSA%20Capital" target="_blank" rel="noopener">Contact us via WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       DASHBOARD
+       ============================================ -->
+  <div id="page-dashboard" class="page">
+    <div class="app-shell">
+      <div class="app-bar">
+        <a href="index.html" class="brand app-bar-brand">
+          <div class="brand-mark">⚖</div>
+          <div class="brand-text">
+            <span class="brand-name">FINEXSA</span>
+            <span class="brand-sub">Capital</span>
+          </div>
+        </a>
+        <div class="user-info">
+          <div class="user-info-text">
+            <div class="user-info-name" id="user-name">—</div>
+            <div class="user-info-email" id="user-email">—</div>
+          </div>
+          <button class="btn-logout" onclick="logout()">🚪 Sign out</button>
+        </div>
+      </div>
+
+      <div class="dashboard-content">
+        <div class="company-header">
+          <div class="company-badge">🏢 Company</div>
+          <h2 class="company-name" id="company-name">—</h2>
+          <p class="company-desc">Your financial reports ready for review and analysis</p>
+        </div>
+
+        <div id="year-tabs" class="year-tabs"></div>
+
+        <div id="reports-container">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p class="loading-text">Loading reports...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       VIEWER
+       ============================================ -->
+  <div id="page-viewer" class="page">
+    <div class="viewer-shell">
+      <div class="viewer-header">
+        <button class="btn-back" onclick="showPage('dashboard')">← Back</button>
+        <h2 class="viewer-title" id="viewer-title">Report</h2>
+        <div class="viewer-tools">
+          <button class="btn-tool" onclick="window.print()">🖨️ Print</button>
+        </div>
+      </div>
+
+      <div class="viewer-container">
+        <div class="viewer-paper">
+          <div id="viewer-content" class="report-table-wrapper">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p class="loading-text">Loading report...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="zoom-controls" id="zoom-controls" style="display:none;">
+        <button class="zoom-btn" onclick="changeZoom(-10)">−</button>
+        <div class="zoom-level" id="zoom-level">100%</div>
+        <button class="zoom-btn" onclick="changeZoom(10)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       FIREBASE + APPS SCRIPT LOGIC (same as original code)
+       ============================================ -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDynBPUjrpBHmPc6EGwHyOZmkEiv-pNhR0",
+      authDomain: "finexsa-capital.firebaseapp.com",
+      projectId: "finexsa-capital",
+      storageBucket: "finexsa-capital.firebasestorage.app",
+      messagingSenderId: "225933147484",
+      appId: "1:225933147484:web:b71f87f0705553062ed599",
+      measurementId: "G-8V2H675WN1"
+    };
+    const API_URL = "https://script.google.com/macros/s/AKfycbzou5xJEALQnB5l6U0uyHQR-fcdj_oZBpZjzxy2PHaY-kfkkdvpZIWz87wqdwbOjdUt/exec";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let userData = null, reportsData = [], selectedYear = null, currentZoom = 100;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            userData = userDoc.data();
+            if (userData.active === false) {
+              showError("This account is not active. Please contact administration.");
+              await signOut(auth); return;
+            }
+            document.getElementById("user-name").textContent = userData.companyName || user.email;
+            document.getElementById("user-email").textContent = user.email;
+            document.getElementById("company-name").textContent = userData.companyName;
+            showPage("dashboard");
+            loadReports();
+          } else {
+            showError("User data could not be found.");
+            await signOut(auth);
+          }
+        } catch (error) {
+          showError("Error loading data: " + error.message);
+        }
+      } else {
+        userData = null;
+        const activePage = document.querySelector('.page.active');
+        if (activePage && (activePage.id === 'page-dashboard' || activePage.id === 'page-viewer')) {
+          showPage("login");
+        }
+      }
+    });
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const btn = document.getElementById("btn-login");
+      btn.disabled = true;
+      btn.textContent = "Signing in...";
+      hideError();
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        let msg = "Sign-in error";
+        if (error.code === "auth/invalid-credential") msg = "Invalid login credentials";
+        else if (error.code === "auth/user-not-found") msg = "This account does not exist";
+        else if (error.code === "auth/wrong-password") msg = "Incorrect password";
+        else if (error.code === "auth/too-many-requests") msg = "Too many attempts. Please try again later.";
+        showError(msg);
+        btn.disabled = false;
+        btn.textContent = "Sign in";
+      }
+    });
+
+    async function loadReports() {
+      try {
+        const response = await fetch(`${API_URL}?action=listReports&spreadsheetId=${userData.spreadsheetId}`);
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error);
+        reportsData = data.reports;
+        renderYearTabs();
+        renderReports();
+      } catch (error) {
+        document.getElementById("reports-container").innerHTML =
+          `<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Error: ${error.message}</p></div>`;
+      }
+    }
+
+    function renderYearTabs() {
+      const years = [...new Set(reportsData.map(r => r.year).filter(Boolean))].sort().reverse();
+      selectedYear = years[0];
+      const html = years.map(y => `<button class="year-tab ${y === selectedYear ? 'active' : ''}" data-year="${y}">📅 ${y}</button>`).join('');
+      const container = document.getElementById("year-tabs");
+      container.innerHTML = html;
+      container.querySelectorAll('.year-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          selectedYear = tab.dataset.year;
+          container.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          renderReports();
+        });
+      });
+    }
+
+    function renderReports() {
+      const filtered = reportsData.filter(r => r.year === selectedYear);
+      if (filtered.length === 0) {
+        document.getElementById("reports-container").innerHTML =
+          `<div class="empty-state"><div class="empty-state-icon">📭</div><p>No reports available for this year</p></div>`;
+        return;
+      }
+      const html = `<div class="reports-grid">` +
+        filtered.map(r => `<div class="report-card" data-report="${r.name}"><div class="report-icon">${r.icon}</div><div class="report-title">${r.title}</div><div class="report-year">📅 ${r.year}</div></div>`).join('') + `</div>`;
+      const container = document.getElementById("reports-container");
+      container.innerHTML = html;
+      container.querySelectorAll('.report-card').forEach(card => {
+        card.addEventListener('click', () => viewReport(card.dataset.report));
+      });
+    }
+
+    async function viewReport(reportName) {
+      showPage("viewer");
+      document.getElementById("viewer-title").textContent = reportName;
+      document.getElementById("zoom-controls").style.display = 'none';
+      document.getElementById("viewer-content").innerHTML =
+        `<div class="loading"><div class="spinner"></div><p class="loading-text">Loading report...</p></div>`;
+      try {
+        const response = await fetch(`${API_URL}?action=getReport&spreadsheetId=${userData.spreadsheetId}&reportName=${encodeURIComponent(reportName)}`);
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error);
+        renderReportTable(data);
+        document.getElementById("zoom-controls").style.display = 'flex';
+      } catch (error) {
+        document.getElementById("viewer-content").innerHTML =
+          `<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Error: ${error.message}</p></div>`;
+      }
+    }
+
+    function renderReportTable(data) {
+      let html = '<table class="report-table" id="report-table" dir="rtl">';
+      for (let r = 0; r < data.data.length; r++) {
+        html += '<tr>';
+        for (let c = 0; c < data.data[r].length; c++) {
+          const cell = data.data[r][c];
+          if (cell === null) continue;
+          const value = cell.v === null || cell.v === undefined ? '' : cell.v;
+          const bg = cell.bg || '#ffffff';
+          const fc = cell.fc || '#000000';
+          const bold = cell.bold ? '700' : '400';
+          const align = cell.align || 'center';
+          const rowSpan = cell.rowSpan ? `rowspan="${cell.rowSpan}"` : '';
+          const colSpan = cell.colSpan ? `colspan="${cell.colSpan}"` : '';
+          let displayValue = value;
+          let isNumber = false;
+          if (typeof value === 'number') {
+            isNumber = true;
+            displayValue = value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+          }
+          const numClass = isNumber ? 'num' : '';
+          html += `<td class="${numClass}" ${rowSpan} ${colSpan} style="background:${bg};color:${fc};font-weight:${bold};text-align:${align};">${displayValue}</td>`;
+        }
+        html += '</tr>';
+      }
+      html += '</table>';
+      document.getElementById("viewer-content").innerHTML = html;
+      currentZoom = 100;
+      updateZoom();
+    }
+
+    window.changeZoom = function(delta) {
+      currentZoom = Math.max(50, Math.min(200, currentZoom + delta));
+      updateZoom();
+    };
+
+    function updateZoom() {
+      const table = document.getElementById('report-table');
+      if (table) {
+        table.style.transform = `scale(${currentZoom / 100})`;
+        table.style.transformOrigin = 'top right';
+      }
+      document.getElementById('zoom-level').textContent = currentZoom + '%';
+    }
+
+    window.showPage = function(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + pageName).classList.add('active');
+      window.scrollTo(0, 0);
+    };
+
+    window.logout = async function() {
+      await signOut(auth);
+      showPage("login");
+    };
+
+    function showError(msg) {
+      const el = document.getElementById("login-error");
+      el.textContent = msg;
+      el.classList.add("show");
+    }
+
+    function hideError() {
+      document.getElementById("login-error").classList.remove("show");
+    }
+  </script>
+</body>
+</html>

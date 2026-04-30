@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms &amp; Conditions — FINEXSA Capital</title>
+<meta name="description" content="The terms governing the use of FINEXSA Capital services and the contractual relationship with our clients.">
+
+<link rel="alternate" hreflang="ar" href="https://finexsacapital.com/terms.html">
+<link rel="alternate" hreflang="en" href="https://finexsacapital.com/en/terms.html">
+<link rel="alternate" hreflang="x-default" href="https://finexsacapital.com/terms.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<script src="/js/i18n.js" defer></script>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="/en/index.html" class="brand">
+      <div class="brand-mark">⚖</div>
+      <div class="brand-text">
+        <span class="brand-name">FINEXSA</span>
+        <span class="brand-sub">Capital</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/en/index.html">Home</a></li>
+      <li><a href="/en/index.html#about">About</a></li>
+      <li><a href="/en/index.html#services">Services</a></li>
+      <li><a href="/en/index.html#team">Team</a></li>
+      <li><a href="/en/index.html#finexsa-one">FINEXSA One</a></li>
+      <li><a href="/en/index.html#hosting">Cloud Hosting</a></li>
+      <li><a href="/en/index.html#contact">Contact</a></li>
+    </ul>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-switch="ar">AR</button>
+      <button type="button" data-lang-switch="en">EN</button>
+    </div>
+    <a href="/en/login.html" class="nav-cta">
+      <span>🔐</span>
+      <span>Client Portal</span>
+    </a>
+    <button class="burger-btn" id="burger-btn" aria-label="Menu" type="button">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer Menu -->
+<div class="mobile-drawer-overlay" id="drawer-overlay"></div>
+<aside class="mobile-drawer" id="mobile-drawer">
+  <ul class="mobile-drawer-links">
+    <li><a href="/en/index.html#home">Home</a></li>
+    <li><a href="/en/index.html#about">About</a></li>
+    <li><a href="/en/index.html#services">Services</a></li>
+    <li><a href="/en/index.html#team">Team</a></li>
+    <li><a href="/en/index.html#finexsa-one">FINEXSA One</a></li>
+    <li><a href="/en/index.html#hosting">Cloud Hosting</a></li>
+    <li><a href="/en/index.html#contact">Contact</a></li>
+  </ul>
+  <a href="/en/login.html" class="mobile-drawer-cta">🔐 Client Portal</a>
+
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang-switch="ar">العربية</button>
+    <button type="button" data-lang-switch="en">English</button>
+  </div>
+
+  <div class="mobile-drawer-contact">
+    <div class="mobile-drawer-contact-label">Quick Contact</div>
+    <a href="https://wa.me/905362323310" target="_blank" rel="noopener">💬 WhatsApp — Türkiye</a>
+    <a href="tel:+963994470219">📞 Phone — Damascus</a>
+    <a href="mailto:info@finexsacapitalnet.com">📧 info@finexsacapitalnet.com</a>
+  </div>
+</aside>
+
+<script>
+(function() {
+  const burger = document.getElementById('burger-btn');
+  const drawer = document.getElementById('mobile-drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const links = drawer ? drawer.querySelectorAll('a') : [];
+  function toggle() {
+    burger.classList.toggle('is-open');
+    drawer.classList.toggle('is-open');
+    overlay.classList.toggle('is-open');
+    document.body.classList.toggle('drawer-open');
+  }
+  function close() {
+    burger.classList.remove('is-open');
+    drawer.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.classList.remove('drawer-open');
+  }
+  if (burger) burger.addEventListener('click', toggle);
+  if (overlay) overlay.addEventListener('click', close);
+  links.forEach(a => a.addEventListener('click', close));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+  });
+})();
+</script>
+
+<!-- HERO -->
+<section class="legal-hero">
+  <div class="container fade-in">
+    <span class="section-label">Legal Document</span>
+    <h1 class="section-title" style="margin-inline: auto;">Terms &amp; Conditions</h1>
+    <p class="section-lead" style="margin-inline: auto;">
+      The terms governing the use of FINEXSA Capital services and the contractual relationship with our clients.
+    </p>
+    <nav class="breadcrumb">
+      <a href="/en/index.html">Home</a>
+      <span class="sep">▸</span>
+      <span class="current">Terms &amp; Conditions</span>
+    </nav>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section class="legal-content">
+  <div class="container">
+    <div class="legal-wrap fade-in">
+      <span class="legal-date">Last updated: April 2026</span>
+
+      <p style="background: rgba(201, 162, 39, 0.06); border: 1px solid var(--border); padding: 16px 20px; border-radius: 12px; margin-bottom: 32px; font-size: 14px;">
+        <strong>Notice on language:</strong> This English version is provided for the convenience of our international clients. The Arabic version of these Terms &amp; Conditions is the authoritative legal text. In the event of any discrepancy or conflict in interpretation between the two versions, the Arabic version shall prevail.
+      </p>
+
+      <h2>1. Introduction and Acceptance</h2>
+      <p>
+        These Terms and Conditions (the "Terms") govern your use of the <strong>FINEXSA Capital</strong> website and the services we deliver, including the <strong>FINEXSA One</strong> platform for our clients. By using the website or the services, you agree to be bound by these Terms in their entirety.
+      </p>
+      <p>
+        If you are acting on behalf of a company or organization, you represent that you have the authority to bind that entity to these Terms.
+      </p>
+
+      <h2>2. Definitions</h2>
+      <ul>
+        <li><strong>"The Firm" / "We":</strong> Refers to FINEXSA Capital and its branches in Türkiye and Syria.</li>
+        <li><strong>"The Client" / "You":</strong> Any natural or legal person benefiting from the Firm's services.</li>
+        <li><strong>"The Services":</strong> All accounting, advisory, and technical services we deliver.</li>
+        <li><strong>"The Platform":</strong> The FINEXSA One financial analysis tool made available to clients.</li>
+      </ul>
+
+      <h2>3. Scope of Services</h2>
+      <p>FINEXSA Capital provides a range of accounting and advisory services that include:</p>
+      <ul>
+        <li>Bookkeeping and financial records management</li>
+        <li>Preparation of periodic financial reports</li>
+        <li>Economic feasibility studies</li>
+        <li>Financial management and advisory</li>
+        <li>Audit and assurance</li>
+        <li>Financial accounting in accordance with International Financial Reporting Standards (IFRS)</li>
+        <li>Access to the FINEXSA One platform for subscribed clients</li>
+      </ul>
+      <p>
+        The detailed scope of services for each client is defined in a separate service contract executed between the parties prior to the commencement of work.
+      </p>
+
+      <h2>4. Client Responsibilities</h2>
+      <p>To ensure the highest quality delivery of our services, the Client undertakes the following:</p>
+      <ul>
+        <li>Providing us with the necessary data and documentation accurately, completely, and in a timely manner</li>
+        <li>Ensuring the accuracy of the information and documents submitted and their conformity with reality</li>
+        <li>Cooperating with our team and responding to our inquiries within a reasonable time</li>
+        <li>Adhering to the agreed payment schedule</li>
+        <li>Maintaining the confidentiality of FINEXSA One login credentials and not sharing them with any third party</li>
+        <li>Using the Services for lawful purposes only</li>
+      </ul>
+
+      <h2>5. Our Obligations</h2>
+      <p>FINEXSA Capital undertakes the following:</p>
+      <ul>
+        <li>Delivering our services with high professionalism and in accordance with recognized accounting standards</li>
+        <li>Maintaining strict confidentiality of the Client's financial and personal data</li>
+        <li>Preparing reports and services within the agreed timelines</li>
+        <li>Notifying the Client of any material amendments to the service or fees</li>
+        <li>Providing the necessary technical and professional support throughout the engagement</li>
+      </ul>
+
+      <h2>6. Fees and Payment</h2>
+      <p>
+        Our fees are determined according to the nature of each service and the volume of work, and are documented in the service contract signed with the Client. Fees may be:
+      </p>
+      <ul>
+        <li>Fixed monthly fees for ongoing services (bookkeeping, periodic reporting)</li>
+        <li>One-off fees for defined projects (feasibility studies, audit engagements)</li>
+        <li>Annual subscriptions to the FINEXSA One platform</li>
+      </ul>
+      <p>
+        In the event of a payment delay exceeding 30 days, the Firm reserves the right to suspend the services without prior notice, while retaining the right to claim any amounts legally due.
+      </p>
+
+      <h2>7. Professional Confidentiality</h2>
+      <p>
+        All data and information we receive from our clients is treated with strict confidentiality. Our staff are bound by rigorous confidentiality obligations, and we do not disclose any information to third parties except with the Client's written consent or in compliance with a court order.
+      </p>
+
+      <h2>8. Intellectual Property</h2>
+      <h3>Website and platform content</h3>
+      <p>
+        All content on our website — including the design, logos, text, icons, and the FINEXSA One platform and its systems — is owned by FINEXSA Capital and protected under copyright laws. It may not be copied or used without prior written permission.
+      </p>
+      <h3>Reports and deliverables</h3>
+      <p>
+        Reports and documents prepared for the Client become the Client's property upon full settlement of the fees due. We retain backup copies of these deliverables for professional reference purposes in accordance with legal requirements.
+      </p>
+
+      <h2>9. Limitation of Liability</h2>
+      <p>
+        We make every effort to deliver our services to the highest level of accuracy and professionalism. Notwithstanding the foregoing:
+      </p>
+      <ul>
+        <li>We do not assume liability for outcomes arising from inaccurate or incomplete data provided by the Client</li>
+        <li>We do not assume liability for commercial decisions taken by the Client based on our reports</li>
+        <li>We do not assume liability for any indirect or consequential damages</li>
+        <li>Our liability in all cases is limited to the value of the fees paid for the service in dispute</li>
+      </ul>
+
+      <h2>10. Termination</h2>
+      <p>Either party may terminate the engagement under the following conditions:</p>
+      <ul>
+        <li>Providing at least 30 days' prior written notice</li>
+        <li>Settlement of all mutual financial obligations</li>
+        <li>Returning to the Client all original documents and data</li>
+        <li>Maintaining professional confidentiality even after the engagement ends</li>
+      </ul>
+      <p>
+        In the event of a material breach of obligations, the aggrieved party shall have the right to terminate the engagement immediately.
+      </p>
+
+      <h2>11. Governing Law</h2>
+      <p>
+        These Terms are subject to the applicable laws of:
+      </p>
+      <ul>
+        <li><strong>Türkiye</strong> — for clients and operations of the Istanbul branch</li>
+        <li><strong>Syria</strong> — for clients and operations of the Damascus branch</li>
+      </ul>
+
+      <h2>12. Dispute Resolution</h2>
+      <p>
+        We always seek to resolve any dispute amicably through direct dialogue. Where this is not possible, the matter shall be referred to:
+      </p>
+      <ul>
+        <li>Mediation through a neutral party agreed upon by both parties</li>
+        <li>Commercial arbitration in accordance with the applicable laws</li>
+        <li>The competent courts in the relevant jurisdiction as a last resort</li>
+      </ul>
+
+      <h2>13. Amendments to the Terms</h2>
+      <p>
+        We reserve the right to amend these Terms at any time. Any amendments will be published on this page together with an updated "Last updated" date. Continued use of the services following an amendment constitutes implicit acceptance of the new Terms.
+      </p>
+
+      <h2>14. Contact</h2>
+      <p>For any inquiry regarding these Terms or our services, please contact us at:</p>
+      <ul>
+        <li>📧 Email: <a href="mailto:info@finexsacapitalnet.com" style="color:var(--gold);">info@finexsacapitalnet.com</a></li>
+        <li>📍 Headquarters: Istanbul — Türkiye — Merter</li>
+        <li>📞 Phone: <a href="tel:+905362323310" style="color:var(--gold); direction:ltr; display:inline-block;">+90 536 232 3310</a></li>
+        <li>📍 Branch: Damascus — Syria — Al-Hijaz</li>
+        <li>☎ Landline: <a href="tel:+963112224394" style="color:var(--gold); direction:ltr; display:inline-block;">+963 11 222 4394</a></li>
+        <li>📱 Mobile: <a href="tel:+963994470219" style="color:var(--gold); direction:ltr; display:inline-block;">+963 994 470 219</a></li>
+      </ul>
+
+      <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; text-align: center; color: var(--text-dim);">
+        By browsing our website and using our services, you acknowledge that you have read, understood, and agreed to these Terms.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (simplified) -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom" style="padding-top:0; border:none;">
+      <div>© 2026 <strong style="color:var(--text-primary)">FINEXSA Capital</strong>. All rights reserved.</div>
+      <div><a href="/en/privacy.html">Privacy Policy</a> · <a href="/en/terms.html" style="color:var(--gold);">Terms &amp; Conditions</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
