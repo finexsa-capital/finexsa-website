@@ -2763,3 +2763,139 @@ a.branch-location:hover {
   .pricing-card { padding: 28px 22px 24px; }
   .pricing-name { font-size: 24px; }
 }
+
+/* ============================================
+   LANGUAGE SWITCHER (i18n)
+   ============================================ */
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  margin: 0 14px;
+}
+
+.lang-switch button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.lang-switch button:hover {
+  color: var(--text-primary);
+}
+
+.lang-switch button.is-active {
+  background: var(--gold);
+  color: var(--bg-void);
+}
+
+/* Mobile drawer variant */
+.mobile-drawer .lang-switch {
+  margin: 18px 0 0;
+  align-self: flex-start;
+}
+
+@media (max-width: 980px) {
+  .nav-inner > .lang-switch { display: none; }
+}
+
+/* ============================================
+   LTR LANGUAGE SUPPORT
+   ============================================
+   The site was built RTL-first. These rules handle
+   the LTR (English) version cleanly without rewriting
+   existing CSS — they only flip what direction-aware
+   pseudo-elements and arrows demand. */
+
+html[dir="ltr"] body {
+  font-family: 'Inter', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html[dir="ltr"] .nav-links a::after {
+  right: auto;
+  left: 0;
+}
+
+/* Phone numbers stay LTR by nature; text-align should follow flow */
+html[dir="ltr"] .footer-contact div[style*="direction: ltr"] {
+  text-align: left !important;
+}
+
+/* Arrow indicators in LTR pages (← becomes → contextually).
+   Use a class hook on elements that contain a one-way arrow. */
+html[dir="ltr"] .arrow-back::before { content: "← "; }
+html[dir="ltr"] .arrow-fwd::after   { content: " →"; }
+html[dir="rtl"] .arrow-back::before { content: "→ "; }
+html[dir="rtl"] .arrow-fwd::after   { content: " ←"; }
+
+/* Service link arrow flips between LTR/RTL */
+html[dir="ltr"] .service-link-arrow,
+html[dir="ltr"] .related-link {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+html[dir="ltr"] .related-link {
+  transform: none;
+}
+html[dir="ltr"] .related-link::after {
+  content: " →";
+}
+html[dir="ltr"] .related-link::before { content: ""; }
+
+/* Section breadcrumb separator stays neutral (▸) — no flip needed */
+
+/* QR labels and small captions: ensure proper alignment */
+html[dir="ltr"] .branch-qr-label,
+html[dir="ltr"] .partner-label,
+html[dir="ltr"] .showcase-note {
+  text-align: left;
+}
+
+/* Cards that use right-aligned text should follow flow */
+html[dir="ltr"] .branch-card,
+html[dir="ltr"] .feature-text,
+html[dir="ltr"] .audience-item,
+html[dir="ltr"] .process-desc,
+html[dir="ltr"] .footer-brand-text {
+  text-align: left;
+}
+
+/* Mobile drawer flips to slide from left in LTR */
+html[dir="ltr"] .mobile-drawer {
+  right: auto;
+  left: -100%;
+  border-right: 0;
+  border-left: 1px solid var(--border-strong);
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[dir="ltr"] .mobile-drawer.is-open {
+  right: auto;
+  left: 0;
+}
+
+/* Service-card arrow direction in LTR (the ← becomes →) */
+html[dir="ltr"] .service-card:hover .service-link-arrow {
+  transform: translateX(4px) scaleX(-1);
+}
+
+/* Back-link arrow on service detail pages */
+html[dir="ltr"] .back-link {
+  flex-direction: row-reverse;
+}

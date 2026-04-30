@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary Meta Tags -->
+<title>FINEXSA Capital — Professional Accounting & Financial Services</title>
+<meta name="title" content="FINEXSA Capital — Professional Accounting & Financial Services">
+<meta name="description" content="FINEXSA Capital is a specialized firm delivering integrated accounting, financial reporting, audit, and feasibility study services. Headquartered in Istanbul with a branch in Damascus.">
+<meta name="keywords" content="FINEXSA, Capital, accounting, financial reporting, audit, feasibility studies, Istanbul, Damascus, IFRS, bookkeeping">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://finexsacapital.com/en/">
+<meta property="og:title" content="FINEXSA Capital — Professional Accounting & Financial Services">
+<meta property="og:description" content="A specialized firm delivering integrated accounting, financial reporting, audit, and feasibility study services. From Istanbul to Damascus.">
+<meta property="og:site_name" content="FINEXSA Capital">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ar_AR">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://finexsacapital.com/en/">
+<meta property="twitter:title" content="FINEXSA Capital — Professional Accounting & Financial Services">
+<meta property="twitter:description" content="A specialized firm delivering integrated accounting, financial reporting, audit, and feasibility study services.">
+
+<!-- Hreflang for SEO (Arabic ↔ English) -->
+<link rel="alternate" hreflang="ar" href="https://finexsacapital.com/">
+<link rel="alternate" hreflang="en" href="https://finexsacapital.com/en/">
+<link rel="alternate" hreflang="x-default" href="https://finexsacapital.com/">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<script src="/js/i18n.js" defer></script>
+</head>
+<body>
+
+<!-- ============================================
+     NAVIGATION
+     ============================================ -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="/en/index.html" class="brand">
+      <div class="brand-mark">⚖</div>
+      <div class="brand-text">
+        <span class="brand-name">FINEXSA</span>
+        <span class="brand-sub">Capital</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#home" class="active">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="#finexsa-one">FINEXSA One</a></li>
+      <li><a href="#hosting">Cloud Hosting</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-switch="ar">AR</button>
+      <button type="button" data-lang-switch="en">EN</button>
+    </div>
+    <a href="/en/login.html" class="nav-cta">
+      <span>🔐</span>
+      <span>Client Portal</span>
+    </a>
+    <button class="burger-btn" id="burger-btn" aria-label="Menu" type="button">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer Menu -->
+<div class="mobile-drawer-overlay" id="drawer-overlay"></div>
+<aside class="mobile-drawer" id="mobile-drawer">
+  <ul class="mobile-drawer-links">
+    <li><a href="/en/index.html#home">Home</a></li>
+    <li><a href="/en/index.html#about">About</a></li>
+    <li><a href="/en/index.html#services">Services</a></li>
+    <li><a href="/en/index.html#team">Team</a></li>
+    <li><a href="/en/index.html#finexsa-one">FINEXSA One</a></li>
+    <li><a href="/en/index.html#hosting">Cloud Hosting</a></li>
+    <li><a href="/en/index.html#contact">Contact</a></li>
+  </ul>
+  <a href="/en/login.html" class="mobile-drawer-cta">🔐 Client Portal</a>
+
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang-switch="ar">العربية</button>
+    <button type="button" data-lang-switch="en">English</button>
+  </div>
+
+  <div class="mobile-drawer-contact">
+    <div class="mobile-drawer-contact-label">Quick Contact</div>
+    <a href="https://wa.me/905362323310" target="_blank" rel="noopener">💬 WhatsApp — Türkiye</a>
+    <a href="tel:+963994470219">📞 Phone — Damascus</a>
+    <a href="mailto:info@finexsacapitalnet.com">📧 info@finexsacapitalnet.com</a>
+  </div>
+</aside>
+
+<!-- Burger Toggle Script -->
+<script>
+(function() {
+  const burger = document.getElementById('burger-btn');
+  const drawer = document.getElementById('mobile-drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const links = drawer ? drawer.querySelectorAll('a') : [];
+
+  function toggle() {
+    burger.classList.toggle('is-open');
+    drawer.classList.toggle('is-open');
+    overlay.classList.toggle('is-open');
+    document.body.classList.toggle('drawer-open');
+  }
+
+  function close() {
+    burger.classList.remove('is-open');
+    drawer.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.classList.remove('drawer-open');
+  }
+
+  if (burger) burger.addEventListener('click', toggle);
+  if (overlay) overlay.addEventListener('click', close);
+  links.forEach(a => a.addEventListener('click', close));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+  });
+})();
+</script>
+
+
+<!-- ============================================
+     HERO
+     ============================================ -->
+<section class="hero" id="home">
+  <div class="container">
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      <span>Professional Accounting Services Firm</span>
+    </div>
+    <h1 class="hero-title">
+      Your <span class="accent">Trusted</span> Financial Partner<br>
+      From Istanbul to Damascus
+    </h1>
+    <p class="hero-subtitle">
+      FINEXSA Capital is a specialized firm delivering integrated professional accounting services — from bookkeeping and financial reporting to audit, feasibility studies, and financial advisory.
+    </p>
+    <div class="hero-cta-group">
+      <a href="#services" class="btn-primary">Explore Our Services ↓</a>
+      <a href="/en/login.html" class="btn-secondary">🔐 Client Portal</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     ABOUT US
+     ============================================ -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="fade-in">
+      <span class="section-label">About Us</span>
+      <h2 class="section-title">Accounting expertise <span class="italic">rooted</span> in the heart of the region</h2>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-text fade-in">
+        <p class="section-lead">
+          At <strong style="color:var(--gold-bright)">FINEXSA Capital</strong>, we believe every figure carries a story, and every financial report is an opportunity for a better decision. We deliver integrated accounting services that combine deep expertise in local and international standards with modern technology that turns scattered data into actionable strategic insight.
+        </p>
+        <p class="section-lead">
+          Since our establishment, we have served clients across diverse sectors — commercial, industrial, services, and contracting — and we know that every business is a different story. This is why we tailor our accounting solutions to each client's reality, not to off-the-shelf templates.
+        </p>
+        <p class="section-lead">
+          With a presence in two strategic markets — <strong style="color:var(--text-primary)">Türkiye and Syria</strong> — we deliver locally rooted service backed by global standards, in a language that understands the realities of doing business in the region.
+        </p>
+      </div>
+
+      <div class="branches fade-in">
+        <div class="branch-card">
+          <div class="branch-label">Headquarters</div>
+          <div class="branch-content">
+            <div class="branch-info">
+              <h3 class="branch-title">Istanbul — Türkiye</h3>
+              <a href="https://maps.app.goo.gl/jnzKAtcwmpvVzncu5" target="_blank" rel="noopener" class="branch-location" title="Open in Maps">Merter, Güngören</a>
+              <div class="branch-phones">
+                <a href="tel:+905362323310" dir="ltr" class="phone-mobile">+90 536 232 3310</a>
+                <a href="tel:+905360652643" dir="ltr" class="phone-mobile">+90 536 065 2643</a>
+              </div>
+            </div>
+            <a href="https://maps.app.goo.gl/jnzKAtcwmpvVzncu5" target="_blank" rel="noopener" class="branch-qr" title="Open Map">
+              <img class="qr-svg" src="https://api.qrserver.com/v1/create-qr-code/?data=https%3A%2F%2Fmaps.app.goo.gl%2FjnzKAtcwmpvVzncu5&size=180x180&margin=10&format=svg" alt="QR Code for Map" loading="lazy">
+              <span class="branch-qr-label">Scan for Map</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="branch-card">
+          <div class="branch-label">Regional Branch</div>
+          <div class="branch-content">
+            <div class="branch-info">
+              <h3 class="branch-title">Damascus — Syria</h3>
+              <a href="https://maps.app.goo.gl/5Godctxa2489bF4L8" target="_blank" rel="noopener" class="branch-location" title="Open in Maps">Al-Hijaz</a>
+              <div class="branch-phones">
+                <a href="tel:+963112224394" dir="ltr" class="phone-landline">+963 11 222 4394</a>
+                <a href="tel:+963994470219" dir="ltr" class="phone-mobile">+963 994 470 219</a>
+              </div>
+            </div>
+            <a href="https://maps.app.goo.gl/5Godctxa2489bF4L8" target="_blank" rel="noopener" class="branch-qr" title="Open Map">
+              <img class="qr-svg" src="https://api.qrserver.com/v1/create-qr-code/?data=https%3A%2F%2Fmaps.app.goo.gl%2F5Godctxa2489bF4L8&size=180x180&margin=10&format=svg" alt="QR Code for Map" loading="lazy">
+              <span class="branch-qr-label">Scan for Map</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     SERVICES
+     ============================================ -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="section-head-centered fade-in">
+      <span class="section-label">Our Services</span>
+      <h2 class="section-title">The core services <span class="italic">we deliver</span> across accounting and financial analysis</h2>
+      <nav class="breadcrumb">
+        <a href="#home">Home</a>
+        <span class="sep">▸</span>
+        <span class="current">Services</span>
+      </nav>
+    </div>
+
+    <div class="services-grid">
+
+      <a href="/en/services/bookkeeping.html" class="service-card fade-in">
+        <span class="service-number">01 / 06</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 4v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6H6c-1.1 0-2 .9-2 2z"/>
+            <path d="M14 2v6h6"/>
+            <path d="M8 13h8M8 17h5"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Bookkeeping</h3>
+        <p class="service-desc">Organizing and maintaining financial records and accounts to the highest standards of accuracy and professionalism, aligned with current international standards.</p>
+        <span class="service-link">View Details <span class="service-link-arrow">←</span></span>
+      </a>
+
+      <a href="/en/services/reports.html" class="service-card fade-in">
+        <span class="service-number">02 / 06</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 3v18h18"/>
+            <path d="M7 15l4-6 4 4 5-7"/>
+            <circle cx="7" cy="15" r="1.2"/>
+            <circle cx="11" cy="9" r="1.2"/>
+            <circle cx="15" cy="13" r="1.2"/>
+            <circle cx="20" cy="6" r="1.2"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Financial Reporting</h3>
+        <p class="service-desc">Comprehensive analysis of corporate financial data with monthly and cumulative reports that support strategic management decisions.</p>
+        <span class="service-link">View Details <span class="service-link-arrow">←</span></span>
+      </a>
+
+      <a href="/en/services/feasibility.html" class="service-card fade-in">
+        <span class="service-number">03 / 06</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v9l6 3"/>
+            <path d="M8 14l3-3"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Feasibility Studies</h3>
+        <p class="service-desc">In-depth analysis of new and expansion projects — return modelling, risk assessment, and investment opportunity evaluation before the decision is made.</p>
+        <span class="service-link">View Details <span class="service-link-arrow">←</span></span>
+      </a>
+
+      <a href="/en/services/management.html" class="service-card fade-in">
+        <span class="service-number">04 / 06</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="8" width="18" height="12" rx="2"/>
+            <path d="M7 8V6c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v2"/>
+            <path d="M12 12v4M9 14h6"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Financial Management</h3>
+        <p class="service-desc">Integrated services to achieve the company's financial and accounting objectives — cash flow planning and working capital management with discipline.</p>
+        <span class="service-link">View Details <span class="service-link-arrow">←</span></span>
+      </a>
+
+      <a href="/en/services/audit.html" class="service-card fade-in">
+        <span class="service-number">05 / 06</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2l9 4v6c0 5-3.5 9.5-9 10-5.5-.5-9-5-9-10V6l9-4z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Audit &amp; Assurance</h3>
+        <p class="service-desc">Independent and impartial examination of financial records and statements — ensuring standards compliance and surfacing operational and financial risks.</p>
+        <span class="service-link">View Details <span class="service-link-arrow">←</span></span>
+      </a>
+
+      <a href="/en/services/accounting.html" class="service-card fade-in">
+        <span class="service-number">06 / 06</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2v20M7 6h8a3 3 0 010 6H9a3 3 0 000 6h9"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Financial Accounting</h3>
+        <p class="service-desc">Accurate and meaningful financial information for organizations and individuals — preparation of financial statements with transparent profit and loss reporting.</p>
+        <span class="service-link">View Details <span class="service-link-arrow">←</span></span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     TEAM SECTION
+     ============================================ -->
+<section class="section" id="team">
+  <div class="container">
+    <div class="section-head-centered fade-in">
+      <span class="section-label">Our Team</span>
+      <h2 class="section-title">The expertise <span class="italic">behind</span> your numbers</h2>
+      <p class="section-lead" style="margin-top: 16px;">
+        A team of specialized accountants and financial analysts that combines deep experience with an uncompromising commitment to quality.
+      </p>
+    </div>
+
+    <div class="team-grid">
+
+      <!-- 1 — Mohamad Al-Jallad -->
+      <div class="team-card fade-in">
+        <div class="team-photo-wrap">
+          <img src="/team-images/mohammad.jpg" alt="Mohamad Al-Jallad">
+        </div>
+        <h3 class="team-name">Mohamad Al-Jallad</h3>
+        <div class="team-role">Head of Al-Mizan Accounting Software Division</div>
+        <div class="team-branch">Istanbul</div>
+        <div class="team-social">
+          <a href="mailto:mohamad.aljallad@finexsacapitalnet.com" class="team-social-btn" title="Email">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="#" class="team-social-btn" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://wa.me/905360652643" target="_blank" rel="noopener" class="team-social-btn" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg></a>
+        </div>
+      </div>
+
+      <!-- 2 — Alaa Al-Masri -->
+      <div class="team-card fade-in">
+        <div class="team-photo-wrap">
+          <img src="/team-images/alaa.jpg" alt="Alaa Al-Masri">
+        </div>
+        <h3 class="team-name">Alaa Al-Masri</h3>
+        <div class="team-role">Head of Accounting Department</div>
+        <div class="team-branch">Istanbul</div>
+        <div class="team-social">
+          <a href="mailto:accounting@finexsacapitalnet.com" class="team-social-btn" title="Email">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="#" class="team-social-btn" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://wa.me/905362323310" target="_blank" rel="noopener" class="team-social-btn" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg></a>
+        </div>
+      </div>
+
+      <!-- 3 — Ghiath Al-Jareh -->
+      <div class="team-card fade-in">
+        <div class="team-photo-wrap">
+          <img src="/team-images/ghiath.jpeg" alt="Ghiath Al-Jareh">
+        </div>
+        <h3 class="team-name">Ghiath Al-Jareh</h3>
+        <div class="team-role">Accountant</div>
+        <div class="team-branch">Istanbul</div>
+        <div class="team-social">
+          <a href="mailto:ghiath.jareh@finexsacapitalnet.com" class="team-social-btn" title="Email">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="#" class="team-social-btn" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- 4 — Ali Aloush -->
+      <div class="team-card fade-in">
+        <div class="team-photo-wrap">
+          <img src="/team-images/ali.jpeg" alt="Ali Aloush">
+        </div>
+        <h3 class="team-name">Ali Aloush</h3>
+        <div class="team-role">Damascus Branch Manager &amp; Accountant</div>
+        <div class="team-branch">Damascus</div>
+        <div class="team-social">
+          <a href="mailto:ali.aloush@finexsacapitalnet.com" class="team-social-btn" title="Email">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="#" class="team-social-btn" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://wa.me/905518551904" target="_blank" rel="noopener" class="team-social-btn" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg></a>
+        </div>
+      </div>
+
+      <!-- 5 — Muhammad Mustafa -->
+      <div class="team-card fade-in">
+        <div class="team-photo-wrap">
+          <img src="/team-images/muhammad.jpeg" alt="Muhammad Mustafa">
+        </div>
+        <h3 class="team-name">Muhammad Mustafa</h3>
+        <div class="team-role">Accountant</div>
+        <div class="team-branch">Damascus</div>
+        <div class="team-social">
+          <a href="mailto:muhammad.mustafa@finexsacapitalnet.com" class="team-social-btn" title="Email">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="#" class="team-social-btn" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://wa.me/905518919116" target="_blank" rel="noopener" class="team-social-btn" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg></a>
+        </div>
+      </div>
+
+      <!-- 6 — Nour Al-Masri -->
+      <div class="team-card fade-in">
+        <div class="team-photo-wrap">
+          <img src="/team-images/nour.jpeg" alt="Nour Al-Masri">
+        </div>
+        <h3 class="team-name">Nour Al-Masri</h3>
+        <div class="team-role">Accountant</div>
+        <div class="team-branch">Damascus</div>
+        <div class="team-social">
+          <a href="mailto:nour.almasri@finexsacapitalnet.com" class="team-social-btn" title="Email">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="#" class="team-social-btn" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7 — Wael Al-Zarrad -->
+      <div class="team-card fade-in">
+        <div class="team-photo-wrap">
+          <img src="/team-images/wael.jpeg" alt="Wael Al-Zarrad">
+        </div>
+        <h3 class="team-name">Wael Al-Zarrad</h3>
+        <div class="team-role">Accountant</div>
+        <div class="team-branch">Damascus</div>
+        <div class="team-social">
+          <a href="mailto:wael.alzarrad@finexsacapitalnet.com" class="team-social-btn" title="Email">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+          <a href="#" class="team-social-btn" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://wa.me/905515076411" target="_blank" rel="noopener" class="team-social-btn" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     FINEXSA ONE — Showcase
+     ============================================ -->
+<section class="showcase" id="finexsa-one">
+  <div class="container">
+    <div class="showcase-inner">
+
+      <div class="fade-in">
+        <div class="showcase-badge">
+          <span class="star">✦</span>
+          <span>An exclusive tool for our clients</span>
+        </div>
+
+        <h2 class="showcase-name">FINEXSA One</h2>
+        <div class="showcase-subtitle">Accounting Data Analytics Platform</div>
+
+        <p class="showcase-lead">
+          A proprietary technology we built in-house to turn our clients' accounting data into interactive financial reports and analytics, available online around the clock. With one click, our clients access their financial statements, expense breakdowns, retained-earnings allocation, and profitability per department — without delay or complexity.
+        </p>
+
+        <div class="showcase-features">
+          <div class="showcase-feature"><span class="showcase-feature-icon">◆</span><span>Complete financial statements</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">◆</span><span>Intelligent expense analysis</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">◆</span><span>Retained-earnings allocation</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">◆</span><span>Profitability by segment</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">◆</span><span>Secure, encrypted access</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">◆</span><span>Live data updates</span></div>
+        </div>
+
+        <a href="/en/login.html" class="showcase-cta">
+          🔐 Access FINEXSA One
+        </a>
+        <span class="showcase-note">
+          * FINEXSA One is an exclusive tool reserved for clients on our annual service plans.
+        </span>
+      </div>
+
+      <div class="showcase-visual fade-in">
+        <div class="mockup">
+          <div class="mockup-header">
+            <span class="mockup-title">DASHBOARD</span>
+            <span class="mockup-tag">LIVE</span>
+          </div>
+          <div class="mockup-stats">
+            <div class="mockup-stat">
+              <div class="mockup-stat-label">Net Profit</div>
+              <div class="mockup-stat-value gold">284.5K</div>
+            </div>
+            <div class="mockup-stat">
+              <div class="mockup-stat-label">Revenue</div>
+              <div class="mockup-stat-value">1.2M</div>
+            </div>
+            <div class="mockup-stat">
+              <div class="mockup-stat-label">Growth</div>
+              <div class="mockup-stat-value positive">+18.4%</div>
+            </div>
+          </div>
+          <div class="mockup-chart">
+            <div class="mockup-bar" style="height: 45%; animation-delay: 0.1s"></div>
+            <div class="mockup-bar" style="height: 62%; animation-delay: 0.2s"></div>
+            <div class="mockup-bar" style="height: 38%; animation-delay: 0.3s"></div>
+            <div class="mockup-bar" style="height: 78%; animation-delay: 0.4s"></div>
+            <div class="mockup-bar" style="height: 55%; animation-delay: 0.5s"></div>
+            <div class="mockup-bar" style="height: 90%; animation-delay: 0.6s"></div>
+            <div class="mockup-bar" style="height: 72%; animation-delay: 0.7s"></div>
+            <div class="mockup-bar" style="height: 85%; animation-delay: 0.8s"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     CLOUD HOSTING
+     ============================================ -->
+<section class="showcase showcase-alt" id="hosting">
+  <div class="container">
+    <div class="showcase-inner reverse">
+
+      <div class="showcase-visual fade-in">
+        <div class="hosting-mockup">
+          <div class="hosting-mockup-header">
+            <div class="hosting-mockup-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="hosting-mockup-title">Secure Cloud</span>
+          </div>
+          <div class="hosting-server-rack">
+            <div class="server-unit active"><span class="server-led"></span><span class="server-label">SERVER 01</span><span class="server-status">ONLINE</span></div>
+            <div class="server-unit active"><span class="server-led"></span><span class="server-label">SERVER 02</span><span class="server-status">ONLINE</span></div>
+            <div class="server-unit active"><span class="server-led"></span><span class="server-label">BACKUP 01</span><span class="server-status">SYNCING</span></div>
+            <div class="server-unit active"><span class="server-led"></span><span class="server-label">BACKUP 02</span><span class="server-status">ONLINE</span></div>
+          </div>
+          <div class="hosting-stats">
+            <div class="hosting-stat">
+              <span class="hosting-stat-num">99.9%</span>
+              <span class="hosting-stat-lbl">UPTIME</span>
+            </div>
+            <div class="hosting-stat">
+              <span class="hosting-stat-num">256</span>
+              <span class="hosting-stat-lbl">BIT SSL</span>
+            </div>
+            <div class="hosting-stat">
+              <span class="hosting-stat-num">24/7</span>
+              <span class="hosting-stat-lbl">SUPPORT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fade-in">
+        <div class="showcase-badge">
+          <span class="star">☁</span>
+          <span>New professional service</span>
+        </div>
+
+        <h2 class="showcase-name">Secure Cloud Hosting</h2>
+        <div class="showcase-subtitle">For your accounting software, around the clock</div>
+
+        <p class="showcase-lead">
+          Professional hosting for any accounting software your firm runs — Al-Mizan, Onyx, SAP, Oracle, or any other system. Servers protected by modern cybersecurity, automatic daily backups, and a dedicated control panel for every client to access their data securely at any time.
+        </p>
+
+        <div class="showcase-features">
+          <div class="showcase-feature"><span class="showcase-feature-icon">🛡️</span><span>Advanced 256-bit encryption</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">💾</span><span>Automatic daily backups</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">⚡</span><span>High performance on SSD storage</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">🌐</span><span>Anywhere access, 24/7</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">🔐</span><span>Dedicated control panel per subscriber</span></div>
+          <div class="showcase-feature"><span class="showcase-feature-icon">📞</span><span>Continuous technical support</span></div>
+        </div>
+
+        <div class="hosting-cta-group">
+          <a href="https://wa.me/905362323310?text=Hello%2C%20I%27d%20like%20to%20subscribe%20to%20the%20cloud%20hosting%20service" target="_blank" rel="noopener" class="showcase-cta">
+            💬 Subscribe Now
+          </a>
+          <a href="/en/services/hosting.html" class="showcase-cta-secondary">
+            Learn More →
+          </a>
+        </div>
+        <span class="showcase-note">
+          * Each subscriber receives a dedicated control panel with an independent account and direct access to their backup folder.
+        </span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     CTA BANNER
+     ============================================ -->
+<section class="container">
+  <div class="cta-banner fade-in">
+    <h2 class="cta-title">Ready to elevate <span class="italic">your financial reporting?</span></h2>
+    <p class="cta-text">
+      Reach out today for a complimentary consultation and discover how FINEXSA Capital can turn your data into strategic decisions.
+    </p>
+    <div class="hero-cta-group">
+      <a href="https://wa.me/905362323310?text=Hello%2C%20I%27d%20like%20to%20get%20in%20touch%20with%20FINEXSA%20Capital" target="_blank" rel="noopener" class="btn-primary">💬 Contact Us</a>
+      <a href="/en/login.html" class="btn-secondary">🔐 Client Portal</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     FOOTER
+     ============================================ -->
+<footer class="footer" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="/en/index.html" class="brand">
+          <div class="brand-mark">⚖</div>
+          <div class="brand-text">
+            <span class="brand-name">FINEXSA</span>
+            <span class="brand-sub">Capital</span>
+          </div>
+        </a>
+        <p class="footer-brand-text">
+          A professional accounting services firm specialized in financial analysis, audit, and advisory. We deliver solutions that help companies grow by making decisions grounded in data.
+        </p>
+      </div>
+
+      <div>
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#finexsa-one">FINEXSA One</a></li>
+          <li><a href="#hosting">Cloud Hosting</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Our Services</h4>
+        <ul class="footer-links">
+          <li><a href="/en/services/reports.html">Financial Reporting</a></li>
+          <li><a href="/en/services/audit.html">Audit &amp; Assurance</a></li>
+          <li><a href="/en/services/feasibility.html">Feasibility Studies</a></li>
+          <li><a href="/en/services/accounting.html">Financial Accounting</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Get in Touch</h4>
+        <div class="footer-contact">
+          <div style="margin-bottom: 14px;">
+            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:13px;">Headquarters</strong>
+            <div>📍 Istanbul — Türkiye — Merter</div>
+            <div style="direction: ltr;">📱 <a href="tel:+905362323310">+90 536 232 3310</a></div>
+            <div style="direction: ltr;">📱 <a href="tel:+905360652643">+90 536 065 2643</a></div>
+          </div>
+          <div style="margin-bottom: 14px;">
+            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:13px;">Regional Branch</strong>
+            <div>📍 Damascus — Syria — Al-Hijaz</div>
+            <div style="direction: ltr;">☎ <a href="tel:+963112224394">+963 11 222 4394</a></div>
+            <div style="direction: ltr;">📱 <a href="tel:+963994470219">+963 994 470 219</a></div>
+          </div>
+          <div>📧 <a href="mailto:info@finexsacapitalnet.com">info@finexsacapitalnet.com</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Partner + Social Row -->
+    <div class="partner-row">
+      <div class="partner-block">
+        <div>
+          <span class="partner-label">Technology Partner</span>
+          <a href="https://hadarasoft.net" target="_blank" rel="noopener" class="partner-link">
+            <div class="partner-logo">
+              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <line x1="32" y1="10" x2="32" y2="54" stroke="#C9A227" stroke-width="3" stroke-linecap="round"/>
+                <line x1="10" y1="18" x2="54" y2="18" stroke="#C9A227" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="32" cy="18" r="3.5" fill="#C9A227"/>
+                <line x1="14" y1="18" x2="14" y2="32" stroke="#C9A227" stroke-width="1.5"/>
+                <line x1="50" y1="18" x2="50" y2="32" stroke="#C9A227" stroke-width="1.5"/>
+                <path d="M 5 32 L 23 32 L 19 40 Q 14 44 9 40 Z" fill="#C9A227" opacity="0.95"/>
+                <path d="M 41 32 L 59 32 L 55 40 Q 50 44 45 40 Z" fill="#C9A227" opacity="0.95"/>
+                <rect x="22" y="52" width="20" height="3" rx="1.5" fill="#C9A227"/>
+                <circle cx="32" cy="9" r="2" fill="#C9A227"/>
+              </svg>
+            </div>
+            <div class="partner-info">
+              <span class="partner-title">Download Al-Mizan.NET</span>
+              <span class="partner-subtitle">Accounting &amp; Inventory ↓</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-block">
+        <span class="partner-label">Follow Us</span>
+        <div class="social-icons">
+          <a href="#" target="_blank" rel="noopener" class="social-icon" title="Facebook" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" class="social-icon" title="Instagram" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.849.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.849.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" class="social-icon" title="LinkedIn" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" class="social-icon" title="YouTube" aria-label="YouTube">
+            <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 <strong style="color:var(--text-primary)">FINEXSA Capital</strong>. All rights reserved.</div>
+      <div><a href="/en/privacy.html">Privacy Policy</a> · <a href="/en/terms.html">Terms &amp; Conditions</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
