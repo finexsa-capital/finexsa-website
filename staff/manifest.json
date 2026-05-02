@@ -1,0 +1,55 @@
+{
+  "name": "FINEXSA Staff",
+  "short_name": "FINEXSA",
+  "description": "نظام إدارة الصناديق المالية - FINEXSA Capital",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./login.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0A0E1A",
+  "background_color": "#0A0E1A",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "إدخال حركة",
+      "short_name": "صناديق",
+      "description": "إدخال حركة قبض/دفع جديدة",
+      "url": "./cash.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "كشف الحساب",
+      "short_name": "كشف",
+      "description": "استعراض حركات الصندوق",
+      "url": "./cash-report.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
