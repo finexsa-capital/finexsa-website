@@ -1540,17 +1540,6 @@
     });
   <\/script>
 
-
-  <!-- PWA Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('[PWA] Service Worker registered'))
-          .catch(err => console.warn('[PWA] SW registration failed:', err));
-      });
-    }
-  </script>
 </body>
 </html>`;
     }
@@ -1605,6 +1594,17 @@
     onAuthStateChanged(auth, (user) => {
       if (user) loadBoxes();
     });
+  </script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[PWA] Service Worker registered'))
+          .catch(err => console.warn('[PWA] SW registration failed:', err));
+      });
+    }
   </script>
 
 </body>
