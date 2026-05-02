@@ -1409,6 +1409,17 @@
       background: #E6BC3F;
       transform: translateY(-2px);
     }
+    .toolbar button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+    .toolbar button#btnShare {
+      background: #25D366;
+      color: white;
+    }
+    .toolbar button#btnShare:hover {
+      background: #1EA952;
+    }
     .toolbar button.secondary {
       background: transparent;
       color: white;
@@ -1525,19 +1536,95 @@
   </div>
 
   <div class="toolbar">
-    <button onclick="window.print()">
+    <button id="btnShare" style="display:none;">
+      <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      مشاركة كصورة
+    </button>
+    <button onclick="window.print()" id="btnPrint">
       <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       حفظ كـ PDF / طباعة
     </button>
-    <span class="toolbar-hint">اختر "حفظ كـ PDF" من نافذة الطباعة</span>
+    <span class="toolbar-hint" id="toolbarHint">اختر "حفظ كـ PDF" من نافذة الطباعة</span>
     <button class="secondary" onclick="window.close()">إغلاق</button>
   </div>
 
+  <!-- مكتبة التقاط الإيصال كصورة (تُحمَّل فقط عند الحاجة) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
+
   <script>
-    // فتح نافذة الطباعة تلقائياً بعد ثانية واحدة
-    window.addEventListener('load', () => {
-      setTimeout(() => { window.print(); }, 800);
+    // كشف نوع الجهاز
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+    const canShare = typeof navigator.share === 'function' && typeof navigator.canShare === 'function';
+
+    // إظهار زر المشاركة فقط على الموبايل
+    if (isMobile && canShare) {
+      document.getElementById('btnShare').style.display = 'inline-flex';
+      // على الموبايل، نُخفي إشارة الطباعة ونُظهر إشارة المشاركة
+      document.getElementById('toolbarHint').textContent = 'اضغط مشاركة لإرسال الإيصال للعميل';
+    }
+
+    // على الموبايل، لا نفتح نافذة الطباعة تلقائياً (الموبايل لا يدعمها بشكل جيد)
+    if (!isMobile) {
+      window.addEventListener('load', () => {
+        setTimeout(() => { window.print(); }, 800);
+      });
+    }
+
+    // ═════ المشاركة كصورة PNG ═════
+    document.getElementById('btnShare').addEventListener('click', async () => {
+      const btn = document.getElementById('btnShare');
+      const originalHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" style="animation:spin 0.8s linear infinite"><circle cx="12" cy="12" r="10" stroke-dasharray="50 100"/></svg> جاري التحضير...';
+
+      try {
+        const receiptEl = document.querySelector('.receipt-page');
+        if (!receiptEl) throw new Error('الإيصال غير موجود');
+
+        // التقاط الإيصال كصورة عالية الجودة
+        const canvas = await html2canvas(receiptEl, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+
+        // تحويل الصورة إلى Blob
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+        const fileName = document.title + '.png';
+        const file = new File([blob], fileName, { type: 'image/png' });
+
+        // محاولة المشاركة
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: document.title,
+            text: 'إيصال من FINEXSA Capital'
+          });
+        } else {
+          // Fallback: تحميل الصورة مباشرة
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error(err);
+          alert('فشل تحضير الصورة: ' + err.message);
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }
     });
+
+    // إضافة كي-فريم للحركة
+    const styleEl = document.createElement('style');
+    styleEl.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+    document.head.appendChild(styleEl);
   <\/script>
 
 </body>
