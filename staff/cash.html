@@ -837,7 +837,7 @@
               </label>
               <div class="conversion-toggle" id="conversionToggle">
                 <button type="button" class="is-active" data-mode="direct">المبلغ المقابل مباشرة</button>
-                <button type="button" data-mode="rate">سعر الصرف</button>
+                <button type="button" data-mode="rate">سعر الصرف (مثلاً 44.5)</button>
               </div>
               <div class="field-row three">
                 <input type="number" id="amountB" class="field-input" placeholder="0" step="any" min="0">
@@ -1088,18 +1088,67 @@
       const currA = document.getElementById('currencyA').value;
       const currB = document.getElementById('currencyB').value;
 
-      if (state.conversionMode === 'rate' && amountA > 0) {
+      if (state.conversionMode === 'rate' && amountA > 0 && currA && currB) {
+        if (currA === currB) {
+          hint.style.display = 'block';
+          hint.style.color = 'var(--text-dim)';
+          hint.textContent = 'العملتان متطابقتان، لا حاجة لسعر صرف';
+        } else if (amountB > 0) {
+          // حساب وعرض المبلغ المقابل المتوقع
+          const result = computeFromRate(amountA, currA, currB, amountB);
+          hint.style.display = 'block';
+          hint.style.color = 'var(--gold)';
+          hint.textContent = `سيُحفظ المقابل: ${formatNumber(result)} ${currB}`;
+        } else {
+          hint.style.display = 'block';
+          hint.style.color = 'var(--text-dim)';
+          hint.textContent = 'أدخل سعر الصرف (مثلاً 44.5 للدولار/الليرة)';
+        }
+      } else if (state.conversionMode === 'direct' && currA && currB && currA !== currB && amountA > 0 && amountB > 0) {
         hint.style.display = 'block';
-        hint.textContent = currA !== currB
-          ? `سيُحسب المبلغ المقابل: ${amountA} × سعر الصرف`
-          : 'العملتان متطابقتان، لا حاجة لسعر صرف';
-      } else if (currA && currB && currA !== currB && amountA > 0 && amountB > 0) {
-        hint.style.display = 'block';
-        const rate = (amountB / amountA).toFixed(4);
-        hint.textContent = `سعر الصرف الضمني: 1 ${currA} ≈ ${rate} ${currB}`;
+        hint.style.color = 'var(--text-dim)';
+        const stronger = strongerCurrency(currA, currB);
+        let rate;
+        if (stronger === currA) rate = (amountB / amountA);
+        else rate = (amountA / amountB);
+        hint.textContent = `سعر الصرف الضمني: ${formatNumber(rate, 4)} (${stronger === currA ? currA + '/' + currB : currB + '/' + currA})`;
       } else {
         hint.style.display = 'none';
       }
+    }
+
+    /**
+     * يحدد العملة الأقوى بين عملتين
+     * الترتيب: يورو > دولار > ليرة تركية > ليرة سورية
+     */
+    function strongerCurrency(c1, c2) {
+      const rank = (c) => {
+        const s = (c || '').toLowerCase();
+        if (s.includes('يورو') || s.includes('eur')) return 4;
+        if (s.includes('دولار') || s.includes('usd') || s.includes('$')) return 3;
+        if (s.includes('ليرة تركي') || s.includes('try') || s.includes('tl')) return 2;
+        if (s.includes('ليرة سوري') || s.includes('syp')) return 1;
+        return 0;
+      };
+      return rank(c1) >= rank(c2) ? c1 : c2;
+    }
+
+    /**
+     * يحسب المبلغ المقابل من سعر الصرف
+     * sourceAmount: المبلغ في عملة المصدر
+     * sourceCurr: عملة المصدر
+     * destCurr: العملة المقابلة
+     * rate: سعر الصرف (الكبير دائماً، أي قيمة العملة الأقوى بالأضعف)
+     */
+    function computeFromRate(sourceAmount, sourceCurr, destCurr, rate) {
+      if (sourceCurr === destCurr) return sourceAmount;
+      const stronger = strongerCurrency(sourceCurr, destCurr);
+      // إذا المصدر هو الأقوى → اضرب
+      if (stronger === sourceCurr) {
+        return sourceAmount * rate;
+      }
+      // إذا المصدر هو الأضعف → اقسم
+      return sourceAmount / rate;
     }
 
     // ═══════ تغيير الصندوق ═══════
@@ -1275,7 +1324,8 @@
         currB: document.getElementById('currencyB').value,
         note: document.getElementById('note').value.trim(),
         date: document.getElementById('dateInput').value,
-        currentUser: staffData.email
+        currentUser: staffData.email,
+        conversionMode: state.conversionMode
       };
 
       state.drafts.push(draft);
@@ -1366,14 +1416,14 @@
         if (!user) throw new Error('انتهت الجلسة');
         const token = await user.getIdToken();
 
-        // إذا كان وضع سعر الصرف، نحوّل
+        // إذا كان وضع سعر الصرف، نحوّل valB من سعر صرف إلى مبلغ مقابل فعلي
         const drafts = state.drafts.map(d => {
-          // في وضع سعر الصرف، valB هو سعر الصرف نفسه
-          // نحوّله إلى مبلغ مقابل فعلي
-          if (state.conversionMode === 'rate' && d.currA !== d.currB) {
-            return { ...d, valB: d.valA * d.valB };
+          if (d.conversionMode === 'rate' && d.currA !== d.currB) {
+            return { ...d, valB: computeFromRate(d.valA, d.currA, d.currB, d.valB) };
           }
-          return d;
+          // لا نرسل حقل conversionMode للـ Backend
+          const { conversionMode, ...rest } = d;
+          return rest;
         });
 
         const res = await fetch(`${STAFF_API_URL}?action=saveBatch`, {
@@ -1399,8 +1449,9 @@
     });
 
     // ═══════ Helpers ═══════
-    function formatNumber(n) {
-      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(n);
+    function formatNumber(n, digits) {
+      const d = (typeof digits === 'number') ? digits : 2;
+      return new Intl.NumberFormat('en-US', { maximumFractionDigits: d }).format(n);
     }
     function formatDate(dStr) {
       if (!dStr) return '';
