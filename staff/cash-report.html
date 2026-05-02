@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
+  <!-- مكتبة تحويل HTML إلى PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     :root {
       --bg-void:       #0A0E1A;
@@ -432,6 +435,253 @@
     .col-note { color: var(--text-primary); max-width: 280px; }
     .col-cp { color: var(--text-primary); font-weight: 600; }
 
+    /* ─── زر الإيصال ─── */
+    .btn-receipt {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--gold);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s ease;
+      margin: 0 auto;
+    }
+    .btn-receipt:hover {
+      background: var(--gold-muted);
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+    .btn-receipt:disabled {
+      opacity: 0.4;
+      cursor: wait;
+    }
+    .btn-receipt svg { width: 15px; height: 15px; stroke-width: 1.8; }
+
+    /* ─── قالب الإيصال (مخفي، يُستخدم للتحويل لـ PDF) ─── */
+    #receiptTemplate {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      width: 794px; /* A4 width at 96 DPI */
+      background: white;
+      color: #1a1a1a;
+      font-family: 'Tajawal', sans-serif;
+      direction: rtl;
+      padding: 0;
+    }
+
+    .receipt {
+      padding: 50px 55px;
+      background: white;
+      color: #1a1a1a;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* ترويسة الإيصال */
+    .receipt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 22px;
+      border-bottom: 3px double #C9A227;
+      margin-bottom: 30px;
+    }
+
+    .receipt-brand {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .receipt-logo {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #1E2A5A, #2A3A7A);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #C9A227;
+      flex-shrink: 0;
+    }
+
+    .receipt-logo svg { width: 36px; height: 36px; stroke-width: 1.5; }
+
+    .receipt-brand-text { line-height: 1.3; }
+
+    .receipt-brand-name {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1E2A5A;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+
+    .receipt-brand-sub {
+      font-size: 11px;
+      color: #C9A227;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .receipt-branch {
+      text-align: left;
+      font-size: 11px;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    .receipt-branch-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1E2A5A;
+      margin-bottom: 4px;
+    }
+
+    /* عنوان الإيصال */
+    .receipt-title-block {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .receipt-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #1E2A5A;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .receipt-title.rec-color { color: #15803d; }
+    .receipt-title.pay-color { color: #b91c1c; }
+
+    .receipt-number {
+      display: inline-block;
+      font-size: 12px;
+      color: #555;
+      padding: 4px 14px;
+      background: #f7f7f7;
+      border: 1px solid #ddd;
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif;
+      direction: ltr;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    /* جدول التفاصيل */
+    .receipt-details {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    .receipt-details td {
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      font-size: 13.5px;
+      vertical-align: top;
+    }
+
+    .receipt-details .label-cell {
+      background: #f7f7f7;
+      color: #555;
+      font-weight: 700;
+      width: 32%;
+      font-size: 12.5px;
+      letter-spacing: 0.02em;
+    }
+
+    .receipt-details .value-cell {
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .receipt-amount-row .value-cell {
+      font-size: 18px;
+      font-weight: 900;
+      color: #1E2A5A;
+      direction: ltr;
+      text-align: right;
+    }
+
+    .receipt-amount-row.rec .value-cell { color: #15803d; }
+    .receipt-amount-row.pay .value-cell { color: #b91c1c; }
+
+    /* صندوق المبلغ بالحروف */
+    .receipt-words-box {
+      background: #fdfbf3;
+      border: 1.5px dashed #C9A227;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 30px;
+      font-size: 13.5px;
+      color: #1a1a1a;
+    }
+
+    .receipt-words-box strong {
+      color: #1E2A5A;
+      margin-left: 6px;
+    }
+
+    /* التوقيعات */
+    .receipt-signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      margin-top: 50px;
+      padding-top: 20px;
+    }
+
+    .signature-block {
+      text-align: center;
+    }
+
+    .signature-line {
+      border-top: 1.5px solid #999;
+      margin-bottom: 10px;
+      padding-top: 8px;
+    }
+
+    .signature-label {
+      font-size: 12px;
+      color: #555;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .signature-name {
+      font-size: 13px;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    /* تذييل الإيصال */
+    .receipt-footer {
+      margin-top: 50px;
+      padding-top: 18px;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5px;
+      color: #888;
+    }
+
+    .receipt-footer-stamp {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #f7f7f7;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      direction: ltr;
+    }
+
     .empty-state {
       padding: 60px 20px;
       text-align: center;
@@ -722,6 +972,7 @@
                   <th>قبض</th>
                   <th>دفع</th>
                   <th>الرصيد</th>
+                  <th style="text-align:center; width:60px;">إيصال</th>
                 </tr>
               </thead>
               <tbody id="reportBody"></tbody>
@@ -741,6 +992,9 @@
       </main>
     </div>
   </div>
+
+  <!-- ═══════ قالب الإيصال (مخفي) ═══════ -->
+  <div id="receiptTemplate"></div>
 
   <div class="toast-container" id="toastContainer"></div>
 
@@ -974,7 +1228,7 @@
       }
 
       empty.style.display = 'none';
-      body.innerHTML = state.filtered.map(r => `
+      body.innerHTML = state.filtered.map((r, idx) => `
         <tr>
           <td class="col-date">${formatDate(r.date)}</td>
           <td class="col-note" title="${escapeHTML(r.note || '')}">${escapeHTML(r.note || '')}</td>
@@ -982,8 +1236,25 @@
           <td class="col-num col-rec">${(r.rec && r.rec !== '') ? formatNumber(r.rec) : '—'}</td>
           <td class="col-num col-pay">${(r.pay && r.pay !== '') ? formatNumber(r.pay) : '—'}</td>
           <td class="col-num col-balance">${(typeof r.balance === 'number') ? formatNumber(r.balance) : (r.balance || '—')}</td>
+          <td style="text-align:center;">
+            <button class="btn-receipt" data-idx="${idx}" title="تحميل إيصال PDF">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2V8z"/>
+                <line x1="9" y1="9" x2="15" y2="9"/>
+                <line x1="9" y1="13" x2="15" y2="13"/>
+              </svg>
+            </button>
+          </td>
         </tr>
       `).join('');
+
+      // ربط أحداث أزرار الإيصال
+      body.querySelectorAll('.btn-receipt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx, 10);
+          generateReceipt(state.filtered[idx], btn);
+        });
+      });
     }
 
     function updateStats() {
@@ -1006,6 +1277,261 @@
     document.getElementById('btnPrint').addEventListener('click', () => {
       window.print();
     });
+
+    // ═══════ توليد إيصال PDF ═══════
+
+    /**
+     * يحدّد الفرع لعرضه في الإيصال:
+     * - يأخذ من بيانات الموظف الحالي
+     */
+    function getBranchInfo() {
+      const branch = staffData.branch || '';
+      if (branch.includes('إسطنبول') || branch.toLowerCase().includes('istanbul')) {
+        return {
+          name: 'فرع إسطنبول',
+          country: 'تركيا',
+          phones: '+90 536 232 3310 · +90 536 065 2643'
+        };
+      }
+      if (branch.includes('دمشق') || branch.toLowerCase().includes('damascus')) {
+        return {
+          name: 'فرع دمشق',
+          country: 'سوريا',
+          phones: '+963 11 222 4394 · +963 994 470 219'
+        };
+      }
+      // افتراضي: إسطنبول (للأدمن أو من ليس له فرع محدد)
+      return {
+        name: 'فرع إسطنبول',
+        country: 'تركيا',
+        phones: '+90 536 232 3310 · +90 536 065 2643'
+      };
+    }
+
+    /**
+     * يولّد رقم إيصال فريد بصيغة: REC-YYYY-XXXXX
+     * يعتمد على تاريخ الحركة وقيم ثابتة منها لضمان نفس الرقم لنفس الحركة
+     */
+    function generateReceiptNumber(row) {
+      const dateParts = (row.date || '').split('-');
+      const year = dateParts[0] || new Date().getFullYear();
+      // hash بسيط من البيانات الثابتة
+      const seed = `${row.date}-${row.note}-${row.opposite}-${row.rec || row.pay}`;
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash |= 0;
+      }
+      const num = Math.abs(hash % 100000).toString().padStart(5, '0');
+      return `REC-${year}-${num}`;
+    }
+
+    /**
+     * يحوّل المبلغ الرقمي إلى نص بالحروف العربية
+     * (نسخة مبسّطة للأرقام حتى المليار)
+     */
+    function numberToArabicWords(num) {
+      if (num === 0) return 'صفر';
+      const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
+      const tens = ['', 'عشرة', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+      const hundreds = ['', 'مئة', 'مئتان', 'ثلاثمئة', 'أربعمئة', 'خمسمئة', 'ستمئة', 'سبعمئة', 'ثمانمئة', 'تسعمئة'];
+      const teens = ['عشرة', 'أحد عشر', 'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'];
+
+      function lessThan1000(n) {
+        if (n === 0) return '';
+        let result = '';
+        const h = Math.floor(n / 100);
+        const r = n % 100;
+        if (h > 0) result += hundreds[h];
+        if (r > 0) {
+          if (result) result += ' و';
+          if (r < 10) result += ones[r];
+          else if (r < 20) result += teens[r - 10];
+          else {
+            const t = Math.floor(r / 10);
+            const o = r % 10;
+            if (o > 0) result += ones[o] + ' و' + tens[t];
+            else result += tens[t];
+          }
+        }
+        return result;
+      }
+
+      const integerPart = Math.floor(num);
+      const decimalPart = Math.round((num - integerPart) * 100);
+
+      let result = '';
+      const billions = Math.floor(integerPart / 1000000000);
+      const millions = Math.floor((integerPart % 1000000000) / 1000000);
+      const thousands = Math.floor((integerPart % 1000000) / 1000);
+      const remainder = integerPart % 1000;
+
+      if (billions > 0) result += lessThan1000(billions) + ' مليار ';
+      if (millions > 0) result += lessThan1000(millions) + ' مليون ';
+      if (thousands > 0) {
+        if (thousands === 1) result += 'ألف ';
+        else if (thousands === 2) result += 'ألفان ';
+        else if (thousands < 11) result += lessThan1000(thousands) + ' آلاف ';
+        else result += lessThan1000(thousands) + ' ألف ';
+      }
+      if (remainder > 0) {
+        if (result) result += 'و';
+        result += lessThan1000(remainder);
+      }
+
+      result = result.trim();
+
+      if (decimalPart > 0) {
+        result += ' فاصلة ' + lessThan1000(decimalPart);
+      }
+
+      return result || 'صفر';
+    }
+
+    /**
+     * يبني HTML للإيصال
+     */
+    function buildReceiptHTML(row) {
+      const isReceive = row.rec && row.rec !== '';
+      const amount = isReceive ? Number(row.rec) : Number(row.pay);
+      const dirText = isReceive ? 'سند قبض' : 'سند دفع';
+      const dirClass = isReceive ? 'rec-color' : 'pay-color';
+      const rowClass = isReceive ? 'rec' : 'pay';
+      const partyLabel = isReceive ? 'استُلِم من السيد/السادة' : 'دُفع إلى السيد/السادة';
+      const branch = getBranchInfo();
+      const receiptNum = generateReceiptNumber(row);
+      const currency = state.currentCurrency || '';
+      const amountWords = numberToArabicWords(amount) + ' ' + currency + ' فقط لا غير';
+      const today = new Date();
+      const printedAt = today.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      return `
+        <div class="receipt">
+
+          <div class="receipt-header">
+            <div class="receipt-brand">
+              <div class="receipt-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3v18M5 8h14M3 12l2-4 2 4M3 12c0 1.5 1 3 2 3s2-1.5 2-3M17 12l2-4 2 4M17 12c0 1.5 1 3 2 3s2-1.5 2-3M5 21h14"/>
+                </svg>
+              </div>
+              <div class="receipt-brand-text">
+                <div class="receipt-brand-name">FINEXSA Capital</div>
+                <div class="receipt-brand-sub">للخدمات المحاسبية</div>
+              </div>
+            </div>
+            <div class="receipt-branch">
+              <div class="receipt-branch-name">${branch.name}</div>
+              <div>${branch.country}</div>
+              <div style="direction:ltr; text-align:left;">${branch.phones}</div>
+            </div>
+          </div>
+
+          <div class="receipt-title-block">
+            <div class="receipt-title ${dirClass}">${dirText}</div>
+            <div class="receipt-number">${receiptNum}</div>
+          </div>
+
+          <table class="receipt-details">
+            <tr>
+              <td class="label-cell">التاريخ</td>
+              <td class="value-cell" style="direction:ltr; text-align:right;">${formatDate(row.date)}</td>
+            </tr>
+            <tr>
+              <td class="label-cell">${partyLabel}</td>
+              <td class="value-cell">${escapeHTML(row.opposite || '—')}</td>
+            </tr>
+            <tr>
+              <td class="label-cell">الصندوق</td>
+              <td class="value-cell">${escapeHTML(state.currentBox || '')}</td>
+            </tr>
+            <tr>
+              <td class="label-cell">البيان</td>
+              <td class="value-cell">${escapeHTML(row.note || '—')}</td>
+            </tr>
+            <tr class="receipt-amount-row ${rowClass}">
+              <td class="label-cell">المبلغ</td>
+              <td class="value-cell">${formatNumber(amount)} ${currency}</td>
+            </tr>
+          </table>
+
+          <div class="receipt-words-box">
+            <strong>المبلغ بالحروف:</strong> ${amountWords}
+          </div>
+
+          <div class="receipt-signatures">
+            <div class="signature-block">
+              <div class="signature-line"></div>
+              <div class="signature-label">المحاسب</div>
+              <div class="signature-name">${escapeHTML(staffData.name || '')}</div>
+            </div>
+            <div class="signature-block">
+              <div class="signature-line"></div>
+              <div class="signature-label">${isReceive ? 'الدافع' : 'المستلم'}</div>
+              <div class="signature-name">${escapeHTML(row.opposite || '')}</div>
+            </div>
+          </div>
+
+          <div class="receipt-footer">
+            <div>finexsacapital.com · info@finexsacapitalnet.com</div>
+            <div class="receipt-footer-stamp">طُبع في ${printedAt}</div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    /**
+     * يولّد الإيصال ويحمّله كملف PDF
+     */
+    async function generateReceipt(row, btn) {
+      if (!row || (!row.rec && !row.pay)) {
+        toast('لا يمكن إنشاء إيصال لهذه الحركة', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      const originalIcon = btn.innerHTML;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+
+      try {
+        const template = document.getElementById('receiptTemplate');
+        template.innerHTML = buildReceiptHTML(row);
+
+        const receiptNum = generateReceiptNumber(row);
+        const filename = `${receiptNum}.pdf`;
+
+        const opt = {
+          margin: 0,
+          filename: filename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait',
+            compress: true
+          }
+        };
+
+        await html2pdf().set(opt).from(template.firstElementChild).save();
+
+        toast('✓ تم تحميل الإيصال بنجاح', 'success', 2500);
+
+      } catch (err) {
+        console.error(err);
+        toast('فشل توليد الإيصال: ' + err.message, 'error', 4000);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalIcon;
+        document.getElementById('receiptTemplate').innerHTML = '';
+      }
+    }
 
     // Helpers
     function formatNumber(n) {
