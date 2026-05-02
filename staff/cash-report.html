@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="robots" content="noindex, nofollow">
+  <title>كشف الحساب — FINEXSA Staff</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-void:       #0A0E1A;
+      --bg-deep:       #0F1220;
+      --bg-card:       #141827;
+      --bg-card-hover: #1A1F32;
+      --navy:          #1E2A5A;
+      --navy-light:    #2A3A7A;
+      --gold:          #C9A227;
+      --gold-bright:   #E6BC3F;
+      --gold-muted:    rgba(201, 162, 39, 0.15);
+      --text-primary:  #EDEEF2;
+      --text-muted:    #8B92A8;
+      --text-dim:      #5C6378;
+      --border:        rgba(201, 162, 39, 0.12);
+      --border-strong: rgba(201, 162, 39, 0.35);
+      --error:         #FF6B6B;
+      --success:       #4ADE80;
+      --info:          #60A5FA;
+
+      --sidebar-w:     280px;
+      --header-h:      72px;
+      --font-arabic:   'Tajawal', -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-arabic);
+      background: var(--bg-void);
+      color: var(--text-primary);
+      line-height: 1.7;
+      font-size: 15px;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(30, 42, 90, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(201, 162, 39, 0.05) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ─── Loader ─── */
+    #appLoader {
+      position: fixed; inset: 0;
+      background: var(--bg-void);
+      display: grid; place-items: center;
+      z-index: 9999; transition: opacity 0.4s ease;
+    }
+    #appLoader.is-hidden { opacity: 0; pointer-events: none; }
+    .loader-spinner {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── البنية ─── */
+    .app-shell {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      background: var(--bg-deep);
+      border-left: 1px solid var(--border);
+      padding: 24px 18px;
+      position: sticky; top: 0;
+      height: 100vh; overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 12px;
+      padding: 4px 10px 22px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .sidebar-brand-mark {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      border: 1px solid var(--border-strong);
+      border-radius: 50%;
+      display: grid; place-items: center;
+      color: var(--gold); flex-shrink: 0;
+    }
+    .sidebar-brand-mark svg { width: 20px; height: 20px; stroke-width: 1.5; }
+    .sidebar-brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .sidebar-brand-name { font-size: 15px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.04em; }
+    .sidebar-brand-sub { font-size: 10.5px; color: var(--gold); letter-spacing: 0.18em; margin-top: 2px; text-transform: uppercase; }
+    .sidebar-section-label {
+      font-size: 11px; font-weight: 700; color: var(--text-dim);
+      letter-spacing: 0.15em; text-transform: uppercase;
+      margin: 18px 14px 8px;
+    }
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+    .nav-link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; border-radius: 10px;
+      color: var(--text-muted); font-size: 14px; font-weight: 500;
+      transition: all 0.2s ease; position: relative;
+    }
+    .nav-link:hover { background: var(--bg-card); color: var(--text-primary); }
+    .nav-link.is-active {
+      background: var(--gold-muted); color: var(--gold-bright); font-weight: 700;
+    }
+    .nav-link.is-active::before {
+      content: ""; position: absolute; right: 0; top: 8px; bottom: 8px;
+      width: 3px; background: var(--gold); border-radius: 4px 0 0 4px;
+    }
+    .nav-link svg {
+      width: 18px; height: 18px; stroke-width: 1.7;
+      flex-shrink: 0; stroke: currentColor; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .sidebar-footer { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--border); }
+    .sidebar-version { font-size: 11px; color: var(--text-dim); text-align: center; }
+
+    /* ─── Header ─── */
+    .main { display: flex; flex-direction: column; min-height: 100vh; }
+    .header {
+      background: rgba(15, 18, 32, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      height: var(--header-h);
+      position: sticky; top: 0; z-index: 50;
+      padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-toggle {
+      display: none;
+      width: 38px; height: 38px;
+      border: 1px solid var(--border-strong);
+      background: transparent; border-radius: 10px;
+      color: var(--gold); cursor: pointer;
+      align-items: center; justify-content: center;
+    }
+    .header-page-title { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+    .header-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--text-muted); font-size: 13px;
+      padding: 6px 14px; border-radius: 20px;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .header-back:hover { color: var(--gold); border-color: var(--border-strong); }
+
+    /* ─── Profile ─── */
+    .profile-trigger {
+      display: flex; align-items: center; gap: 12px;
+      padding: 6px 14px 6px 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .profile-trigger:hover { border-color: var(--border-strong); background: var(--bg-card-hover); }
+    .profile-avatar {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      border-radius: 50%;
+      display: grid; place-items: center;
+      color: var(--gold); font-weight: 800; font-size: 12px;
+    }
+    .profile-info { text-align: right; line-height: 1.3; }
+    .profile-name { font-size: 13px; font-weight: 700; color: var(--text-primary); max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-role { font-size: 11px; color: var(--gold); }
+
+    /* ─── Sidebar overlay ─── */
+    .sidebar-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 150;
+      opacity: 0; visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .sidebar-overlay.is-open { opacity: 1; visibility: visible; }
+
+    /* ─── Content ─── */
+    .content {
+      flex: 1; padding: 28px;
+      max-width: 1400px; width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ─── Page Header ─── */
+    .page-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 22px; gap: 16px; flex-wrap: wrap;
+    }
+    .page-title-block h2 {
+      font-size: 24px; font-weight: 800; color: var(--text-primary);
+      margin-bottom: 4px; letter-spacing: -0.01em;
+    }
+    .page-subtitle { font-size: 13.5px; color: var(--text-muted); }
+
+    /* ─── Box Selector ─── */
+    .selector-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 18px;
+    }
+    .selector-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 14px;
+      align-items: end;
+    }
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+    }
+    .field-select, .field-input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg-void);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-primary);
+      transition: all 0.25s ease;
+    }
+    .field-select:focus, .field-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: var(--bg-deep);
+      box-shadow: 0 0 0 3px var(--gold-muted);
+    }
+    .field-select {
+      appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C9A227' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 14px center;
+      padding-left: 36px;
+    }
+    .field-select option { background: var(--bg-deep); color: var(--text-primary); }
+    .field-input[type="date"] { direction: ltr; text-align: right; }
+
+    .btn-primary {
+      padding: 11px 22px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+      color: var(--bg-void);
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px -8px var(--gold-muted);
+    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      padding: 11px 18px;
+      background: transparent;
+      border: 1.5px solid var(--border-strong);
+      color: var(--text-muted);
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ─── Filters ─── */
+    .filters-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.5fr auto auto;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .filter-group { min-width: 0; }
+
+    /* ─── Stats ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover { border-color: var(--border-strong); }
+    .stat-label {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+      text-align: right;
+    }
+    .stat-value.balance { color: var(--gold); font-size: 26px; }
+    .stat-value.rec { color: var(--success); }
+    .stat-value.pay { color: var(--error); }
+    .stat-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* ─── Table ─── */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 16px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-title { font-size: 15px; font-weight: 800; color: var(--text-primary); }
+    .table-count { font-size: 12.5px; color: var(--text-muted); }
+
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    th {
+      background: var(--bg-deep);
+      color: var(--text-muted);
+      font-weight: 700;
+      text-align: right;
+      padding: 12px 16px;
+      font-size: 11.5px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    tbody tr:hover { background: var(--bg-card-hover); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .col-num { font-variant-numeric: tabular-nums; direction: ltr; text-align: right; }
+    .col-rec { color: var(--success); font-weight: 700; }
+    .col-pay { color: var(--error); font-weight: 700; }
+    .col-balance { color: var(--gold); font-weight: 800; }
+    .col-date { color: var(--text-muted); white-space: nowrap; font-size: 12.5px; }
+    .col-note { color: var(--text-primary); max-width: 280px; }
+    .col-cp { color: var(--text-primary); font-weight: 600; }
+
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-dim);
+    }
+    .empty-state-icon {
+      width: 64px; height: 64px;
+      margin: 0 auto 16px;
+      opacity: 0.4;
+    }
+    .empty-state-title { font-size: 15px; color: var(--text-muted); margin-bottom: 6px; }
+    .empty-state-msg { font-size: 13px; }
+
+    /* ─── Skeleton ─── */
+    .skeleton-row td {
+      padding: 16px;
+    }
+    .skeleton-bar {
+      height: 12px;
+      background: linear-gradient(90deg, var(--bg-deep) 25%, var(--bg-card-hover) 50%, var(--bg-deep) 75%);
+      background-size: 200% 100%;
+      border-radius: 4px;
+      animation: shimmer 1.5s linear infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ─── Toast ─── */
+    .toast-container {
+      position: fixed; bottom: 24px; right: 24px;
+      z-index: 1000;
+      display: flex; flex-direction: column-reverse; gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      min-width: 260px; max-width: 360px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 18px 40px -12px rgba(0,0,0,0.5);
+      animation: toastIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: auto;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .toast.is-leaving { animation: toastOut 0.25s ease forwards; }
+    @keyframes toastOut { to { opacity: 0; transform: translateX(40px); } }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+    .toast-icon {
+      width: 28px; height: 28px;
+      flex-shrink: 0; border-radius: 50%;
+      display: grid; place-items: center;
+    }
+    .toast.success .toast-icon { background: rgba(74,222,128,0.15); color: var(--success); }
+    .toast.error .toast-icon { background: rgba(255,107,107,0.15); color: var(--error); }
+    .toast-icon svg { width: 16px; height: 16px; stroke-width: 2.5; }
+    .toast-msg { font-size: 13.5px; line-height: 1.5; flex: 1; }
+
+    /* ─── Print ─── */
+    @media print {
+      body { background: white; color: black; }
+      body::before { display: none; }
+      .sidebar, .header, .filters-bar, .selector-card, .toast-container { display: none !important; }
+      .app-shell { grid-template-columns: 1fr !important; }
+      .content { padding: 0; max-width: none; }
+      .stat-card, .table-card { break-inside: avoid; border-color: #ccc; background: white; }
+      .stat-label, .stat-meta, .table-title, .table-count, th, td, .col-note, .col-cp, .stat-value, .col-num { color: black !important; }
+      th { background: #f5f5f5 !important; }
+    }
+
+    /* ─── Mobile ─── */
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .filters-bar { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 900px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed; top: 0; right: 0;
+        width: 280px; z-index: 200;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        box-shadow: -20px 0 60px -10px rgba(0,0,0,0.5);
+      }
+      .sidebar.is-open { transform: translateX(0); }
+      .header-toggle { display: flex; }
+      .header { padding: 0 18px; }
+      .content { padding: 22px 14px; }
+      .profile-info { display: none; }
+      .profile-trigger { padding: 4px; gap: 0; }
+      .selector-row { grid-template-columns: 1fr; }
+      .selector-row > * { width: 100%; }
+      .filters-bar { grid-template-columns: 1fr; padding: 14px; }
+      .toast-container { right: 12px; left: 12px; bottom: 12px; }
+      .toast { min-width: 0; max-width: none; }
+      .col-note { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card { padding: 14px 16px; }
+      .stat-value { font-size: 18px; }
+      .stat-value.balance { font-size: 21px; }
+      .header-back span { display: none; }
+      table { font-size: 12.5px; }
+      th, td { padding: 10px 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="appLoader"><div class="loader-spinner"></div></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v18M5 8h14M3 12l2-4 2 4M3 12c0 1.5 1 3 2 3s2-1.5 2-3M17 12l2-4 2 4M17 12c0 1.5 1 3 2 3s2-1.5 2-3M5 21h14"/>
+          </svg>
+        </div>
+        <div class="sidebar-brand-text">
+          <span class="sidebar-brand-name">FINEXSA</span>
+          <span class="sidebar-brand-sub">Staff Panel</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section-label">القائمة الرئيسية</div>
+      <ul class="nav-list">
+        <li><a href="dashboard.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+          <span>الرئيسية</span>
+        </a></li>
+        <li><a href="cash.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="12" cy="15" r="2"/></svg>
+          <span>الصناديق</span>
+        </a></li>
+        <li><a href="cash-report.html" class="nav-link is-active">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+          <span>كشف الحساب</span>
+        </a></li>
+        <li><a href="tasks.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>المهام</span>
+        </a></li>
+      </ul>
+
+      <div class="sidebar-section-label" id="adminSectionLabel" style="display:none">الإدارة</div>
+      <ul class="nav-list" id="adminNavList" style="display:none">
+        <li><a href="admin-users.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>إدارة الموظفين</span>
+        </a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-version">v1.0.0 · 2026 ©</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+
+      <header class="header">
+        <div class="header-left">
+          <button class="header-toggle" id="sidebarToggle" aria-label="فتح القائمة">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <h1 class="header-page-title">كشف الحساب</h1>
+        </div>
+        <div class="header-right" style="display:flex; align-items:center; gap:14px;">
+          <a href="dashboard.html" class="header-back">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <span>الرئيسية</span>
+          </a>
+          <div class="profile-trigger" id="profileTrigger">
+            <div class="profile-avatar" id="profileAvatar">FX</div>
+            <div class="profile-info">
+              <div class="profile-name" id="profileName">…</div>
+              <div class="profile-role" id="profileRole">…</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>كشف حساب الصناديق</h2>
+            <p class="page-subtitle">اختر صندوقاً لاستعراض حركاته وأرصدته</p>
+          </div>
+        </div>
+
+        <!-- Box Selector -->
+        <div class="selector-card">
+          <div class="selector-row">
+            <div>
+              <label class="field-label" for="boxSelect">الصندوق</label>
+              <select id="boxSelect" class="field-select">
+                <option value="">— اختر الصندوق —</option>
+              </select>
+            </div>
+            <button class="btn-primary" id="btnLoad" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              تحميل
+            </button>
+            <button class="btn-secondary" id="btnPrint" disabled>طباعة</button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar" id="filtersBar" style="display:none">
+          <div class="filter-group">
+            <label class="field-label" for="filterFrom">من تاريخ</label>
+            <input type="date" id="filterFrom" class="field-input">
+          </div>
+          <div class="filter-group">
+            <label class="field-label" for="filterTo">إلى تاريخ</label>
+            <input type="date" id="filterTo" class="field-input">
+          </div>
+          <div class="filter-group">
+            <label class="field-label" for="filterSearch">بحث</label>
+            <input type="text" id="filterSearch" class="field-input" placeholder="بحث في البيان أو الحساب المقابل…">
+          </div>
+          <div class="filter-group">
+            <label class="field-label" for="filterDir">النوع</label>
+            <select id="filterDir" class="field-select">
+              <option value="">الكل</option>
+              <option value="rec">قبض فقط</option>
+              <option value="pay">دفع فقط</option>
+            </select>
+          </div>
+          <div style="display:flex; align-items:end;">
+            <button class="btn-secondary" id="btnReset">مسح الفلاتر</button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid" style="display:none">
+          <div class="stat-card">
+            <div class="stat-label">الرصيد الحالي</div>
+            <div class="stat-value balance" id="statBalance">—</div>
+            <div class="stat-meta" id="statBalanceMeta">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">إجمالي القبض</div>
+            <div class="stat-value rec" id="statRec">—</div>
+            <div class="stat-meta">حركات وارد</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">إجمالي الدفع</div>
+            <div class="stat-value pay" id="statPay">—</div>
+            <div class="stat-meta">حركات صادر</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">عدد الحركات</div>
+            <div class="stat-value" id="statCount">—</div>
+            <div class="stat-meta" id="statCountMeta">حركة معروضة</div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card" id="tableCard" style="display:none">
+          <div class="table-header">
+            <div class="table-title" id="tableTitle">حركات الصندوق</div>
+            <div class="table-count" id="tableCount"></div>
+          </div>
+          <div class="table-wrap">
+            <table id="reportTable">
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>البيان</th>
+                  <th>الحساب المقابل</th>
+                  <th>قبض</th>
+                  <th>دفع</th>
+                  <th>الرصيد</th>
+                </tr>
+              </thead>
+              <tbody id="reportBody"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="emptyState" style="display:none">
+            <div class="empty-state-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <div class="empty-state-title">لا توجد حركات</div>
+            <div class="empty-state-msg">لم نجد حركات تطابق الفلاتر المُحدَّدة</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDynBPUjrpBHmPc6EGwHyOZmkEiv-pNhR0",
+      authDomain: "finexsa-capital.firebaseapp.com",
+      projectId: "finexsa-capital",
+      storageBucket: "finexsa-capital.firebasestorage.app",
+      messagingSenderId: "225933147484",
+      appId: "1:225933147484:web:b71f87f0705553062ed599",
+      measurementId: "G-8V2H675WN1"
+    };
+
+    const STAFF_API_URL = 'https://script.google.com/macros/s/AKfycbx_0dlteS5I41Z5vNb7E_IgsdMm2y8iFfe6QwL_OSgkpQu2HK4GqCug2CNz8eGB6pxa/exec';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    function safeParseArray(raw) {
+      try { const p = JSON.parse(raw || '[]'); return Array.isArray(p) ? p : []; }
+      catch { return []; }
+    }
+
+    const staffData = {
+      uid: sessionStorage.getItem('finexsa_staff_uid'),
+      email: sessionStorage.getItem('finexsa_staff_email') || '',
+      name: sessionStorage.getItem('finexsa_staff_name') || 'موظف',
+      role: sessionStorage.getItem('finexsa_staff_role') || 'accountant',
+      branch: sessionStorage.getItem('finexsa_staff_branch') || '',
+      allowedBoxes: safeParseArray(sessionStorage.getItem('finexsa_staff_allowed'))
+    };
+
+    if (!staffData.uid) window.location.replace('login.html');
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) { sessionStorage.clear(); window.location.replace('login.html'); }
+    });
+
+    const getInitials = n => {
+      if (!n) return 'FX';
+      const p = n.trim().split(/\s+/);
+      return (p.length === 1 ? p[0].substring(0,2) : p[0][0]+p[1][0]).toUpperCase();
+    };
+    const translateRole = r => ({admin:'مدير النظام', accountant:'محاسب', manager:'مدير قسم', viewer:'مشاهد'}[r] || r);
+
+    document.getElementById('profileAvatar').textContent = getInitials(staffData.name);
+    document.getElementById('profileName').textContent = staffData.name;
+    document.getElementById('profileRole').textContent = translateRole(staffData.role);
+
+    if (staffData.role === 'admin') {
+      document.getElementById('adminSectionLabel').style.display = 'block';
+      document.getElementById('adminNavList').style.display = 'flex';
+    }
+
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+      sidebar.classList.add('is-open');
+      sidebarOverlay.classList.add('is-open');
+    });
+    sidebarOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('is-open');
+      sidebarOverlay.classList.remove('is-open');
+    });
+
+    // Toast
+    function toast(msg, type = 'info', duration = 3500) {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      const icons = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+      };
+      el.innerHTML = `<div class="toast-icon">${icons[type]||icons.success}</div><div class="toast-msg">${msg}</div>`;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => {
+        el.classList.add('is-leaving');
+        setTimeout(() => el.remove(), 300);
+      }, duration);
+    }
+
+    // State
+    const state = {
+      boxes: [],
+      currentBox: null,
+      currentCurrency: '',
+      rawData: [],     // كل الحركات من الخادم
+      filtered: []     // بعد تطبيق الفلاتر
+    };
+
+    // Load boxes
+    async function loadBoxes() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        const res = await fetch(`${STAFF_API_URL}?action=getLists&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+
+        state.boxes = data.lists['الصناديق'] || [];
+        const sel = document.getElementById('boxSelect');
+        sel.innerHTML = '<option value="">— اختر الصندوق —</option>';
+        state.boxes.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b; opt.textContent = b;
+          sel.appendChild(opt);
+        });
+
+        document.getElementById('appLoader').classList.add('is-hidden');
+        setTimeout(() => document.getElementById('appLoader').remove(), 400);
+      } catch (err) {
+        toast('فشل تحميل الصناديق: ' + err.message, 'error', 5000);
+      }
+    }
+
+    document.getElementById('boxSelect').addEventListener('change', (e) => {
+      document.getElementById('btnLoad').disabled = !e.target.value;
+    });
+
+    // Load report
+    document.getElementById('btnLoad').addEventListener('click', loadReport);
+
+    async function loadReport() {
+      const box = document.getElementById('boxSelect').value;
+      if (!box) return;
+
+      const btn = document.getElementById('btnLoad');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loader-spinner" style="width:14px;height:14px;border-width:2px;"></span> جاري التحميل…';
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const url = `${STAFF_API_URL}?action=getReport&token=${encodeURIComponent(token)}&box=${encodeURIComponent(box)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.message);
+
+        state.currentBox = data.boxName;
+        state.currentCurrency = data.currency || '';
+        state.rawData = data.data || [];
+
+        document.getElementById('filtersBar').style.display = 'grid';
+        document.getElementById('statsGrid').style.display = 'grid';
+        document.getElementById('tableCard').style.display = 'block';
+        document.getElementById('btnPrint').disabled = false;
+        document.getElementById('tableTitle').textContent = `حركات ${state.currentBox}`;
+
+        if (data.summary) {
+          document.getElementById('statBalance').textContent = formatNumber(data.summary.currentBalance);
+          document.getElementById('statBalanceMeta').textContent = state.currentCurrency || '—';
+        }
+
+        applyFilters();
+
+      } catch (err) {
+        toast('فشل تحميل البيانات: ' + err.message, 'error', 5000);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> تحميل';
+      }
+    }
+
+    // Filters
+    ['filterFrom', 'filterTo', 'filterSearch', 'filterDir'].forEach(id => {
+      document.getElementById(id).addEventListener('input', applyFilters);
+      document.getElementById(id).addEventListener('change', applyFilters);
+    });
+
+    document.getElementById('btnReset').addEventListener('click', () => {
+      document.getElementById('filterFrom').value = '';
+      document.getElementById('filterTo').value = '';
+      document.getElementById('filterSearch').value = '';
+      document.getElementById('filterDir').value = '';
+      applyFilters();
+    });
+
+    function applyFilters() {
+      const from = document.getElementById('filterFrom').value;
+      const to = document.getElementById('filterTo').value;
+      const search = document.getElementById('filterSearch').value.trim().toLowerCase();
+      const dir = document.getElementById('filterDir').value;
+
+      let filtered = state.rawData.filter(r => {
+        if (from && r.date < from) return false;
+        if (to && r.date > to) return false;
+        if (dir === 'rec' && (!r.rec || r.rec === '')) return false;
+        if (dir === 'pay' && (!r.pay || r.pay === '')) return false;
+        if (search) {
+          const haystack = `${r.note || ''} ${r.opposite || ''}`.toLowerCase();
+          if (!haystack.includes(search)) return false;
+        }
+        return true;
+      });
+
+      state.filtered = filtered;
+      renderTable();
+      updateStats();
+    }
+
+    function renderTable() {
+      const body = document.getElementById('reportBody');
+      const empty = document.getElementById('emptyState');
+      const count = document.getElementById('tableCount');
+
+      count.textContent = `${state.filtered.length} حركة`;
+
+      if (state.filtered.length === 0) {
+        body.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      body.innerHTML = state.filtered.map(r => `
+        <tr>
+          <td class="col-date">${formatDate(r.date)}</td>
+          <td class="col-note" title="${escapeHTML(r.note || '')}">${escapeHTML(r.note || '')}</td>
+          <td class="col-cp">${escapeHTML(r.opposite || '')}</td>
+          <td class="col-num col-rec">${(r.rec && r.rec !== '') ? formatNumber(r.rec) : '—'}</td>
+          <td class="col-num col-pay">${(r.pay && r.pay !== '') ? formatNumber(r.pay) : '—'}</td>
+          <td class="col-num col-balance">${(typeof r.balance === 'number') ? formatNumber(r.balance) : (r.balance || '—')}</td>
+        </tr>
+      `).join('');
+    }
+
+    function updateStats() {
+      let totalRec = 0, totalPay = 0;
+      state.filtered.forEach(r => {
+        if (typeof r.rec === 'number') totalRec += r.rec;
+        if (typeof r.pay === 'number') totalPay += r.pay;
+      });
+
+      document.getElementById('statRec').textContent = formatNumber(totalRec);
+      document.getElementById('statPay').textContent = formatNumber(totalPay);
+      document.getElementById('statCount').textContent = state.filtered.length;
+      document.getElementById('statCountMeta').textContent =
+        state.filtered.length === state.rawData.length
+          ? 'كل الحركات'
+          : `من أصل ${state.rawData.length}`;
+    }
+
+    // Print
+    document.getElementById('btnPrint').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Helpers
+    function formatNumber(n) {
+      if (n === null || n === undefined || n === '') return '—';
+      const num = Number(n);
+      if (isNaN(num)) return String(n);
+      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(num);
+    }
+    function formatDate(s) {
+      if (!s) return '—';
+      const parts = String(s).split('-');
+      if (parts.length !== 3) return s;
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    function escapeHTML(s) {
+      return String(s || '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c])
+      );
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) loadBoxes();
+    });
+  </script>
+
+</body>
+</html>
