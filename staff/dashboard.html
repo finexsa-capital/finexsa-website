@@ -12,6 +12,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
+    /* ═══ فرض الأرقام اللاتينية في كل التطبيق ═══ */
+    *, *::before, *::after {
+      -moz-font-feature-settings: "lnum";
+      -webkit-font-feature-settings: "lnum";
+      font-feature-settings: "lnum";
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    body, input, select, textarea, button {
+      font-feature-settings: "lnum";
+    }
+
     /* ============================================
        FINEXSA Staff — Dashboard
        ============================================ */

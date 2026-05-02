@@ -14,6 +14,17 @@
   <link rel="stylesheet" href="m.css">
 
   <style>
+    /* ═══ فرض الأرقام اللاتينية في كل التطبيق ═══ */
+    *, *::before, *::after {
+      -moz-font-feature-settings: "lnum";
+      -webkit-font-feature-settings: "lnum";
+      font-feature-settings: "lnum";
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    body, input, select, textarea, button {
+      font-feature-settings: "lnum";
+    }
+
     body { padding-bottom: 0; }
 
     .receipt-screen {
@@ -397,7 +408,7 @@
       const dirLabel = isReceive ? 'سند قبض' : 'سند دفع';
       const recNumber = generateReceiptNumber(txn);
       const amountWords = numberToArabicWords(amount, currency);
-      const printedAt = new Date().toLocaleDateString('ar-SY', {
+      const printedAt = new Date().toLocaleDateString('en-GB', {
         day: '2-digit', month: 'long', year: 'numeric'
       });
 

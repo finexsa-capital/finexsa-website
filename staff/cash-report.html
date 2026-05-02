@@ -12,6 +12,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
+    /* ═══ فرض الأرقام اللاتينية في كل التطبيق ═══ */
+    *, *::before, *::after {
+      -moz-font-feature-settings: "lnum";
+      -webkit-font-feature-settings: "lnum";
+      font-feature-settings: "lnum";
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    body, input, select, textarea, button {
+      font-feature-settings: "lnum";
+    }
+
     :root {
       --bg-void:       #0A0E1A;
       --bg-deep:       #0F1220;
@@ -1178,7 +1189,7 @@
       const currency = state.currentCurrency || '';
       const amountWords = numberToArabicWords(amount) + ' ' + currency + ' فقط لا غير';
       const today = new Date();
-      const printedAt = today.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+      const printedAt = today.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
 
       return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">

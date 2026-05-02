@@ -17,6 +17,17 @@
   <link rel="stylesheet" href="m.css">
 
   <style>
+    /* ═══ فرض الأرقام اللاتينية في كل التطبيق ═══ */
+    *, *::before, *::after {
+      -moz-font-feature-settings: "lnum";
+      -webkit-font-feature-settings: "lnum";
+      font-feature-settings: "lnum";
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    body, input, select, textarea, button {
+      font-feature-settings: "lnum";
+    }
+
     /* ═══ Filter card (top) ═══ */
     .filter-card {
       background: var(--bg-card);

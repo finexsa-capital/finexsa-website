@@ -456,3 +456,19 @@ button { font-family: inherit; }
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ═══ فرض الأرقام اللاتينية في كل التطبيق ═══ */
+* {
+  font-feature-settings: "lnum";
+  font-variant-numeric: lining-nums;
+}
+.tabular,
+input[type="number"],
+input[type="date"],
+.field-input[type="number"],
+.field-input[type="date"] {
+  font-feature-settings: "lnum" "tnum";
+  font-variant-numeric: lining-nums tabular-nums;
+  direction: ltr;
+}
