@@ -965,13 +965,23 @@
     });
 
     // ═══════ قراءة بيانات الجلسة ═══════
+    function safeParseArray(raw) {
+      try {
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
     const staffData = {
       uid: sessionStorage.getItem('finexsa_staff_uid'),
       email: sessionStorage.getItem('finexsa_staff_email') || '',
       name: sessionStorage.getItem('finexsa_staff_name') || 'موظف',
       role: sessionStorage.getItem('finexsa_staff_role') || 'accountant',
       branch: sessionStorage.getItem('finexsa_staff_branch') || '',
-      allowedBoxes: JSON.parse(sessionStorage.getItem('finexsa_staff_allowed') || '[]')
+      allowedBoxes: safeParseArray(sessionStorage.getItem('finexsa_staff_allowed'))
     };
 
     // ═══════ تعبئة الـ Header ═══════
@@ -1018,7 +1028,7 @@
     }
 
     // ═══════ الإحصاءات الأولية ═══════
-    const isAllBoxes = staffData.allowedBoxes.includes('all') || staffData.role === 'admin';
+    const isAllBoxes = staffData.role === 'admin' || (Array.isArray(staffData.allowedBoxes) && staffData.allowedBoxes.indexOf('all') !== -1);
     const boxCount = isAllBoxes ? '∞' : staffData.allowedBoxes.length;
     document.getElementById('statBoxes').textContent = boxCount;
     if (isAllBoxes) {
