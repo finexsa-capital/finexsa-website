@@ -792,7 +792,7 @@
     @media (max-width: 1100px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
       .app-shell { grid-template-columns: 1fr; }
       .sidebar {
         position: fixed; top: 0; right: 0;
@@ -960,7 +960,7 @@
 
         <!-- Search -->
         <div class="search-bar">
-          <input type="text" id="searchInput" class="search-input" placeholder="بحث بالاسم أو البريد الإلكتروني…">
+          <input type="text" id="searchInput" class="search-input" placeholder="بحث بالاسم أو البريد الإلكتروني…" autocomplete="off" name="search-staff-q">
           <select id="filterRole" class="form-select" style="max-width: 180px;">
             <option value="">كل الأدوار</option>
             <option value="admin">مدير النظام</option>
@@ -1375,6 +1375,18 @@
       const allowed = Array.isArray(s.allowedBoxes) ? s.allowedBoxes : [];
       renderBoxesSelector(allowed);
       modal.classList.add('is-open');
+
+      // حماية: تأكد أن قائمة الموظفين لم تُفلتر بالخطأ بسبب autocomplete
+      setTimeout(() => {
+        if (document.getElementById('searchInput').value !== '') {
+          // إذا تم ملء البحث تلقائياً، أعد عرض كامل القائمة
+          const wasFiltered = state.filteredStaff.length !== state.staff.length;
+          if (wasFiltered) {
+            document.getElementById('searchInput').value = '';
+            applyFilters();
+          }
+        }
+      }, 50);
     }
 
     function renderBoxesSelector(selected) {
