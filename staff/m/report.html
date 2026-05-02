@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <title>كشف الحساب — FINEXSA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="m.css">
+
+  <style>
+    /* ═══ Filter card (top) ═══ */
+    .filter-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .filter-row.single { grid-template-columns: 1fr; margin-bottom: 0; }
+    .filter-row .field-group { margin-bottom: 0; }
+
+    /* ═══ Stats summary ═══ */
+    .summary {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-deep));
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .summary-balance {
+      text-align: center;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed var(--border);
+      margin-bottom: 14px;
+    }
+    .summary-label {
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .summary-value {
+      font-size: 30px;
+      font-weight: 900;
+      direction: ltr;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .summary-value.positive { color: var(--success); }
+    .summary-value.negative { color: var(--error); }
+    .summary-currency {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-right: 6px;
+      font-weight: 700;
+    }
+
+    .summary-flow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .flow-item {
+      text-align: center;
+    }
+    .flow-icon {
+      width: 28px; height: 28px;
+      margin: 0 auto 6px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+    }
+    .flow-icon.receive {
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--success);
+    }
+    .flow-icon.pay {
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--error);
+    }
+    .flow-icon svg { width: 14px; height: 14px; stroke-width: 2.5; stroke: currentColor; fill: none; }
+    .flow-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .flow-amount {
+      font-size: 14px;
+      font-weight: 800;
+      direction: ltr;
+      margin-top: 2px;
+    }
+    .flow-amount.receive { color: var(--success); }
+    .flow-amount.pay { color: var(--error); }
+
+    /* ═══ Transaction Cards ═══ */
+    .txn-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+      animation: slideIn 0.25s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .txn-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .txn-dir {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .txn-dir.receive {
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--success);
+    }
+    .txn-dir.pay {
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--error);
+    }
+    .txn-dir svg { width: 18px; height: 18px; stroke-width: 2.4; stroke: currentColor; fill: none; }
+
+    .txn-info { flex: 1; min-width: 0; }
+    .txn-amount {
+      font-size: 17px;
+      font-weight: 800;
+      direction: ltr;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .txn-amount.receive { color: var(--success); }
+    .txn-amount.pay { color: var(--error); }
+    .txn-amount-currency {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-right: 4px;
+      font-weight: 700;
+    }
+    .txn-opposite {
+      font-size: 13px;
+      color: var(--text-primary);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .txn-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border);
+    }
+    .txn-meta-item { display: inline-flex; align-items: center; gap: 4px; }
+    .txn-meta-item svg { width: 11px; height: 11px; stroke-width: 2; stroke: currentColor; fill: none; }
+    .txn-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .txn-balance {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+      margin-bottom: 10px;
+    }
+    .txn-balance-label { color: var(--text-dim); font-weight: 700; }
+    .txn-balance-value {
+      font-weight: 800;
+      direction: ltr;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .txn-actions {
+      display: flex;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .txn-action-btn {
+      flex: 1;
+      padding: 10px 8px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .txn-action-btn:active { transform: scale(0.96); }
+    .txn-action-btn.receipt {
+      background: var(--gold-muted);
+      border-color: var(--border-strong);
+      color: var(--gold-bright);
+    }
+    .txn-action-btn.share {
+      background: rgba(37, 211, 102, 0.12);
+      border-color: rgba(37, 211, 102, 0.3);
+      color: var(--whatsapp);
+    }
+    .txn-action-btn svg { width: 13px; height: 13px; stroke-width: 2; stroke: currentColor; fill: none; }
+
+    /* Skeleton loader */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: skeleton 1.4s ease-in-out infinite;
+      border-radius: 8px;
+    }
+    @keyframes skeleton {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
+    .skeleton-card {
+      height: 140px;
+      margin-bottom: 10px;
+    }
+
+    /* Header action button */
+    .filter-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .filter-toggle.is-active {
+      background: var(--gold-muted);
+      border-color: var(--gold);
+      color: var(--gold-bright);
+    }
+    .filter-toggle svg { width: 12px; height: 12px; }
+
+    .filters-row-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 2px 0;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+    .filters-row-pills::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .filter-pill.is-active {
+      background: var(--gold-muted);
+      border-color: var(--gold);
+      color: var(--gold-bright);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-loader" id="appLoader"><div class="spinner"></div></div>
+
+  <header class="app-header">
+    <div class="header-left">
+      <button class="icon-btn" onclick="window.location.href='index.html'" aria-label="رجوع">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="app-title">كشف الحساب</h1>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="refreshBtn" aria-label="تحديث">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-content">
+
+    <!-- Filter card -->
+    <div class="filter-card">
+
+      <div class="filter-row single">
+        <div class="field-group">
+          <label class="field-label" for="boxSelect">
+            <span class="required">*</span> الصندوق
+          </label>
+          <select id="boxSelect" class="field-select">
+            <option value="">— اختر الصندوق —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="field-group">
+          <label class="field-label" for="fromDate">من</label>
+          <input type="date" id="fromDate" class="field-input">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="toDate">إلى</label>
+          <input type="date" id="toDate" class="field-input">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="loadBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        عرض الحركات
+      </button>
+
+    </div>
+
+    <!-- Filters pills -->
+    <div class="filters-row-pills" id="dirFilters" style="display:none">
+      <button class="filter-pill is-active" data-dir="">الكل</button>
+      <button class="filter-pill" data-dir="receive">قبض فقط</button>
+      <button class="filter-pill" data-dir="pay">دفع فقط</button>
+    </div>
+
+    <!-- Summary card -->
+    <div class="summary" id="summary" style="display:none">
+      <div class="summary-balance">
+        <div class="summary-label">الرصيد الحالي</div>
+        <div class="summary-value" id="balanceValue">
+          <span id="balanceNumber">0</span>
+          <span class="summary-currency" id="balanceCurrency"></span>
+        </div>
+      </div>
+      <div class="summary-flow">
+        <div class="flow-item">
+          <div class="flow-icon receive">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+          </div>
+          <div class="flow-label">إجمالي القبض</div>
+          <div class="flow-amount receive" id="totalReceive">0</div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-icon pay">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="19" x2="12" y2="5"/></svg>
+          </div>
+          <div class="flow-label">إجمالي الدفع</div>
+          <div class="flow-amount pay" id="totalPay">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions list -->
+    <div id="txnList"></div>
+
+  </main>
+
+  <!-- Bottom Tabbar -->
+  <nav class="tabbar">
+    <a href="index.html" class="tab">
+      <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+      <span>الرئيسية</span>
+    </a>
+    <a href="cash.html" class="tab">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="12" cy="15" r="2"/></svg>
+      <span>حركة</span>
+    </a>
+    <a href="report.html" class="tab is-active">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>كشف</span>
+    </a>
+    <a href="tasks.html" class="tab">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>المهام</span>
+    </a>
+  </nav>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDynBPUjrpBHmPc6EGwHyOZmkEiv-pNhR0",
+      authDomain: "finexsa-capital.firebaseapp.com",
+      projectId: "finexsa-capital",
+      storageBucket: "finexsa-capital.firebasestorage.app",
+      messagingSenderId: "225933147484",
+      appId: "1:225933147484:web:b71f87f0705553062ed599",
+      measurementId: "G-8V2H675WN1"
+    };
+
+    const STAFF_API_URL = 'https://script.google.com/macros/s/AKfycbx_0dlteS5I41Z5vNb7E_IgsdMm2y8iFfe6QwL_OSgkpQu2HK4GqCug2CNz8eGB6pxa/exec';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    function getStorage() {
+      if (localStorage.getItem('finexsa_m_uid')) return localStorage;
+      if (sessionStorage.getItem('finexsa_m_uid')) return sessionStorage;
+      return null;
+    }
+
+    const storage = getStorage();
+    if (!storage) window.location.replace('login.html');
+
+    function safeParseArray(raw) {
+      try { const p = JSON.parse(raw || '[]'); return Array.isArray(p) ? p : []; }
+      catch { return []; }
+    }
+
+    const me = {
+      uid: storage.getItem('finexsa_m_uid'),
+      name: storage.getItem('finexsa_m_name') || 'موظف',
+      role: storage.getItem('finexsa_m_role') || 'accountant',
+      branch: storage.getItem('finexsa_m_branch') || '',
+      allowedBoxes: safeParseArray(storage.getItem('finexsa_m_allowed'))
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        localStorage.clear(); sessionStorage.clear();
+        window.location.replace('login.html');
+      }
+    });
+
+    function detectCurrency(boxName) {
+      if (!boxName) return '';
+      const n = boxName.toLowerCase();
+      if (n.includes('دولار') || n.includes('usd')) return 'USD';
+      if (n.includes('ليرة تركي') || n.includes('تركي') || n.includes('try')) return 'TRY';
+      if (n.includes('ليرة سوري') || n.includes('سوري') || n.includes('syp')) return 'SYP';
+      if (n.includes('يورو') || n.includes('eur')) return 'EUR';
+      return '';
+    }
+    function currencyArabic(code) {
+      return ({USD:'دولار', TRY:'ليرة تركي', SYP:'ليرة سورية', EUR:'يورو'}[code] || code);
+    }
+
+    function toast(msg, type = 'info', duration = 2500) {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      const icons = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+        info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'
+      };
+      el.innerHTML = `<div class="toast-icon">${icons[type]||icons.info}</div><span>${msg}</span>`;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => {
+        el.classList.add('is-leaving');
+        setTimeout(() => el.remove(), 200);
+      }, duration);
+    }
+
+    // ═════ State ═════
+    const state = {
+      boxes: [],
+      transactions: [],
+      filteredTxns: [],
+      directionFilter: '',
+      currentBox: '',
+      currentCurrency: ''
+    };
+
+    // ═════ تحميل الصناديق ═════
+    async function loadBoxes() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        const res = await fetch(`${STAFF_API_URL}?action=getBoxes&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+
+        const isAll = me.role === 'admin' || me.allowedBoxes.includes('all');
+        state.boxes = isAll ? data.boxes : data.boxes.filter(b => me.allowedBoxes.includes(b));
+
+        const select = document.getElementById('boxSelect');
+        select.innerHTML = '<option value="">— اختر الصندوق —</option>';
+        state.boxes.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b; opt.textContent = b;
+          select.appendChild(opt);
+        });
+
+        document.getElementById('appLoader').classList.add('is-hidden');
+        setTimeout(() => document.getElementById('appLoader').remove(), 400);
+      } catch (err) {
+        toast('فشل التحميل: ' + err.message, 'error');
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => { if (user) loadBoxes(); });
+
+    // ═════ تواريخ افتراضية: آخر 30 يوم ═════
+    const today = new Date();
+    const past = new Date();
+    past.setDate(past.getDate() - 30);
+
+    function fmt(d) {
+      return d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+    }
+    document.getElementById('toDate').value = fmt(today);
+    document.getElementById('fromDate').value = fmt(past);
+
+    // ═════ تحميل الكشف ═════
+    document.getElementById('loadBtn').addEventListener('click', loadReport);
+    document.getElementById('refreshBtn').addEventListener('click', loadReport);
+
+    async function loadReport() {
+      const box = document.getElementById('boxSelect').value;
+      const from = document.getElementById('fromDate').value;
+      const to = document.getElementById('toDate').value;
+
+      if (!box) { toast('اختر الصندوق', 'error'); return; }
+
+      const list = document.getElementById('txnList');
+      list.innerHTML = `
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      `;
+      document.getElementById('summary').style.display = 'none';
+      document.getElementById('dirFilters').style.display = 'none';
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const url = `${STAFF_API_URL}?action=getReport&token=${encodeURIComponent(token)}&box=${encodeURIComponent(box)}&from=${from}&to=${to}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+
+        state.transactions = data.rows || [];
+        state.currentBox = box;
+        state.currentCurrency = detectCurrency(box);
+
+        applyFilter();
+        renderSummary(data);
+
+        if (state.transactions.length > 0) {
+          document.getElementById('dirFilters').style.display = 'flex';
+        }
+      } catch (err) {
+        list.innerHTML = '';
+        toast('فشل تحميل الكشف: ' + err.message, 'error', 4000);
+      }
+    }
+
+    // ═════ Filter pills ═════
+    document.querySelectorAll('[data-dir]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-dir]').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        state.directionFilter = btn.dataset.dir;
+        applyFilter();
+      });
+    });
+
+    function applyFilter() {
+      let filtered = state.transactions;
+      if (state.directionFilter === 'receive') {
+        filtered = filtered.filter(t => (t.rec || 0) > 0);
+      } else if (state.directionFilter === 'pay') {
+        filtered = filtered.filter(t => (t.pay || 0) > 0);
+      }
+      state.filteredTxns = filtered;
+      renderTransactions();
+    }
+
+    // ═════ عرض الإحصائيات ═════
+    function renderSummary(data) {
+      const summary = document.getElementById('summary');
+      let totalRec = 0, totalPay = 0;
+      state.transactions.forEach(t => {
+        totalRec += (t.rec || 0);
+        totalPay += (t.pay || 0);
+      });
+      const balance = totalRec - totalPay;
+
+      const balanceEl = document.getElementById('balanceValue');
+      balanceEl.classList.remove('positive', 'negative');
+      balanceEl.classList.add(balance >= 0 ? 'positive' : 'negative');
+
+      document.getElementById('balanceNumber').textContent = formatNumber(Math.abs(balance));
+      document.getElementById('balanceCurrency').textContent = currencyArabic(state.currentCurrency);
+      document.getElementById('totalReceive').textContent = formatNumber(totalRec);
+      document.getElementById('totalPay').textContent = formatNumber(totalPay);
+
+      summary.style.display = 'block';
+    }
+
+    // ═════ عرض الحركات ═════
+    function renderTransactions() {
+      const list = document.getElementById('txnList');
+      if (state.filteredTxns.length === 0) {
+        list.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="empty-title">لا توجد حركات</div>
+            <div class="empty-msg">جرّب تغيير الفترة أو المرشّح</div>
+          </div>
+        `;
+        return;
+      }
+
+      // ترتيب من الأحدث + حساب الرصيد التراكمي
+      const sorted = [...state.filteredTxns].sort((a, b) => {
+        const dA = new Date(a.date || 0), dB = new Date(b.date || 0);
+        return dA - dB;
+      });
+      let running = 0;
+      const withBalance = sorted.map(t => {
+        running += (t.rec || 0) - (t.pay || 0);
+        return { ...t, balance: running };
+      }).reverse();
+
+      list.innerHTML = withBalance.map((t, idx) => {
+        const isReceive = (t.rec || 0) > 0;
+        const amount = isReceive ? t.rec : t.pay;
+        const dirClass = isReceive ? 'receive' : 'pay';
+        const dirIcon = isReceive
+          ? '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>'
+          : '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="19" x2="12" y2="5"/></svg>';
+
+        const txnId = t._rowId || `txn_${idx}`;
+
+        return `
+          <div class="txn-card">
+            <div class="txn-head">
+              <div class="txn-dir ${dirClass}">${dirIcon}</div>
+              <div class="txn-info">
+                <div class="txn-amount ${dirClass}">
+                  ${isReceive ? '+' : '−'}${formatNumber(amount)}
+                  <span class="txn-amount-currency">${currencyArabic(state.currentCurrency)}</span>
+                </div>
+                <div class="txn-opposite">${escapeHTML(t.opposite || '—')}</div>
+              </div>
+            </div>
+
+            <div class="txn-meta">
+              <span class="txn-meta-item">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                ${formatDate(t.date)}
+              </span>
+            </div>
+
+            ${t.note ? `<div class="txn-note">${escapeHTML(t.note)}</div>` : ''}
+
+            <div class="txn-balance">
+              <span class="txn-balance-label">الرصيد بعد الحركة</span>
+              <span class="txn-balance-value ${t.balance >= 0 ? 'text-success' : 'text-error'}">${formatNumber(t.balance)} ${currencyArabic(state.currentCurrency)}</span>
+            </div>
+
+            <div class="txn-actions">
+              <button class="txn-action-btn receipt" data-receipt='${escapeJSON(t)}'>
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                عرض الإيصال
+              </button>
+              <button class="txn-action-btn share" data-share='${escapeJSON(t)}'>
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                مشاركة
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ربط الأزرار
+      list.querySelectorAll('[data-receipt]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const t = JSON.parse(btn.dataset.receipt);
+          openReceipt(t, false);
+        });
+      });
+      list.querySelectorAll('[data-share]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const t = JSON.parse(btn.dataset.share);
+          openReceipt(t, true);
+        });
+      });
+    }
+
+    function openReceipt(txn, autoShare) {
+      // حفظ الحركة في sessionStorage ثم الانتقال
+      sessionStorage.setItem('finexsa_m_receipt', JSON.stringify({
+        txn,
+        box: state.currentBox,
+        currency: state.currentCurrency,
+        autoShare: !!autoShare
+      }));
+      window.location.href = 'receipt.html';
+    }
+
+    // ═════ Helpers ═════
+    function formatNumber(n) {
+      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(Number(n) || 0);
+    }
+    function formatDate(s) {
+      if (!s) return '—';
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    }
+    function escapeHTML(s) {
+      return String(s || '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c])
+      );
+    }
+    function escapeJSON(o) {
+      return JSON.stringify(o).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

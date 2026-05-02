@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <title>الإيصال — FINEXSA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="m.css">
+
+  <style>
+    body { padding-bottom: 0; }
+
+    .receipt-screen {
+      padding: 16px;
+      padding-bottom: 200px;
+      min-height: 100vh;
+    }
+
+    /* ═══ شكل الإيصال ═══ */
+    .receipt {
+      background: white;
+      color: #1a1a1a;
+      border-radius: 14px;
+      padding: 24px 22px;
+      box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+      max-width: 480px;
+      margin: 0 auto;
+      direction: rtl;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    .receipt-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid #1E2A5A;
+      margin-bottom: 18px;
+    }
+    .receipt-brand {
+      flex: 1;
+    }
+    .receipt-brand-name {
+      font-size: 19px;
+      font-weight: 800;
+      color: #1E2A5A;
+      letter-spacing: 0;
+    }
+    .receipt-brand-sub {
+      font-size: 11px;
+      color: #C9A227;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .receipt-logo {
+      width: 50px; height: 50px;
+      background: linear-gradient(135deg, #1E2A5A, #2A3A7A);
+      border-radius: 50%;
+      display: grid; place-items: center;
+      color: #C9A227;
+      flex-shrink: 0;
+    }
+    .receipt-logo svg {
+      width: 24px; height: 24px;
+      stroke-width: 1.5;
+      stroke: currentColor; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .receipt-branch {
+      text-align: left;
+      direction: ltr;
+      font-size: 10px;
+      color: #555;
+      line-height: 1.5;
+    }
+    .receipt-branch-name {
+      font-size: 11px;
+      color: #1E2A5A;
+      font-weight: 700;
+      direction: rtl;
+      text-align: left;
+      margin-bottom: 2px;
+    }
+
+    .receipt-title-block {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .receipt-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #FFF;
+      background: ${dirColor};
+      display: inline-block;
+      padding: 6px 32px;
+      border-radius: 6px;
+      letter-spacing: 0;
+      margin-bottom: 8px;
+    }
+    .receipt-number {
+      font-size: 11.5px;
+      color: #555;
+      direction: ltr;
+      font-family: 'Courier New', monospace;
+      background: #f5f5f5;
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 100px;
+      border: 1px solid #ddd;
+    }
+
+    .receipt-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+    .receipt-table tr {
+      border-bottom: 1px solid #eee;
+    }
+    .receipt-table th {
+      text-align: right;
+      padding: 10px 12px;
+      font-weight: 700;
+      color: #555;
+      background: #f8f9fa;
+      width: 38%;
+      font-size: 12px;
+    }
+    .receipt-table td {
+      padding: 10px 12px;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+    .receipt-table .amount-cell {
+      font-size: 15px;
+      font-weight: 900;
+      color: ${dirColor};
+    }
+
+    .words-box {
+      background: #fffbeb;
+      border: 1px dashed #C9A227;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      margin-bottom: 18px;
+    }
+    .words-box strong {
+      color: #1E2A5A;
+      margin-left: 6px;
+    }
+
+    .signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding-top: 18px;
+      border-top: 1px solid #ddd;
+      margin-bottom: 14px;
+    }
+    .sig-block {
+      text-align: center;
+    }
+    .sig-line {
+      border-top: 1px solid #888;
+      padding-top: 6px;
+      margin-bottom: 4px;
+    }
+    .sig-label {
+      font-size: 10.5px;
+      color: #777;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .sig-name {
+      font-size: 11.5px;
+      color: #333;
+      font-weight: 700;
+    }
+
+    .receipt-footer {
+      text-align: center;
+      padding-top: 12px;
+      border-top: 1px dashed #ddd;
+      font-size: 9.5px;
+      color: #888;
+    }
+    .footer-stamp { margin-top: 4px; color: #aaa; }
+
+    /* ═══ شريط الأزرار السفلي ═══ */
+    .actions-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      padding: 14px 16px;
+      padding-bottom: calc(14px + var(--safe-bottom));
+      background: rgba(15, 18, 32, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      z-index: 90;
+      display: flex;
+      gap: 8px;
+    }
+    .actions-bar .btn {
+      flex: 1;
+      padding: 14px;
+      font-size: 14px;
+    }
+    .actions-bar .btn-whatsapp {
+      flex: 2;
+    }
+
+    .receipt-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      gap: 14px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="header-left">
+      <button class="icon-btn" onclick="window.history.back()" aria-label="رجوع">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="app-title">معاينة الإيصال</h1>
+    </div>
+    <div class="header-right"></div>
+  </header>
+
+  <main class="receipt-screen">
+    <div id="receiptContainer">
+      <div class="receipt-loading">
+        <div class="spinner"></div>
+        <span>جاري التحضير...</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- شريط الأزرار -->
+  <div class="actions-bar" id="actionsBar" style="display:none">
+    <button class="btn btn-whatsapp" id="btnWhatsapp">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      مشاركة واتساب
+    </button>
+    <button class="btn btn-secondary" id="btnShareOther">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      مشاركة عام
+    </button>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    // ═════ قراءة بيانات الإيصال ═════
+    const receiptData = JSON.parse(sessionStorage.getItem('finexsa_m_receipt') || 'null');
+    if (!receiptData) {
+      document.getElementById('receiptContainer').innerHTML = `
+        <div class="empty">
+          <div class="empty-title">لا يوجد إيصال للعرض</div>
+          <div class="empty-msg">ارجع لصفحة كشف الحساب واختر حركة</div>
+        </div>
+      `;
+    } else {
+      buildReceipt();
+    }
+
+    function getStorage() {
+      if (localStorage.getItem('finexsa_m_uid')) return localStorage;
+      if (sessionStorage.getItem('finexsa_m_uid')) return sessionStorage;
+      return null;
+    }
+
+    function currencyArabic(code) {
+      return ({USD:'دولار', TRY:'ليرة تركي', SYP:'ليرة سورية', EUR:'يورو'}[code] || code);
+    }
+
+    function toast(msg, type = 'info', duration = 2500) {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      const icons = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+        info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'
+      };
+      el.innerHTML = `<div class="toast-icon">${icons[type]||icons.info}</div><span>${msg}</span>`;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => {
+        el.classList.add('is-leaving');
+        setTimeout(() => el.remove(), 200);
+      }, duration);
+    }
+
+    function formatNumber(n) {
+      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(Number(n) || 0);
+    }
+    function formatDate(s) {
+      if (!s) return '—';
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    }
+    function escapeHTML(s) {
+      return String(s || '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c])
+      );
+    }
+
+    function generateReceiptNumber(t) {
+      // رقم متسق: تاريخ + هاش بسيط من البيانات
+      const date = t.date ? new Date(t.date) : new Date();
+      const year = date.getFullYear();
+      const str = `${t.date}${t.opposite}${(t.rec||0)+(t.pay||0)}${t.note||''}`;
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      const num = Math.abs(hash) % 100000;
+      return `REC-${year}-${String(num).padStart(5, '0')}`;
+    }
+
+    // ═════ تحويل الرقم إلى كلمات (مبسّط) ═════
+    function numberToArabicWords(num, currency) {
+      if (num === 0) return 'صفر';
+      const ones = ['','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة'];
+      const tens = ['','عشرة','عشرون','ثلاثون','أربعون','خمسون','ستون','سبعون','ثمانون','تسعون'];
+      const elevens = ['عشرة','أحد عشر','اثنا عشر','ثلاثة عشر','أربعة عشر','خمسة عشر','ستة عشر','سبعة عشر','ثمانية عشر','تسعة عشر'];
+      const hundreds = ['','مئة','مئتان','ثلاثمئة','أربعمئة','خمسمئة','ستمئة','سبعمئة','ثمانمئة','تسعمئة'];
+
+      function below1000(n) {
+        if (n === 0) return '';
+        const h = Math.floor(n / 100);
+        const r = n % 100;
+        let words = [];
+        if (h > 0) words.push(hundreds[h]);
+        if (r > 0) {
+          if (r < 10) words.push(ones[r]);
+          else if (r < 20) words.push(elevens[r - 10]);
+          else {
+            const t = Math.floor(r / 10), o = r % 10;
+            if (o > 0) words.push(`${ones[o]} و${tens[t]}`);
+            else words.push(tens[t]);
+          }
+        }
+        return words.join(' و');
+      }
+
+      const intPart = Math.floor(num);
+      let words = '';
+      if (intPart >= 1000000) {
+        const m = Math.floor(intPart / 1000000);
+        words += (m === 1 ? 'مليون' : m === 2 ? 'مليونان' : `${below1000(m)} مليون`) + ' ';
+      }
+      const thousands = Math.floor((intPart % 1000000) / 1000);
+      if (thousands > 0) {
+        if (thousands === 1) words += 'ألف ';
+        else if (thousands === 2) words += 'ألفان ';
+        else if (thousands < 11) words += `${below1000(thousands)} آلاف `;
+        else words += `${below1000(thousands)} ألفاً `;
+      }
+      const rest = intPart % 1000;
+      if (rest > 0) words += below1000(rest);
+
+      const currencyName = ({USD:'دولار', TRY:'ليرة تركي', SYP:'ليرة سورية', EUR:'يورو'}[currency] || '');
+      return (words.trim() + ' ' + currencyName + ' فقط لا غير').trim();
+    }
+
+    // ═════ بناء الإيصال ═════
+    function buildReceipt() {
+      const { txn, box, currency, autoShare } = receiptData;
+      const isReceive = (txn.rec || 0) > 0;
+      const amount = isReceive ? txn.rec : txn.pay;
+
+      // اسم المحاسب من الجلسة
+      const storage = getStorage();
+      const accountantName = storage ? (storage.getItem('finexsa_m_name') || '') : '';
+      const branch = storage ? (storage.getItem('finexsa_m_branch') || '') : '';
+
+      const dirColor = isReceive ? '#16a34a' : '#dc2626';
+      const dirLabel = isReceive ? 'سند قبض' : 'سند دفع';
+      const recNumber = generateReceiptNumber(txn);
+      const amountWords = numberToArabicWords(amount, currency);
+      const printedAt = new Date().toLocaleDateString('ar-SY', {
+        day: '2-digit', month: 'long', year: 'numeric'
+      });
+
+      const html = `
+        <div class="receipt" id="receiptElement" style="--dir-color: ${dirColor};">
+          <div class="receipt-head">
+            <div class="receipt-brand">
+              <div class="receipt-brand-name">FINEXSA Capital</div>
+              <div class="receipt-brand-sub">للخدمات المحاسبية</div>
+            </div>
+            <div class="receipt-logo">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v18M5 8h14M3 12l2-4 2 4M3 12c0 1.5 1 3 2 3s2-1.5 2-3M17 12l2-4 2 4M17 12c0 1.5 1 3 2 3s2-1.5 2-3M5 21h14"/>
+              </svg>
+            </div>
+            <div class="receipt-branch">
+              <div class="receipt-branch-name">${branch ? 'فرع ' + branch : 'FINEXSA'}</div>
+              <div>${branch === 'إسطنبول' ? 'تركيا' : (branch === 'دمشق' ? 'سوريا' : '')}</div>
+              <div>+90 536 232 3310</div>
+              <div>+90 536 065 2643</div>
+            </div>
+          </div>
+
+          <div class="receipt-title-block">
+            <div class="receipt-title" style="background:${dirColor}; color:white;">${dirLabel}</div>
+            <div style="margin-top:8px;"><span class="receipt-number">${recNumber}</span></div>
+          </div>
+
+          <table class="receipt-table">
+            <tr>
+              <th>التاريخ</th>
+              <td>${formatDate(txn.date)}</td>
+            </tr>
+            <tr>
+              <th>${isReceive ? 'قُبض من السيد/السادة' : 'دُفع إلى السيد/السادة'}</th>
+              <td>${escapeHTML(txn.opposite || '—')}</td>
+            </tr>
+            <tr>
+              <th>الصندوق</th>
+              <td>${escapeHTML(box)}</td>
+            </tr>
+            ${txn.note ? `<tr><th>البيان</th><td>${escapeHTML(txn.note)}</td></tr>` : ''}
+            <tr>
+              <th>المبلغ</th>
+              <td class="amount-cell" style="color:${dirColor};">${formatNumber(amount)} ${currencyArabic(currency)}</td>
+            </tr>
+          </table>
+
+          <div class="words-box">
+            <strong>المبلغ بالحروف:</strong>${amountWords}
+          </div>
+
+          <div class="signatures">
+            <div class="sig-block">
+              <div class="sig-line"></div>
+              <div class="sig-label">المحاسب</div>
+              <div class="sig-name">${escapeHTML(accountantName)}</div>
+            </div>
+            <div class="sig-block">
+              <div class="sig-line"></div>
+              <div class="sig-label">${isReceive ? 'الدافع' : 'المستلم'}</div>
+              <div class="sig-name">${escapeHTML(txn.opposite || '')}</div>
+            </div>
+          </div>
+
+          <div class="receipt-footer">
+            <div>finexsacapital.com · info@finexsacapitalnet.com</div>
+            <div class="footer-stamp">طُبع في ${printedAt}</div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('receiptContainer').innerHTML = html;
+      document.getElementById('actionsBar').style.display = 'flex';
+
+      // اسم الملف لمشاركة سريعة
+      const safeBoxName = (box || 'box').replace(/[\\/:*?"<>|]/g, '_').substring(0, 30);
+      window._receiptFileName = `${dirLabel}_${recNumber}_${safeBoxName}.png`;
+      window._receiptCaption = `${dirLabel} رقم ${recNumber}\nالمبلغ: ${formatNumber(amount)} ${currencyArabic(currency)}\n${isReceive ? 'قبض من' : 'دفع إلى'}: ${txn.opposite || ''}\nالتاريخ: ${formatDate(txn.date)}`;
+
+      // إذا الموظف ضغط "مشاركة" مباشرة من الكشف، نُفعّلها بعد ثانية
+      if (autoShare) {
+        setTimeout(() => shareReceipt('whatsapp'), 600);
+      }
+    }
+
+    // ═════ التقاط الإيصال كصورة ═════
+    async function captureReceipt() {
+      const el = document.getElementById('receiptElement');
+      if (!el) throw new Error('الإيصال غير موجود');
+      const canvas = await html2canvas(el, {
+        scale: 2.5,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+      return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+    }
+
+    // ═════ المشاركة ═════
+    async function shareReceipt(target) {
+      const btnWhatsapp = document.getElementById('btnWhatsapp');
+      const btnOther = document.getElementById('btnShareOther');
+      const targetBtn = target === 'whatsapp' ? btnWhatsapp : btnOther;
+      const originalHTML = targetBtn.innerHTML;
+      targetBtn.disabled = true;
+      btnWhatsapp.disabled = true; btnOther.disabled = true;
+      targetBtn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px;"></div> جاري التحضير...';
+
+      try {
+        const blob = await captureReceipt();
+        const file = new File([blob], window._receiptFileName, { type: 'image/png' });
+
+        // محاولة Web Share API
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'إيصال FINEXSA Capital',
+            text: window._receiptCaption
+          });
+        } else {
+          // Fallback: تحميل
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = window._receiptFileName;
+          a.click();
+          URL.revokeObjectURL(url);
+          toast('تم حفظ الإيصال للمعرض. شاركه يدوياً عبر واتساب.', 'info', 4000);
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error(err);
+          toast('فشل التحضير: ' + err.message, 'error', 4000);
+        }
+      } finally {
+        btnWhatsapp.disabled = false; btnOther.disabled = false;
+        targetBtn.innerHTML = originalHTML;
+      }
+    }
+
+    document.getElementById('btnWhatsapp').addEventListener('click', () => shareReceipt('whatsapp'));
+    document.getElementById('btnShareOther').addEventListener('click', () => shareReceipt('other'));
+  </script>
+</body>
+</html>

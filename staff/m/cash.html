@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <title>حركة جديدة — FINEXSA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="m.css">
+
+  <style>
+    /* ═══ زرّا قبض/دفع ═══ */
+    .direction-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 6px;
+    }
+    .dir-btn {
+      padding: 14px 12px;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .dir-btn svg {
+      width: 22px; height: 22px;
+      stroke-width: 2.2;
+      stroke: currentColor; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .dir-btn:active { transform: scale(0.96); }
+    .dir-btn.is-active.receive {
+      background: linear-gradient(135deg, var(--success), #5fe890);
+      color: var(--bg-void);
+      box-shadow: 0 6px 14px -4px rgba(74,222,128,0.4);
+    }
+    .dir-btn.is-active.pay {
+      background: linear-gradient(135deg, var(--error), #ff8e8e);
+      color: white;
+      box-shadow: 0 6px 14px -4px rgba(255,107,107,0.4);
+    }
+
+    /* ═══ مبلغ كبير ═══ */
+    .amount-display {
+      background: var(--bg-card);
+      border: 2px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .amount-display .field-label {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .amount-input-wrapper {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+    }
+    .amount-display input {
+      font-size: 36px;
+      font-weight: 900;
+      background: transparent;
+      border: none;
+      color: var(--gold);
+      text-align: center;
+      width: 100%;
+      direction: ltr;
+      font-family: inherit;
+      padding: 4px 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .amount-display input:focus { outline: none; }
+    .amount-display input::placeholder { color: var(--text-dim); opacity: 0.6; }
+    .currency-tag {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    /* ═══ تحويل العملة ═══ */
+    .conversion-card {
+      background: var(--bg-deep);
+      border: 1px dashed var(--border-strong);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .conversion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .conversion-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+    }
+    .conversion-mode-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-void);
+      padding: 3px;
+      border-radius: 8px;
+    }
+    .mode-btn {
+      padding: 5px 10px;
+      background: transparent;
+      border: none;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .mode-btn.is-active {
+      background: var(--gold-muted);
+      color: var(--gold-bright);
+    }
+    .conversion-body input {
+      direction: ltr;
+      text-align: right;
+    }
+    .conversion-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ═══ Drafts list ═══ */
+    .drafts-section {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .drafts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .drafts-title {
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .drafts-count {
+      font-size: 11px;
+      padding: 3px 10px;
+      background: var(--gold-muted);
+      color: var(--gold-bright);
+      border: 1px solid var(--border-strong);
+      border-radius: 100px;
+      font-weight: 700;
+    }
+    .draft-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .draft-dir {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .draft-dir.receive {
+      background: rgba(74,222,128,0.15);
+      color: var(--success);
+    }
+    .draft-dir.pay {
+      background: rgba(255,107,107,0.15);
+      color: var(--error);
+    }
+    .draft-dir svg { width: 16px; height: 16px; stroke-width: 2.5; }
+    .draft-info { flex: 1; min-width: 0; }
+    .draft-amount {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+      direction: ltr;
+      text-align: right;
+    }
+    .draft-meta {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .draft-remove {
+      width: 28px; height: 28px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .draft-remove:active {
+      background: rgba(255, 107, 107, 0.1);
+      border-color: var(--error);
+      color: var(--error);
+    }
+    .draft-remove svg { width: 14px; height: 14px; stroke-width: 2.5; }
+
+    /* Save button (sticky) */
+    .save-bar {
+      position: fixed;
+      bottom: calc(var(--tab-h) + var(--safe-bottom));
+      left: 0; right: 0;
+      padding: 12px 16px;
+      background: rgba(15, 18, 32, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      z-index: 90;
+      display: none;
+    }
+    .save-bar.is-visible { display: block; }
+    .save-bar .btn { padding: 16px; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+  <div class="app-loader" id="appLoader"><div class="spinner"></div></div>
+
+  <header class="app-header">
+    <div class="header-left">
+      <button class="icon-btn" onclick="window.location.href='index.html'" aria-label="رجوع">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="app-title">حركة جديدة</h1>
+    </div>
+    <div class="header-right"></div>
+  </header>
+
+  <main class="app-content">
+
+    <!-- اختيار الصندوق -->
+    <div class="field-group">
+      <label class="field-label" for="boxSelect">
+        <span class="required">*</span> الصندوق
+      </label>
+      <select id="boxSelect" class="field-select">
+        <option value="">— اختر الصندوق —</option>
+      </select>
+    </div>
+
+    <!-- اتجاه: قبض / دفع -->
+    <div class="direction-toggle">
+      <button class="dir-btn receive" data-dir="receive">
+        <svg viewBox="0 0 24 24"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        قبض
+      </button>
+      <button class="dir-btn pay" data-dir="pay">
+        <svg viewBox="0 0 24 24"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="19" x2="12" y2="5"/></svg>
+        دفع
+      </button>
+    </div>
+
+    <!-- المبلغ -->
+    <div class="amount-display">
+      <label class="field-label">
+        <span class="required">*</span> المبلغ
+      </label>
+      <div class="amount-input-wrapper">
+        <input type="number" id="amountInput" placeholder="0" inputmode="decimal" step="any">
+        <span class="currency-tag" id="currencyTag">—</span>
+      </div>
+    </div>
+
+    <!-- الطرف الآخر -->
+    <div class="field-group">
+      <label class="field-label" for="oppositeInput">
+        <span class="required">*</span> الطرف الآخر
+        <span class="field-label-hint" id="oppositeHint">من الذي قبض منه؟</span>
+      </label>
+      <input type="text" id="oppositeInput" class="field-input" placeholder="مثلاً: السيد أحمد / صندوق X">
+    </div>
+
+    <!-- التاريخ -->
+    <div class="field-group">
+      <label class="field-label" for="dateInput">التاريخ</label>
+      <input type="date" id="dateInput" class="field-input">
+    </div>
+
+    <!-- البيان -->
+    <div class="field-group">
+      <label class="field-label" for="noteInput">البيان</label>
+      <textarea id="noteInput" class="field-textarea" placeholder="ملاحظات إضافية (اختياري)"></textarea>
+    </div>
+
+    <!-- تحويل عملة -->
+    <div class="conversion-card" id="conversionCard" style="display:none">
+      <div class="conversion-header">
+        <span class="conversion-title">تحويل عملة (اختياري)</span>
+        <div class="conversion-mode-toggle">
+          <button class="mode-btn is-active" data-mode="amount">مبلغ</button>
+          <button class="mode-btn" data-mode="rate">سعر صرف</button>
+        </div>
+      </div>
+      <div class="conversion-body">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label" id="convLabel">المبلغ المستبدل</label>
+          <input type="number" id="convInput" class="field-input" placeholder="0" inputmode="decimal" step="any">
+          <div class="conversion-hint" id="convHint"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- زر إضافة للقائمة -->
+    <button class="btn btn-secondary" id="addToDraftsBtn">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      إضافة للقائمة
+    </button>
+
+    <!-- قائمة الحركات المنتظرة -->
+    <div class="drafts-section" id="draftsSection" style="display:none">
+      <div class="drafts-header">
+        <span class="drafts-title">حركات جاهزة للحفظ</span>
+        <span class="drafts-count" id="draftsCount">0</span>
+      </div>
+      <div id="draftsList"></div>
+    </div>
+
+  </main>
+
+  <!-- شريط حفظ ثابت -->
+  <div class="save-bar" id="saveBar">
+    <button class="btn btn-primary" id="saveAllBtn">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <span id="saveBtnText">حفظ الكل</span>
+    </button>
+  </div>
+
+  <!-- Bottom Tabbar -->
+  <nav class="tabbar">
+    <a href="index.html" class="tab">
+      <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+      <span>الرئيسية</span>
+    </a>
+    <a href="cash.html" class="tab is-active">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="12" cy="15" r="2"/></svg>
+      <span>حركة</span>
+    </a>
+    <a href="report.html" class="tab">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>كشف</span>
+    </a>
+    <a href="tasks.html" class="tab">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>المهام</span>
+    </a>
+  </nav>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDynBPUjrpBHmPc6EGwHyOZmkEiv-pNhR0",
+      authDomain: "finexsa-capital.firebaseapp.com",
+      projectId: "finexsa-capital",
+      storageBucket: "finexsa-capital.firebasestorage.app",
+      messagingSenderId: "225933147484",
+      appId: "1:225933147484:web:b71f87f0705553062ed599",
+      measurementId: "G-8V2H675WN1"
+    };
+
+    const STAFF_API_URL = 'https://script.google.com/macros/s/AKfycbx_0dlteS5I41Z5vNb7E_IgsdMm2y8iFfe6QwL_OSgkpQu2HK4GqCug2CNz8eGB6pxa/exec';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    function getStorage() {
+      if (localStorage.getItem('finexsa_m_uid')) return localStorage;
+      if (sessionStorage.getItem('finexsa_m_uid')) return sessionStorage;
+      return null;
+    }
+
+    const storage = getStorage();
+    if (!storage) window.location.replace('login.html');
+
+    function safeParseArray(raw) {
+      try { const p = JSON.parse(raw || '[]'); return Array.isArray(p) ? p : []; }
+      catch { return []; }
+    }
+
+    const me = {
+      uid: storage.getItem('finexsa_m_uid'),
+      name: storage.getItem('finexsa_m_name') || 'موظف',
+      role: storage.getItem('finexsa_m_role') || 'accountant',
+      allowedBoxes: safeParseArray(storage.getItem('finexsa_m_allowed'))
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        localStorage.clear(); sessionStorage.clear();
+        window.location.replace('login.html');
+      }
+    });
+
+    // ═════ كشف عملة الصندوق من اسمه ═════
+    function detectCurrency(boxName) {
+      if (!boxName) return '';
+      const n = boxName.toLowerCase();
+      if (n.includes('دولار') || n.includes('usd')) return 'USD';
+      if (n.includes('ليرة تركي') || n.includes('تركي') || n.includes('try')) return 'TRY';
+      if (n.includes('ليرة سوري') || n.includes('سوري') || n.includes('syp')) return 'SYP';
+      if (n.includes('يورو') || n.includes('eur')) return 'EUR';
+      return '';
+    }
+
+    function currencyArabic(code) {
+      return ({USD:'دولار', TRY:'ليرة تركي', SYP:'ليرة سورية', EUR:'يورو'}[code] || code);
+    }
+
+    // أيها الأقوى (1 وحدة منها = X من الأخرى)
+    function strongerCurrency(c1, c2) {
+      const order = { EUR: 4, USD: 3, TRY: 2, SYP: 1 };
+      return (order[c1] || 0) >= (order[c2] || 0) ? c1 : c2;
+    }
+
+    // ═════ State ═════
+    const state = {
+      direction: 'receive', // receive or pay
+      drafts: [],
+      boxes: [],
+      conversionMode: 'amount' // amount or rate
+    };
+
+    // ═════ Toast ═════
+    function toast(msg, type = 'success', duration = 2500) {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      const icons = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+        info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/></svg>'
+      };
+      el.innerHTML = `<div class="toast-icon">${icons[type]||icons.info}</div><span>${msg}</span>`;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => {
+        el.classList.add('is-leaving');
+        setTimeout(() => el.remove(), 200);
+      }, duration);
+    }
+
+    // ═════ تحميل الصناديق ═════
+    async function loadBoxes() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        const res = await fetch(`${STAFF_API_URL}?action=getBoxes&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+
+        const isAll = me.role === 'admin' || me.allowedBoxes.includes('all');
+        state.boxes = isAll ? data.boxes : data.boxes.filter(b => me.allowedBoxes.includes(b));
+
+        const select = document.getElementById('boxSelect');
+        select.innerHTML = '<option value="">— اختر الصندوق —</option>';
+        state.boxes.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b; opt.textContent = b;
+          select.appendChild(opt);
+        });
+
+        // إخفاء loader
+        document.getElementById('appLoader').classList.add('is-hidden');
+        setTimeout(() => document.getElementById('appLoader').remove(), 400);
+      } catch (err) {
+        toast('فشل تحميل الصناديق: ' + err.message, 'error');
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) loadBoxes();
+    });
+
+    // ═════ التاريخ افتراضياً = اليوم ═════
+    const today = new Date();
+    document.getElementById('dateInput').value =
+      today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0');
+
+    // ═════ تبديل قبض/دفع ═════
+    function setDirection(dir) {
+      state.direction = dir;
+      document.querySelectorAll('.dir-btn').forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.dir === dir);
+      });
+      document.getElementById('oppositeHint').textContent =
+        dir === 'receive' ? 'من الذي قبض منه؟' : 'إلى من دُفع؟';
+      updateNoteAuto();
+    }
+    document.querySelectorAll('.dir-btn').forEach(btn => {
+      btn.addEventListener('click', () => setDirection(btn.dataset.dir));
+    });
+    setDirection('receive'); // افتراضي
+
+    // ═════ تحديث currency tag + conversion ═════
+    document.getElementById('boxSelect').addEventListener('change', (e) => {
+      const box = e.target.value;
+      const currency = detectCurrency(box);
+      document.getElementById('currencyTag').textContent = currency ? currencyArabic(currency) : '—';
+      updateConversionVisibility();
+    });
+
+    function updateConversionVisibility() {
+      const box = document.getElementById('boxSelect').value;
+      const opposite = document.getElementById('oppositeInput').value.trim();
+      const fromCurrency = detectCurrency(box);
+      const toCurrency = detectCurrency(opposite);
+
+      // إظهار التحويل فقط لو: الطرف الآخر صندوق + العملتان مختلفتان
+      const show = fromCurrency && toCurrency && fromCurrency !== toCurrency;
+      document.getElementById('conversionCard').style.display = show ? 'block' : 'none';
+
+      if (show) {
+        const stronger = strongerCurrency(fromCurrency, toCurrency);
+        const weaker = stronger === fromCurrency ? toCurrency : fromCurrency;
+        const hint = state.conversionMode === 'amount'
+          ? `أدخل المبلغ المستبدل بـ ${currencyArabic(weaker)}`
+          : `سعر صرف 1 ${currencyArabic(stronger)} = X ${currencyArabic(weaker)}`;
+        document.getElementById('convHint').textContent = hint;
+        document.getElementById('convLabel').textContent = state.conversionMode === 'amount'
+          ? `المبلغ بـ ${currencyArabic(weaker)}`
+          : `سعر الصرف`;
+      }
+    }
+
+    document.getElementById('oppositeInput').addEventListener('input', () => {
+      updateConversionVisibility();
+      updateNoteAuto();
+    });
+
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        state.conversionMode = btn.dataset.mode;
+        document.getElementById('convInput').value = '';
+        updateConversionVisibility();
+      });
+    });
+
+    // ═════ ملء البيان تلقائياً ═════
+    let noteEditedManually = false;
+    document.getElementById('noteInput').addEventListener('input', () => { noteEditedManually = true; });
+
+    function updateNoteAuto() {
+      if (noteEditedManually) return;
+      const opposite = document.getElementById('oppositeInput').value.trim();
+      if (opposite) {
+        const prefix = state.direction === 'receive' ? 'قبض من' : 'دفع إلى';
+        document.getElementById('noteInput').value = `${prefix} ${opposite}`;
+      }
+    }
+
+    // ═════ إضافة للقائمة ═════
+    document.getElementById('addToDraftsBtn').addEventListener('click', () => {
+      const box = document.getElementById('boxSelect').value;
+      const amount = parseFloat(document.getElementById('amountInput').value);
+      const opposite = document.getElementById('oppositeInput').value.trim();
+      const date = document.getElementById('dateInput').value;
+      const note = document.getElementById('noteInput').value.trim();
+
+      if (!box) { toast('اختر الصندوق', 'error'); return; }
+      if (!amount || amount <= 0) { toast('أدخل مبلغاً صحيحاً', 'error'); return; }
+      if (!opposite) { toast('أدخل الطرف الآخر', 'error'); return; }
+      if (!date) { toast('أدخل التاريخ', 'error'); return; }
+
+      // حساب التحويل
+      let convAmount = null, rate = null;
+      const fromCur = detectCurrency(box);
+      const toCur = detectCurrency(opposite);
+
+      if (fromCur && toCur && fromCur !== toCur) {
+        const convVal = parseFloat(document.getElementById('convInput').value);
+        if (convVal && convVal > 0) {
+          if (state.conversionMode === 'amount') {
+            convAmount = convVal;
+          } else {
+            rate = convVal;
+            const stronger = strongerCurrency(fromCur, toCur);
+            // لو مبلغنا بالعملة القوية: convAmount = amount * rate
+            // لو مبلغنا بالضعيفة: convAmount = amount / rate
+            if (fromCur === stronger) {
+              convAmount = amount * rate;
+            } else {
+              convAmount = amount / rate;
+            }
+          }
+        }
+      }
+
+      const draft = {
+        id: Date.now() + Math.random(),
+        box, amount, opposite, date, note,
+        direction: state.direction,
+        currency: fromCur,
+        oppositeCurrency: toCur,
+        convAmount,
+        rate
+      };
+
+      state.drafts.push(draft);
+      renderDrafts();
+      resetForm();
+      toast('✓ أضيفت للقائمة', 'success', 1500);
+    });
+
+    function resetForm() {
+      document.getElementById('amountInput').value = '';
+      document.getElementById('oppositeInput').value = '';
+      document.getElementById('noteInput').value = '';
+      document.getElementById('convInput').value = '';
+      noteEditedManually = false;
+      document.getElementById('conversionCard').style.display = 'none';
+      document.getElementById('amountInput').focus();
+    }
+
+    // ═════ عرض القائمة ═════
+    function renderDrafts() {
+      const section = document.getElementById('draftsSection');
+      const list = document.getElementById('draftsList');
+      const count = document.getElementById('draftsCount');
+      const saveBar = document.getElementById('saveBar');
+
+      if (state.drafts.length === 0) {
+        section.style.display = 'none';
+        saveBar.classList.remove('is-visible');
+        return;
+      }
+
+      section.style.display = 'block';
+      saveBar.classList.add('is-visible');
+      count.textContent = state.drafts.length;
+      document.getElementById('saveBtnText').textContent = `حفظ ${state.drafts.length} حركة`;
+
+      list.innerHTML = state.drafts.map(d => {
+        const dirIcon = d.direction === 'receive'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="19" x2="12" y2="5"/></svg>';
+        return `
+          <div class="draft-card">
+            <div class="draft-dir ${d.direction}">${dirIcon}</div>
+            <div class="draft-info">
+              <div class="draft-amount">${formatNumber(d.amount)} ${currencyArabic(d.currency)}</div>
+              <div class="draft-meta">${escapeHTML(d.opposite)} · ${formatDate(d.date)}</div>
+            </div>
+            <button class="draft-remove" data-id="${d.id}" aria-label="حذف">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      list.querySelectorAll('[data-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.drafts = state.drafts.filter(d => String(d.id) !== btn.dataset.id);
+          renderDrafts();
+          toast('حُذفت من القائمة', 'info', 1200);
+        });
+      });
+    }
+
+    // ═════ حفظ الكل ═════
+    document.getElementById('saveAllBtn').addEventListener('click', async () => {
+      if (state.drafts.length === 0) return;
+      const btn = document.getElementById('saveAllBtn');
+      const originalText = document.getElementById('saveBtnText').textContent;
+      btn.disabled = true;
+      document.getElementById('saveBtnText').textContent = 'جاري الحفظ…';
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+
+        // تحويل drafts إلى تنسيق Master.txt
+        const rows = state.drafts.map(d => {
+          const isReceive = d.direction === 'receive';
+          // Master format: [date, box, opposite, note, amount-in, amount-out, conv-in, conv-out, rate]
+          // الإدخال يعتمد على اتجاه الصندوق: قبض = أمواله ترتفع
+          return {
+            date: d.date,
+            box: d.box,
+            opposite: d.opposite,
+            note: d.note || '',
+            amountIn: isReceive ? d.amount : 0,
+            amountOut: isReceive ? 0 : d.amount,
+            convIn: isReceive ? 0 : (d.convAmount || 0),
+            convOut: isReceive ? (d.convAmount || 0) : 0,
+            rate: d.rate || 0
+          };
+        });
+
+        const res = await fetch(`${STAFF_API_URL}?action=saveBatch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ token, data: { rows } })
+        });
+        const result = await res.json();
+
+        if (!result.ok) throw new Error(result.message);
+
+        toast(`✓ تم حفظ ${state.drafts.length} حركة`, 'success');
+        state.drafts = [];
+        renderDrafts();
+      } catch (err) {
+        toast('فشل الحفظ: ' + err.message, 'error', 4000);
+      } finally {
+        btn.disabled = false;
+        document.getElementById('saveBtnText').textContent = originalText;
+      }
+    });
+
+    // ═════ Helpers ═════
+    function formatNumber(n) {
+      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(n);
+    }
+    function formatDate(s) {
+      if (!s) return '';
+      const parts = String(s).split('-');
+      if (parts.length !== 3) return s;
+      return `${parts[2]}/${parts[1]}`;
+    }
+    function escapeHTML(s) {
+      return String(s || '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c])
+      );
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
