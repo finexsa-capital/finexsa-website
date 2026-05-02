@@ -17,16 +17,7 @@
   <link rel="stylesheet" href="m.css">
 
   <style>
-    /* ═══ فرض الأرقام اللاتينية في كل التطبيق ═══ */
-    *, *::before, *::after {
-      -moz-font-feature-settings: "lnum";
-      -webkit-font-feature-settings: "lnum";
-      font-feature-settings: "lnum";
-      font-variant-numeric: lining-nums tabular-nums;
-    }
-    body, input, select, textarea, button {
-      font-feature-settings: "lnum";
-    }
+    *, *::before, *::after { font-feature-settings: "lnum"; font-variant-numeric: lining-nums; }
 
     /* Hero الترحيب */
     .hero {
@@ -46,35 +37,56 @@
       background: radial-gradient(circle, var(--gold-muted), transparent 70%);
       pointer-events: none;
     }
+    .hero-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-avatar {
+      width: 54px; height: 54px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+      border-radius: 50%;
+      display: grid; place-items: center;
+      color: var(--bg-void);
+      font-weight: 900;
+      font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 8px 20px -6px rgba(201, 162, 39, 0.5);
+    }
+    .hero-text { flex: 1; min-width: 0; }
     .hero-greeting {
       font-size: 11.5px;
       color: var(--gold);
       letter-spacing: 0.18em;
       text-transform: uppercase;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .hero-name {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
       margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .hero-meta {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
-      margin-top: 8px;
     }
     .hero-tag {
-      padding: 3px 10px;
+      padding: 2px 9px;
       background: var(--gold-muted);
       color: var(--gold-bright);
       border: 1px solid var(--border-strong);
       border-radius: 100px;
       font-weight: 700;
-      font-size: 11px;
+      font-size: 10.5px;
     }
 
     /* Stats */
@@ -116,9 +128,15 @@
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.02em;
+      direction: ltr;
+      text-align: right;
+    }
+    .stat-meta {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 2px;
     }
 
-    /* Quick actions */
     .section-title {
       font-size: 14px;
       font-weight: 800;
@@ -174,7 +192,6 @@
       line-height: 1.4;
     }
 
-    /* Sign out button */
     .signout-row {
       margin-top: 24px;
       padding-top: 18px;
@@ -185,7 +202,7 @@
       background: transparent;
       border: 1px solid rgba(255, 107, 107, 0.3);
       color: var(--error);
-      padding: 8px 16px;
+      padding: 8px 20px;
       border-radius: 100px;
       font-size: 12.5px;
       font-weight: 700;
@@ -205,7 +222,7 @@
     </div>
     <div class="header-right">
       <button class="icon-btn" id="signoutBtnHeader" aria-label="خروج">
-        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
     </div>
   </header>
@@ -214,11 +231,16 @@
 
     <!-- Hero -->
     <section class="hero">
-      <div class="hero-greeting" id="greeting">مرحباً</div>
-      <div class="hero-name" id="userName">…</div>
-      <div class="hero-meta">
-        <span class="hero-tag" id="userRole">…</span>
-        <span id="userBranch" class="text-muted"></span>
+      <div class="hero-content">
+        <div class="hero-avatar" id="heroAvatar">··</div>
+        <div class="hero-text">
+          <div class="hero-greeting" id="greeting">مرحباً</div>
+          <div class="hero-name" id="userName">…</div>
+          <div class="hero-meta">
+            <span class="hero-tag" id="userRole">…</span>
+            <span id="userBranch" class="text-muted"></span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -230,6 +252,7 @@
         </div>
         <div class="stat-label">الصناديق</div>
         <div class="stat-value" id="statBoxes">—</div>
+        <div class="stat-meta" id="statBoxesMeta">صندوق مسموح</div>
       </div>
       <div class="stat">
         <div class="stat-icon">
@@ -237,13 +260,13 @@
         </div>
         <div class="stat-label">المهام النشطة</div>
         <div class="stat-value" id="statTasks">—</div>
+        <div class="stat-meta">للتنفيذ</div>
       </div>
     </section>
 
     <!-- Quick actions -->
     <h2 class="section-title">الإجراءات السريعة</h2>
     <div class="actions-grid">
-
       <a href="cash.html" class="action">
         <div class="action-icon">
           <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -265,7 +288,7 @@
           <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         </div>
         <div class="action-title">المهام</div>
-        <div class="action-desc">قائمة مهامي</div>
+        <div class="action-desc" id="tasksActionDesc">قائمة مهامي</div>
       </a>
 
       <a href="report.html" class="action">
@@ -275,7 +298,6 @@
         <div class="action-title">إيصال</div>
         <div class="action-desc">طباعة ومشاركة</div>
       </a>
-
     </div>
 
     <div class="signout-row">
@@ -284,7 +306,6 @@
 
   </main>
 
-  <!-- Bottom Tabbar -->
   <nav class="tabbar">
     <a href="index.html" class="tab is-active">
       <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
@@ -326,9 +347,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ═════ قراءة بيانات الجلسة ═════
     function getStorage() {
-      // إذا كانت البيانات في localStorage (تذكّرني)، استخدمها، وإلا sessionStorage
       if (localStorage.getItem('finexsa_m_uid')) return localStorage;
       if (sessionStorage.getItem('finexsa_m_uid')) return sessionStorage;
       return null;
@@ -342,7 +361,8 @@
       catch { return []; }
     }
 
-    const me = {
+    // قراءة الجلسة (للتعبئة الأولية الفورية)
+    let me = {
       uid: storage.getItem('finexsa_m_uid'),
       email: storage.getItem('finexsa_m_email') || '',
       name: storage.getItem('finexsa_m_name') || 'موظف',
@@ -353,35 +373,113 @@
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        localStorage.clear();
-        sessionStorage.clear();
+        localStorage.clear(); sessionStorage.clear();
         window.location.replace('login.html');
       }
     });
 
-    // ═════ تعبئة الواجهة ═════
-    const translateRole = r => ({admin:'مدير النظام', accountant:'محاسب', manager:'مدير قسم', viewer:'مشاهد'}[r] || r);
-
-    document.getElementById('userName').textContent = me.name;
-    document.getElementById('userRole').textContent = translateRole(me.role);
-    if (me.branch) {
-      document.getElementById('userBranch').textContent = '📍 ' + me.branch;
+    // ═════ Helpers ═════
+    function getInitials(name) {
+      if (!name) return 'FX';
+      const parts = String(name).trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
     }
 
-    // تحية حسب الوقت
-    const hour = new Date().getHours();
-    let greeting = 'مرحباً';
-    if (hour >= 5 && hour < 12) greeting = 'صباح الخير';
-    else if (hour >= 12 && hour < 17) greeting = 'مساء الخير';
-    else if (hour >= 17 && hour < 22) greeting = 'مساء الخير';
-    else greeting = 'ليلة سعيدة';
-    document.getElementById('greeting').textContent = greeting;
+    function translateRole(role) {
+      const map = {
+        'admin': 'مدير النظام',
+        'accountant': 'محاسب',
+        'manager': 'مدير قسم',
+        'viewer': 'مشاهد'
+      };
+      return map[role] || role;
+    }
 
-    // الإحصائيات
-    const isAllBoxes = me.role === 'admin' || me.allowedBoxes.includes('all');
-    document.getElementById('statBoxes').textContent = isAllBoxes ? '∞' : me.allowedBoxes.length;
+    function getGreeting() {
+      const hour = new Date().getHours();
+      if (hour >= 5 && hour < 12) return 'صباح الخير';
+      if (hour >= 12 && hour < 17) return 'مساء الخير';
+      if (hour >= 17 && hour < 22) return 'مساء الخير';
+      return 'ليلة سعيدة';
+    }
 
-    // عدد المهام (لاحقاً من API)
+    // ═════ تعبئة الواجهة ═════
+    function renderProfile() {
+      document.getElementById('heroAvatar').textContent = getInitials(me.name);
+      document.getElementById('userName').textContent = me.name;
+      document.getElementById('userRole').textContent = translateRole(me.role);
+      document.getElementById('greeting').textContent = getGreeting();
+      if (me.branch) {
+        document.getElementById('userBranch').textContent = '📍 ' + me.branch;
+      } else {
+        document.getElementById('userBranch').textContent = '';
+      }
+
+      // إحصائية الصناديق
+      const isAllBoxes = me.role === 'admin' || me.allowedBoxes.includes('all');
+      const statBoxes = document.getElementById('statBoxes');
+      const statBoxesMeta = document.getElementById('statBoxesMeta');
+      if (isAllBoxes) {
+        statBoxes.textContent = '∞';
+        statBoxesMeta.textContent = 'وصول كامل';
+      } else {
+        statBoxes.textContent = me.allowedBoxes.length;
+        statBoxesMeta.textContent = me.allowedBoxes.length === 1 ? 'صندوق' : 'صندوق مسموح';
+      }
+
+      // تحديث وصف زر المهام
+      if (me.role === 'admin') {
+        document.getElementById('tasksActionDesc').textContent = 'إدارة المهام';
+      }
+    }
+
+    renderProfile();
+
+    // ═════ تحديث البيانات عبر getMe (نفس API سطح المكتب) ═════
+    async function refreshMe() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        const res = await fetch(`${STAFF_API_URL}?action=getMe&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (!data.ok) {
+          if (data.code === 'USER_INACTIVE' || data.code === 'USER_NOT_FOUND') {
+            localStorage.clear(); sessionStorage.clear();
+            await signOut(auth);
+            window.location.replace('login.html');
+          }
+          return;
+        }
+
+        // تحديث القيم في الواجهة و localStorage
+        const u = data.user;
+        me = {
+          uid: u.uid,
+          email: u.email,
+          name: u.displayName || me.name,
+          role: u.role,
+          branch: u.branch || '',
+          allowedBoxes: u.allowedBoxes || []
+        };
+
+        // حفظ في الـ storage الذي كان مستخدماً
+        storage.setItem('finexsa_m_uid', me.uid);
+        storage.setItem('finexsa_m_email', me.email);
+        storage.setItem('finexsa_m_name', me.name);
+        storage.setItem('finexsa_m_role', me.role);
+        storage.setItem('finexsa_m_branch', me.branch);
+        storage.setItem('finexsa_m_allowed', JSON.stringify(me.allowedBoxes));
+
+        renderProfile();
+      } catch (err) {
+        // فشل صامت — البيانات من الجلسة كافية
+        console.warn('Failed to refresh me:', err);
+      }
+    }
+
+    // ═════ تحميل عدد المهام (نفس منطق سطح المكتب) ═════
     async function loadTasksCount() {
       try {
         const user = auth.currentUser;
@@ -389,7 +487,12 @@
         const token = await user.getIdToken();
         const res = await fetch(`${STAFF_API_URL}?action=getTasks&token=${encodeURIComponent(token)}&status=todo`);
         const data = await res.json();
-        document.getElementById('statTasks').textContent = data.ok ? (data.tasks || []).length : '0';
+        if (data.ok) {
+          const count = (data.tasks || []).length;
+          document.getElementById('statTasks').textContent = count;
+        } else {
+          document.getElementById('statTasks').textContent = '0';
+        }
       } catch {
         document.getElementById('statTasks').textContent = '0';
       }
@@ -405,15 +508,18 @@
     document.getElementById('signoutBtn').addEventListener('click', handleSignout);
     document.getElementById('signoutBtnHeader').addEventListener('click', handleSignout);
 
+    // ═════ تحميل البيانات بعد التحقق ═════
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await Promise.all([refreshMe(), loadTasksCount()]);
+      }
+    });
+
     // ═════ إخفاء Loader ═════
     setTimeout(() => {
       document.getElementById('appLoader').classList.add('is-hidden');
       setTimeout(() => document.getElementById('appLoader').remove(), 400);
-    }, 250);
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) loadTasksCount();
-    });
+    }, 300);
   </script>
 
   <script>
