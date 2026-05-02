@@ -865,10 +865,10 @@
 
     // قراءة بيانات المستخدم من sessionStorage
     const me = {
-      uid: sessionStorage.getItem('finexsa_uid'),
-      email: sessionStorage.getItem('finexsa_email') || '',
-      name: sessionStorage.getItem('finexsa_name') || 'موظف',
-      role: sessionStorage.getItem('finexsa_role') || 'accountant'
+      uid: sessionStorage.getItem('finexsa_staff_uid'),
+      email: sessionStorage.getItem('finexsa_staff_email') || '',
+      name: sessionStorage.getItem('finexsa_staff_name') || 'موظف',
+      role: sessionStorage.getItem('finexsa_staff_role') || 'accountant'
     };
 
     if (!me.uid) {
