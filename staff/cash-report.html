@@ -264,7 +264,30 @@
       padding-left: 36px;
     }
     .field-select option { background: var(--bg-deep); color: var(--text-primary); }
-    .field-input[type="date"] { direction: ltr; text-align: right; }
+    .field-input[type="date"] {
+      direction: ltr;
+      text-align: right;
+      cursor: pointer;
+      position: relative;
+      padding-left: 14px;
+    }
+    .field-input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.7) sepia(1) saturate(5) hue-rotate(15deg);
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 0.2s ease;
+      margin-right: 4px;
+      margin-left: 0;
+    }
+    .field-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+    .field-input[type="date"]::-webkit-datetime-edit {
+      color: var(--text-primary);
+    }
+    .field-input[type="date"]:not(:focus):not(:valid)::-webkit-datetime-edit {
+      color: var(--text-dim);
+    }
 
     .btn-primary {
       padding: 11px 22px;
@@ -894,6 +917,16 @@
     ['filterFrom', 'filterTo', 'filterSearch', 'filterDir'].forEach(id => {
       document.getElementById(id).addEventListener('input', applyFilters);
       document.getElementById(id).addEventListener('change', applyFilters);
+    });
+
+    // فتح التقويم عند الضغط على الحقل بأكمله
+    ['filterFrom', 'filterTo'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('click', () => {
+        if (typeof el.showPicker === 'function') {
+          try { el.showPicker(); } catch (e) {}
+        }
+      });
     });
 
     document.getElementById('btnReset').addEventListener('click', () => {
