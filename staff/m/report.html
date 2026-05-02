@@ -450,7 +450,8 @@
       currentCurrency: '',
       rawData: [],
       filtered: [],
-      directionFilter: ''
+      directionFilter: '',
+      summary: null
     };
 
     // ═══ تحميل قائمة الصناديق ═══
@@ -523,6 +524,7 @@
         state.currentBox = data.boxName || box;
         state.currentCurrency = data.currency || '';
         state.rawData = data.data || [];
+        state.summary = data.summary || null;
 
         // اكتشاف الفترة تلقائياً من البيانات
         if (state.rawData.length > 0) {
@@ -591,20 +593,26 @@
 
     function updateStats() {
       let totalRec = 0, totalPay = 0;
-      // ✅ نفس منطق الإحصائيات في سطح المكتب — على كامل البيانات
       state.rawData.forEach(r => {
         if (typeof r.rec === 'number') totalRec += r.rec;
         else if (r.rec && !isNaN(parseFloat(r.rec))) totalRec += parseFloat(r.rec);
         if (typeof r.pay === 'number') totalPay += r.pay;
         else if (r.pay && !isNaN(parseFloat(r.pay))) totalPay += parseFloat(r.pay);
       });
-      const balance = totalRec - totalPay;
+
+      // ✅ الرصيد الحالي يأتي من الـ API (آخر قيمة عمود F)
+      // البيانات معكوسة من الأحدث للأقدم، لذلك أول صف = آخر حركة = الرصيد الحالي
+      const currentBalance = (state.summary && typeof state.summary.currentBalance === 'number')
+        ? state.summary.currentBalance
+        : (state.rawData.length > 0 && typeof state.rawData[0].balance === 'number'
+            ? state.rawData[0].balance
+            : 0);
 
       const balanceEl = document.getElementById('balanceValue');
       balanceEl.classList.remove('positive', 'negative');
-      balanceEl.classList.add(balance >= 0 ? 'positive' : 'negative');
+      balanceEl.classList.add(currentBalance >= 0 ? 'positive' : 'negative');
 
-      document.getElementById('balanceNumber').textContent = formatNumber(Math.abs(balance));
+      document.getElementById('balanceNumber').textContent = formatNumber(Math.abs(currentBalance));
       document.getElementById('balanceCurrency').textContent = state.currentCurrency || '';
       document.getElementById('totalReceive').textContent = formatNumber(totalRec);
       document.getElementById('totalPay').textContent = formatNumber(totalPay);
@@ -625,26 +633,15 @@
         return;
       }
 
-      // ترتيب من الأقدم لحساب الرصيد التراكمي ثم عكس للعرض
-      const sorted = [...state.filtered].sort((a, b) => {
-        const dA = (a.date || '');
-        const dB = (b.date || '');
-        return String(dA).localeCompare(String(dB));
-      });
-      let running = 0;
-      const withBalance = sorted.map(r => {
-        const recVal = (typeof r.rec === 'number') ? r.rec : (parseFloat(r.rec) || 0);
-        const payVal = (typeof r.pay === 'number') ? r.pay : (parseFloat(r.pay) || 0);
-        running += recVal - payVal;
-        return { ...r, balance: running };
-      }).reverse();
-
-      list.innerHTML = withBalance.map(r => {
+      // ✅ البيانات تأتي مرتبة من الأحدث للأقدم، وكل صف يحتوي balance من العمود F
+      // لا حاجة لحساب تراكمي محلي
+      list.innerHTML = state.filtered.map(r => {
         const recVal = (typeof r.rec === 'number') ? r.rec : (parseFloat(r.rec) || 0);
         const payVal = (typeof r.pay === 'number') ? r.pay : (parseFloat(r.pay) || 0);
         const isReceive = recVal > 0;
         const amount = isReceive ? recVal : payVal;
         const dirClass = isReceive ? 'receive' : 'pay';
+        const balanceVal = (typeof r.balance === 'number') ? r.balance : (parseFloat(r.balance) || 0);
         const dirIcon = isReceive
           ? '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>'
           : '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="19" x2="12" y2="5"/></svg>';
@@ -670,7 +667,7 @@
             ${r.note ? `<div class="txn-note">${escapeHTML(r.note)}</div>` : ''}
             <div class="txn-balance">
               <span class="txn-balance-label">الرصيد بعد الحركة</span>
-              <span class="txn-balance-value" style="color:${r.balance >= 0 ? 'var(--success)' : 'var(--error)'};">${formatNumber(r.balance)} ${state.currentCurrency}</span>
+              <span class="txn-balance-value" style="color:${balanceVal >= 0 ? 'var(--success)' : 'var(--error)'};">${formatNumber(balanceVal)} ${state.currentCurrency}</span>
             </div>
             <div class="txn-actions">
               <button class="txn-action-btn receipt" data-receipt='${escapeJSON(r)}'>
