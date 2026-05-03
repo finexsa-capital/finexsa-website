@@ -95,8 +95,7 @@
       background: var(--bg-deep);
       border-left: 1px solid var(--border);
       padding: 24px 18px;
-      position: sticky;
-      top: 0;
+      position: sticky; top: 0;
       height: 100vh;
       overflow-y: auto;
       display: flex;
@@ -173,8 +172,7 @@
       background: rgba(15, 18, 32, 0.85);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
+      display: flex; align-items: center;
       justify-content: space-between;
       position: sticky; top: 0; z-index: 50;
     }
@@ -320,9 +318,7 @@
       color: var(--text-muted);
     }
     .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
     }
     .meta-item .meta-label { color: var(--text-dim); font-weight: 600; }
     .meta-item .meta-value { color: var(--text-primary); font-weight: 700; }
@@ -342,8 +338,7 @@
       border-radius: 50%;
       display: grid; place-items: center;
       color: var(--bg-void);
-      font-weight: 800;
-      font-size: 9px;
+      font-weight: 800; font-size: 9px;
       flex-shrink: 0;
     }
 
@@ -360,15 +355,11 @@
       color: var(--text-primary);
       letter-spacing: 0.02em;
     }
-    .section-title-line {
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
+    .section-title-line { flex: 1; height: 1px; background: var(--border); }
 
     .tasks-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 18px;
     }
 
@@ -423,14 +414,84 @@
       color: var(--text-dim);
       font-weight: 600;
       letter-spacing: 0.04em;
-    }
-
-    .task-list {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
+    /* Countdown pill */
+    .countdown-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0;
+    }
+    .countdown-pill.urgent {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: var(--warning);
+    }
+    .countdown-pill svg {
+      width: 10px; height: 10px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* Monthly dual-period */
+    .monthly-period {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: var(--bg-deep);
+    }
+    .monthly-period:last-child { margin-bottom: 0; }
+    .monthly-period.review {
+      border-style: dashed;
+      border-color: rgba(245, 158, 11, 0.3);
+      background: rgba(245, 158, 11, 0.03);
+    }
+    .monthly-period-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .monthly-period-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .monthly-period-name .review-tag {
+      font-size: 10px;
+      padding: 1px 7px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--warning);
+      border-radius: 100px;
+      font-weight: 700;
+    }
+
+    /* Task list */
+    .task-list { display: flex; flex-direction: column; gap: 8px; }
+
+    /* Task item — interactive */
     .task-item {
       padding: 12px 14px;
       background: var(--bg-deep);
@@ -439,12 +500,32 @@
       display: flex;
       gap: 12px;
       align-items: flex-start;
-      transition: all 0.15s ease;
+      transition: all 0.18s ease;
+      user-select: none;
     }
     .task-item:hover {
       border-color: var(--border-strong);
       background: var(--bg-card-hover);
     }
+    .monthly-period .task-item { background: var(--bg-card); }
+
+    .task-item.is-done {
+      background: rgba(74, 222, 128, 0.04) !important;
+      border-color: rgba(74, 222, 128, 0.25);
+    }
+    .task-item.is-done:hover {
+      background: rgba(74, 222, 128, 0.07) !important;
+    }
+    .task-item.is-done .task-item-label {
+      color: var(--text-muted);
+      text-decoration: line-through;
+      text-decoration-color: rgba(74, 222, 128, 0.5);
+    }
+    .task-item.is-pending {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
     .task-item-num {
       min-width: 26px;
       height: 26px;
@@ -458,6 +539,12 @@
       display: grid; place-items: center;
       flex-shrink: 0;
     }
+    .task-item.is-done .task-item-num {
+      background: rgba(74, 222, 128, 0.1);
+      border-color: rgba(74, 222, 128, 0.35);
+      color: var(--success);
+    }
+
     .task-item-body { flex: 1; min-width: 0; }
     .task-item-label {
       font-size: 14px;
@@ -470,6 +557,88 @@
       color: var(--text-muted);
       margin-top: 5px;
       line-height: 1.6;
+    }
+
+    /* Done meta line under checked task */
+    .task-done-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: var(--success);
+      font-weight: 600;
+      flex-wrap: wrap;
+    }
+    .task-done-meta svg {
+      width: 12px; height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .task-done-meta .by-name { color: var(--text-primary); font-weight: 700; }
+    .task-done-meta .when { color: var(--text-muted); font-weight: 500; }
+    .task-done-meta .unmark-btn {
+      margin-right: auto;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-dim);
+      font-size: 10.5px;
+      padding: 2px 9px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .task-done-meta .unmark-btn:hover {
+      color: var(--error);
+      border-color: rgba(255, 107, 107, 0.4);
+      background: rgba(255, 107, 107, 0.05);
+    }
+
+    /* Custom checkbox */
+    .task-checkbox {
+      width: 28px; height: 28px;
+      border: 2px solid var(--border-strong);
+      border-radius: 50%;
+      background: var(--bg-card);
+      cursor: pointer;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      transition: all 0.18s ease;
+      position: relative;
+      align-self: flex-start;
+      margin-top: 1px;
+    }
+    .task-checkbox:hover {
+      border-color: var(--gold);
+      background: var(--gold-muted);
+      transform: scale(1.05);
+    }
+    .task-checkbox.is-checked {
+      background: linear-gradient(135deg, var(--success), #6ade8a);
+      border-color: var(--success);
+    }
+    .task-checkbox.is-checked:hover {
+      background: linear-gradient(135deg, #6ade8a, var(--success));
+    }
+    .task-checkbox svg {
+      width: 14px; height: 14px;
+      stroke: white;
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s ease;
+    }
+    .task-checkbox.is-checked svg {
+      opacity: 1;
+      transform: scale(1);
     }
 
     .task-empty-cat {
@@ -490,7 +659,7 @@
     }
     @keyframes skeleton { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
-    /* Error / Empty state */
+    /* Error state */
     .full-state {
       padding: 80px 20px;
       text-align: center;
@@ -574,14 +743,40 @@
       min-width: 280px;
     }
     @keyframes toastIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+    .toast.success { border-color: var(--success); }
     .toast.error { border-color: var(--error); }
     .toast-icon {
       width: 26px; height: 26px;
       border-radius: 50%;
       display: grid; place-items: center;
     }
+    .toast.success .toast-icon { background: rgba(74,222,128,0.15); color: var(--success); }
     .toast.error .toast-icon { background: rgba(255,107,107,0.15); color: var(--error); }
+    .toast.info .toast-icon { background: rgba(96,165,250,0.15); color: var(--info); }
     .toast-icon svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+    /* Progress summary */
+    .progress-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--bg-card);
+      border-radius: 100px;
+      overflow: hidden;
+      min-width: 60px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success), #6ade8a);
+      transition: width 0.4s ease;
+    }
 
     /* Mobile */
     @media (max-width: 1024px) {
@@ -668,7 +863,7 @@
       </ul>
 
       <div class="sidebar-footer">
-        <div class="sidebar-version">Companies v1.1.0</div>
+        <div class="sidebar-version">Companies v1.2.0</div>
       </div>
     </aside>
 
@@ -698,7 +893,7 @@
         </div>
       </header>
 
-      <!-- Main content (loads dynamically) -->
+      <!-- Main content -->
       <div class="content" id="mainContent" style="display:none">
 
         <!-- Company Hero -->
@@ -709,9 +904,7 @@
               <span id="companyName">…</span>
               <span class="status-badge active" id="companyStatus">نشطة</span>
             </h1>
-            <div class="company-meta" id="companyMeta">
-              <!-- مُولَّد من JS -->
-            </div>
+            <div class="company-meta" id="companyMeta"></div>
           </div>
         </div>
 
@@ -721,13 +914,11 @@
           <span class="section-title-line"></span>
         </div>
 
-        <div class="tasks-grid" id="tasksGrid">
-          <!-- مُولَّد من JS -->
-        </div>
+        <div class="tasks-grid" id="tasksGrid"></div>
 
       </div>
 
-      <!-- Error state (loads dynamically) -->
+      <!-- Error state -->
       <div class="content" id="errorContent" style="display:none">
         <div class="full-state">
           <div class="full-state-icon" id="errorIcon"></div>
@@ -766,7 +957,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ═══ قراءة بيانات الموظف ═══
+    // ═══ بيانات الموظف ═══
     const me = {
       uid: sessionStorage.getItem('finexsa_staff_uid'),
       email: sessionStorage.getItem('finexsa_staff_email') || '',
@@ -774,9 +965,7 @@
       role: sessionStorage.getItem('finexsa_staff_role') || 'accountant'
     };
 
-    if (!me.uid) {
-      window.location.replace('../login.html');
-    }
+    if (!me.uid) window.location.replace('../login.html');
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -787,11 +976,24 @@
 
     const isAdmin = me.role === 'admin';
 
-    // ═══ قراءة معرّف الشركة من الرابط ═══
+    // ═══ معرّف الشركة من الرابط ═══
     const params = new URLSearchParams(window.location.search);
     const companyId = (params.get('id') || '').trim();
 
-    // ═══ المساعدات ═══
+    // ═══ الثوابت ═══
+    const UNMARK_GRACE_HOURS = 1;
+    const MONTHLY_REVIEW_DAYS = 10;
+
+    // ═══ حالة التطبيق ═══
+    const state = {
+      company: null,
+      defaultTasks: { daily: [], weekly: [], monthly: [] },
+      completions: {},          // مفتاح: taskId__periodKey
+      pendingTasks: new Set(),  // tasks قيد الإرسال
+      countdownTimer: null
+    };
+
+    // ═══ المساعدات الأساسية ═══
     function getInitials(name) {
       if (!name) return 'FX';
       const parts = String(name).trim().split(/\s+/);
@@ -805,22 +1007,11 @@
       );
     }
 
-    function formatArabicDate(iso) {
-      try {
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return '—';
-        return d.toLocaleDateString('ar', {
-          year: 'numeric', month: 'long', day: 'numeric'
-        });
-      } catch {
-        return '—';
-      }
-    }
+    function pad2(n) { return String(n).padStart(2, '0'); }
 
     document.getElementById('userName').textContent = me.name;
     document.getElementById('userAvatar').textContent = getInitials(me.name);
 
-    // إظهار قسم الإدارة في الـ Sidebar (إن كان admin)
     if (isAdmin) {
       document.getElementById('adminSection').style.display = 'block';
       document.getElementById('adminNavList').style.display = 'block';
@@ -835,8 +1026,9 @@
       const el = document.createElement('div');
       el.className = `toast ${type}`;
       const icons = {
+        success: '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
         error: '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-        info:  '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'
+        info: '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'
       };
       el.innerHTML = `<div class="toast-icon">${icons[type]||icons.info}</div><span>${escapeHTML(msg)}</span>`;
       document.getElementById('toastContainer').appendChild(el);
@@ -869,7 +1061,6 @@
 
     // ═══ التحقق المبكر من المعرّف ═══
     if (!companyId) {
-      // ننتظر تحميل المتصفح ثم نظهر الخطأ
       window.addEventListener('DOMContentLoaded', () => {
         showError(
           'معرّف الشركة مفقود',
@@ -879,7 +1070,218 @@
       });
     }
 
-    // ═══ تحميل الشركة + المهام بالتوازي ═══
+    // ════════════════════════════════════════════════════
+    //  حسابات التواريخ بتوقيت إسطنبول (UTC+3 ثابت)
+    // ════════════════════════════════════════════════════
+
+    /**
+     * يعيد مكوّنات الوقت الحالي بتوقيت إسطنبول
+     */
+    function getIstanbulComponents(date) {
+      date = date || new Date();
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Europe/Istanbul',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        weekday: 'short',
+        hour12: false
+      });
+      const parts = formatter.formatToParts(date);
+      const get = (type) => {
+        const p = parts.find(x => x.type === type);
+        return p ? p.value : null;
+      };
+      let hour = parseInt(get('hour'), 10);
+      // بعض المتصفحات تُرجع 24 بدلاً من 0
+      if (hour === 24) hour = 0;
+      return {
+        year:    parseInt(get('year'), 10),
+        month:   parseInt(get('month'), 10),
+        day:     parseInt(get('day'), 10),
+        hour:    hour,
+        minute:  parseInt(get('minute'), 10),
+        second:  parseInt(get('second'), 10),
+        weekday: get('weekday')
+      };
+    }
+
+    const WEEKDAY_NUM = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+    /**
+     * مفتاح اليوم الحالي بصيغة YYYY-MM-DD
+     */
+    function getDailyKey() {
+      const t = getIstanbulComponents();
+      return `${t.year}-${pad2(t.month)}-${pad2(t.day)}`;
+    }
+
+    /**
+     * مفتاح الأسبوع الحالي
+     *   - الأسبوع يبدأ السبت وينتهي الجمعة
+     *   - المفتاح: تاريخ يوم الجمعة بصيغة YYYY-W-MMDD
+     */
+    function getWeeklyKey() {
+      const t = getIstanbulComponents();
+      const dayNum = WEEKDAY_NUM[t.weekday];
+      // الأيام إلى الجمعة المقبلة (شاملاً اليوم إن كان جمعة)
+      const daysToFriday = (5 - dayNum + 7) % 7;
+      // بناء تاريخ الجمعة
+      const fri = new Date(Date.UTC(t.year, t.month - 1, t.day));
+      fri.setUTCDate(fri.getUTCDate() + daysToFriday);
+      const fy = fri.getUTCFullYear();
+      const fm = fri.getUTCMonth() + 1;
+      const fd = fri.getUTCDate();
+      return `${fy}-W-${pad2(fm)}${pad2(fd)}`;
+    }
+
+    /**
+     * مفاتيح الشهرية
+     *   - primary: الشهر الجاري دائماً
+     *   - reviewing: الشهر السابق إن كان اليوم 1-10 من الشهر، وإلا null
+     */
+    function getMonthlyKeys() {
+      const t = getIstanbulComponents();
+      const primary = `${t.year}-${pad2(t.month)}`;
+      if (t.day <= MONTHLY_REVIEW_DAYS) {
+        let py = t.year, pm = t.month - 1;
+        if (pm < 1) { pm = 12; py -= 1; }
+        return { primary: primary, reviewing: `${py}-${pad2(pm)}` };
+      }
+      return { primary: primary, reviewing: null };
+    }
+
+    /**
+     * عدّاد تنازلي للمهام اليومية (حتى 23:59 من اليوم الحالي)
+     */
+    function getDailyCountdown() {
+      const t = getIstanbulComponents();
+      const totalMinutesLeft = (23 - t.hour) * 60 + (59 - t.minute);
+      return formatShortDuration(totalMinutesLeft);
+    }
+
+    /**
+     * عدّاد تنازلي للمهام الأسبوعية (حتى الجمعة 23:59)
+     */
+    function getWeeklyCountdown() {
+      const t = getIstanbulComponents();
+      const dayNum = WEEKDAY_NUM[t.weekday];
+      const daysToFriday = (5 - dayNum + 7) % 7;
+      if (daysToFriday === 0) {
+        // اليوم جمعة
+        const totalMinutesLeft = (23 - t.hour) * 60 + (59 - t.minute);
+        return formatShortDuration(totalMinutesLeft);
+      }
+      return formatDays(daysToFriday);
+    }
+
+    /**
+     * عدّاد المهام الشهرية (الشهر الجاري — حتى آخر يوم)
+     */
+    function getMonthlyCurrentCountdown() {
+      const t = getIstanbulComponents();
+      // عدد أيام الشهر الحالي
+      const lastDay = new Date(Date.UTC(t.year, t.month, 0)).getUTCDate();
+      const daysLeft = lastDay - t.day;
+      if (daysLeft === 0) {
+        // اليوم الأخير — احسب الساعات
+        const minutesLeft = (23 - t.hour) * 60 + (59 - t.minute);
+        return formatShortDuration(minutesLeft);
+      }
+      return formatDays(daysLeft);
+    }
+
+    /**
+     * عدّاد نافذة المراجعة للشهر السابق (حتى 10 من الشهر الجاري 23:59)
+     */
+    function getMonthlyReviewCountdown() {
+      const t = getIstanbulComponents();
+      if (t.day > MONTHLY_REVIEW_DAYS) return null;
+      const daysLeft = MONTHLY_REVIEW_DAYS - t.day;
+      if (daysLeft === 0) {
+        // اليوم العاشر — احسب الساعات
+        const minutesLeft = (23 - t.hour) * 60 + (59 - t.minute);
+        return formatShortDuration(minutesLeft);
+      }
+      return formatDays(daysLeft);
+    }
+
+    function formatShortDuration(totalMinutes) {
+      if (totalMinutes < 0) return '0د';
+      if (totalMinutes < 60) return `${totalMinutes}د`;
+      const hours = Math.floor(totalMinutes / 60);
+      const mins = totalMinutes % 60;
+      return mins > 0 ? `${hours}س ${mins}د` : `${hours}س`;
+    }
+
+    function formatDays(n) {
+      if (n === 1) return 'يوم واحد';
+      if (n === 2) return 'يومان';
+      if (n >= 3 && n <= 10) return `${n} أيام`;
+      return `${n} يوماً`;
+    }
+
+    /**
+     * يحوّل وقت ISO إلى نص نسبي بالعربية مثل "منذ 5 دقائق"
+     */
+    function timeAgo(iso) {
+      if (!iso) return '';
+      const past = new Date(iso).getTime();
+      const now = Date.now();
+      const diffSec = Math.max(0, Math.floor((now - past) / 1000));
+      if (diffSec < 60) return 'الآن';
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return `منذ ${diffMin} ${diffMin === 1 ? 'دقيقة' : diffMin === 2 ? 'دقيقتين' : (diffMin <= 10 ? 'دقائق' : 'دقيقة')}`;
+      const diffHr = Math.floor(diffMin / 60);
+      if (diffHr < 24) return `منذ ${diffHr} ${diffHr === 1 ? 'ساعة' : diffHr === 2 ? 'ساعتين' : (diffHr <= 10 ? 'ساعات' : 'ساعة')}`;
+      const diffDay = Math.floor(diffHr / 24);
+      if (diffDay < 30) return `منذ ${diffDay} ${diffDay === 1 ? 'يوم' : diffDay === 2 ? 'يومين' : (diffDay <= 10 ? 'أيام' : 'يوماً')}`;
+      // أقدم من شهر — تاريخ كامل
+      try {
+        return new Date(iso).toLocaleDateString('ar', { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch { return ''; }
+    }
+
+    /**
+     * تنسيق اسم الشهر بالعربية من مفتاح YYYY-MM
+     */
+    function formatMonthName(periodKey) {
+      const [y, m] = periodKey.split('-');
+      try {
+        const d = new Date(parseInt(y, 10), parseInt(m, 10) - 1, 1);
+        return d.toLocaleDateString('ar', { year: 'numeric', month: 'long' });
+      } catch {
+        return periodKey;
+      }
+    }
+
+    /**
+     * هل يستطيع المستخدم إلغاء تشييك هذه المهمة؟
+     *   - الأدمن: دائماً نعم
+     *   - الموظف: نفسه فقط، خلال نافذة الساعة
+     */
+    function canUnmark(completion) {
+      if (!completion || !completion.done) return false;
+      if (isAdmin) return true;
+      if (completion.lastDoneByUid !== me.uid) return false;
+      if (!completion.lastDoneAt) return false;
+      const hoursSince = (Date.now() - new Date(completion.lastDoneAt).getTime()) / (1000 * 60 * 60);
+      return hoursSince <= UNMARK_GRACE_HOURS;
+    }
+
+    function formatArabicDate(iso) {
+      try {
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return '—';
+        return d.toLocaleDateString('ar', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      } catch { return '—'; }
+    }
+
+    // ════════════════════════════════════════════════════
+    //  تحميل البيانات
+    // ════════════════════════════════════════════════════
+
     async function loadAll() {
       if (!companyId) return;
       try {
@@ -891,23 +1293,33 @@
         const token = await user.getIdToken();
         const tokenEnc = encodeURIComponent(token);
 
-        // استدعاءان متوازيان
-        const [compRes, tasksRes] = await Promise.all([
+        // مفاتيح الفترات للاستعلام
+        const monthly = getMonthlyKeys();
+        const periodKeys = [getDailyKey(), getWeeklyKey(), monthly.primary];
+        if (monthly.reviewing) periodKeys.push(monthly.reviewing);
+
+        // 3 استدعاءات بالتوازي
+        const [compRes, tasksRes, completionsRes] = await Promise.all([
           fetch(`${COMPANIES_API_URL}?action=getCompanies&token=${tokenEnc}`),
-          fetch(`${COMPANIES_API_URL}?action=getDefaultTasks&token=${tokenEnc}`)
+          fetch(`${COMPANIES_API_URL}?action=getDefaultTasks&token=${tokenEnc}`),
+          fetch(`${COMPANIES_API_URL}?action=listCompletions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              token: token,
+              data: { companyId: companyId, periodKeys: periodKeys }
+            })
+          })
         ]);
 
-        const compData  = await compRes.json();
-        const tasksData = await tasksRes.json();
+        const compData        = await compRes.json();
+        const tasksData       = await tasksRes.json();
+        const completionsData = await completionsRes.json();
 
-        if (!compData.ok) {
-          throw new Error(compData.message || 'فشل تحميل بيانات الشركة');
-        }
-        if (!tasksData.ok) {
-          throw new Error(tasksData.message || 'فشل تحميل المهام الافتراضية');
-        }
+        if (!compData.ok)        throw new Error(compData.message || 'فشل تحميل بيانات الشركة');
+        if (!tasksData.ok)       throw new Error(tasksData.message || 'فشل تحميل المهام الافتراضية');
+        if (!completionsData.ok) throw new Error(completionsData.message || 'فشل تحميل سجلات الإنجاز');
 
-        // البحث عن الشركة المطلوبة
         const company = (compData.companies || []).find(c => c.id === companyId);
         if (!company) {
           showError(
@@ -918,15 +1330,17 @@
           return;
         }
 
-        // ترشيح المهام النشطة فقط
-        const activeTasks = {
+        state.company = company;
+        state.defaultTasks = {
           daily:   (tasksData.tasks.daily   || []).filter(t => t.active !== false),
           weekly:  (tasksData.tasks.weekly  || []).filter(t => t.active !== false),
           monthly: (tasksData.tasks.monthly || []).filter(t => t.active !== false)
         };
+        state.completions = completionsData.completions || {};
 
-        renderCompany(company);
-        renderTasks(activeTasks);
+        renderCompany();
+        renderTasks();
+        startCountdownTimer();
 
         document.getElementById('mainContent').style.display = 'block';
         hideLoader();
@@ -936,19 +1350,17 @@
       }
     }
 
-    // ═══ عرض بيانات الشركة ═══
-    function renderCompany(c) {
-      // العنوان في الترويسة
+    // ════════════════════════════════════════════════════
+    //  Rendering
+    // ════════════════════════════════════════════════════
+
+    function renderCompany() {
+      const c = state.company;
       document.getElementById('headerTitle').textContent = c.name || 'بدون اسم';
       document.title = (c.name || 'شركة') + ' — FINEXSA Staff';
-
-      // الأفاتار
       document.getElementById('companyAvatar').textContent = getInitials(c.name || 'CO');
-
-      // الاسم
       document.getElementById('companyName').textContent = c.name || 'بدون اسم';
 
-      // شارة الحالة
       const statusEl = document.getElementById('companyStatus');
       if (c.active === false) {
         statusEl.className = 'status-badge inactive';
@@ -958,15 +1370,11 @@
         statusEl.textContent = 'نشطة';
       }
 
-      // البيانات الوصفية
       const metaEl = document.getElementById('companyMeta');
       const assigneeInitials = getInitials(c.assigneeName || c.assigneeUid || '?');
       const createdDate = c.createdAt ? formatArabicDate(c.createdAt) : '—';
 
-      let html = '';
-
-      // الموظف المسؤول
-      html += `
+      let html = `
         <div class="meta-item">
           <span class="meta-label">الموظف المسؤول:</span>
           <span class="assignee-chip">
@@ -974,17 +1382,11 @@
             <span class="meta-value">${escapeHTML(c.assigneeName || '—')}</span>
           </span>
         </div>
-      `;
-
-      // تاريخ الإنشاء
-      html += `
         <div class="meta-item">
           <span class="meta-label">تاريخ الإنشاء:</span>
           <span class="meta-value">${escapeHTML(createdDate)}</span>
         </div>
       `;
-
-      // أُنشئت بواسطة (للأدمن فقط، لأنه قد لا يكون مفيداً للموظف العادي)
       if (isAdmin && c.createdByName) {
         html += `
           <div class="meta-item">
@@ -993,76 +1395,377 @@
           </div>
         `;
       }
-
       metaEl.innerHTML = html;
     }
 
-    // ═══ عرض المهام ═══
     const CAT_CONFIG = {
       daily: {
         label: 'المهام اليومية',
-        sub: 'تُنفَّذ في كل يوم عمل',
-        icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+        sub:   'تُنفَّذ في كل يوم عمل',
+        icon:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
       },
       weekly: {
         label: 'المهام الأسبوعية',
-        sub: 'تُنفَّذ مرة في الأسبوع',
-        icon: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
+        sub:   'تُنفَّذ مرة في الأسبوع',
+        icon:  '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
       },
       monthly: {
         label: 'المهام الشهرية',
-        sub: 'تُنفَّذ مرة في الشهر',
-        icon: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
+        sub:   'تُنفَّذ مرة في الشهر',
+        icon:  '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
       }
     };
 
-    function renderTasks(tasks) {
+    const ICON_CLOCK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    const ICON_CHECK = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    function renderTasks() {
       const grid = document.getElementById('tasksGrid');
-      const cats = ['daily', 'weekly', 'monthly'];
-
-      grid.innerHTML = cats.map(cat => {
-        const conf = CAT_CONFIG[cat];
-        const items = tasks[cat] || [];
-        const count = items.length;
-
-        let listHTML;
-        if (count === 0) {
-          listHTML = `<div class="task-empty-cat">لا توجد مهام مفعَّلة في هذا القسم.</div>`;
-        } else {
-          listHTML = items.map((t, i) => taskItemHTML(t, i + 1)).join('');
-        }
-
-        return `
-          <div class="task-card">
-            <div class="task-card-head">
-              <div class="task-card-icon ${cat}">${conf.icon}</div>
-              <div class="task-card-title">
-                <div class="task-card-name">${escapeHTML(conf.label)}</div>
-                <div class="task-card-meta">${count} مهمة · ${escapeHTML(conf.sub)}</div>
-              </div>
-            </div>
-            <div class="task-list">${listHTML}</div>
-          </div>
-        `;
-      }).join('');
+      grid.innerHTML =
+        renderDailyCard() +
+        renderWeeklyCard() +
+        renderMonthlyCard();
+      attachCheckboxEvents();
+      attachUnmarkEvents();
     }
 
-    function taskItemHTML(t, n) {
+    function renderDailyCard() {
+      const tasks = state.defaultTasks.daily;
+      const periodKey = getDailyKey();
+      const cd = getDailyCountdown();
+      return cardWrap(
+        'daily', tasks.length,
+        cd, false,
+        renderTaskList(tasks, 'daily', periodKey)
+      );
+    }
+
+    function renderWeeklyCard() {
+      const tasks = state.defaultTasks.weekly;
+      const periodKey = getWeeklyKey();
+      const cd = getWeeklyCountdown();
+      return cardWrap(
+        'weekly', tasks.length,
+        cd, false,
+        renderTaskList(tasks, 'weekly', periodKey)
+      );
+    }
+
+    function renderMonthlyCard() {
+      const tasks = state.defaultTasks.monthly;
+      const monthly = getMonthlyKeys();
+      const conf = CAT_CONFIG.monthly;
+
+      // إن وُجدت نافذة مراجعة، اعرض قسمين
+      let body = '';
+      const cdCurrent = getMonthlyCurrentCountdown();
+
+      if (monthly.reviewing) {
+        const cdReview = getMonthlyReviewCountdown();
+        // الشهر الجاري أولاً (الأهم)
+        body += `
+          <div class="monthly-period">
+            <div class="monthly-period-head">
+              <div class="monthly-period-name">${escapeHTML(formatMonthName(monthly.primary))}</div>
+              ${countdownPill(cdCurrent, false)}
+            </div>
+            <div class="task-list">${renderTaskItems(tasks, 'monthly', monthly.primary)}</div>
+          </div>
+          <div class="monthly-period review">
+            <div class="monthly-period-head">
+              <div class="monthly-period-name">
+                <span>${escapeHTML(formatMonthName(monthly.reviewing))}</span>
+                <span class="review-tag">نافذة المراجعة</span>
+              </div>
+              ${countdownPill(cdReview, true)}
+            </div>
+            <div class="task-list">${renderTaskItems(tasks, 'monthly', monthly.reviewing)}</div>
+          </div>
+        `;
+      } else {
+        body = `<div class="task-list">${renderTaskItems(tasks, 'monthly', monthly.primary)}</div>`;
+      }
+
+      // العدّاد الرئيسي للبطاقة (يُخفى لو هناك قسمان داخل البطاقة)
+      const headerCountdown = monthly.reviewing ? null : cdCurrent;
+
+      return `
+        <div class="task-card">
+          <div class="task-card-head">
+            <div class="task-card-icon monthly">${conf.icon}</div>
+            <div class="task-card-title">
+              <div class="task-card-name">${escapeHTML(conf.label)}</div>
+              <div class="task-card-meta">
+                <span>${tasks.length} مهمة</span>
+                <span>·</span>
+                <span>${escapeHTML(conf.sub)}</span>
+                ${headerCountdown ? '<span>·</span>' + countdownPill(headerCountdown, false) : ''}
+              </div>
+            </div>
+          </div>
+          ${body}
+        </div>
+      `;
+    }
+
+    function cardWrap(cat, count, countdown, isUrgent, listHTML) {
+      const conf = CAT_CONFIG[cat];
+      return `
+        <div class="task-card">
+          <div class="task-card-head">
+            <div class="task-card-icon ${cat}">${conf.icon}</div>
+            <div class="task-card-title">
+              <div class="task-card-name">${escapeHTML(conf.label)}</div>
+              <div class="task-card-meta">
+                <span>${count} مهمة</span>
+                <span>·</span>
+                <span>${escapeHTML(conf.sub)}</span>
+                <span>·</span>
+                ${countdownPill(countdown, isUrgent)}
+              </div>
+            </div>
+          </div>
+          <div class="task-list">${listHTML}</div>
+        </div>
+      `;
+    }
+
+    function countdownPill(text, urgent) {
+      const cls = urgent ? 'countdown-pill urgent' : 'countdown-pill';
+      return `<span class="${cls}">${ICON_CLOCK} <span>${escapeHTML(text)}</span></span>`;
+    }
+
+    function renderTaskList(tasks, category, periodKey) {
+      if (!tasks || tasks.length === 0) {
+        return `<div class="task-empty-cat">لا توجد مهام مفعَّلة في هذا القسم.</div>`;
+      }
+      return renderTaskItems(tasks, category, periodKey);
+    }
+
+    function renderTaskItems(tasks, category, periodKey) {
+      if (!tasks || tasks.length === 0) {
+        return `<div class="task-empty-cat">لا توجد مهام مفعَّلة في هذا القسم.</div>`;
+      }
+      return tasks.map((t, i) => taskItemHTML(t, i + 1, category, periodKey)).join('');
+    }
+
+    function taskItemHTML(t, n, category, periodKey) {
+      const docId = t.id + '__' + periodKey;
+      const completion = state.completions[docId];
+      const isDone = !!(completion && completion.done);
+      const isPending = state.pendingTasks.has(docId);
+
+      const classes = ['task-item'];
+      if (isDone) classes.push('is-done');
+      if (isPending) classes.push('is-pending');
+
       const hint = t.hint && String(t.hint).trim()
         ? `<div class="task-item-hint">${escapeHTML(t.hint)}</div>`
         : '';
+
+      let doneMeta = '';
+      if (isDone) {
+        const byName = completion.lastDoneByName || '—';
+        const when = timeAgo(completion.lastDoneAt);
+        const showUnmark = canUnmark(completion);
+        doneMeta = `
+          <div class="task-done-meta">
+            ${ICON_CHECK}
+            <span class="by-name">${escapeHTML(byName)}</span>
+            <span class="when">· ${escapeHTML(when)}</span>
+            ${showUnmark ? `<button class="unmark-btn" data-doc-id="${escapeHTML(docId)}" data-task-id="${escapeHTML(t.id)}" data-period-key="${escapeHTML(periodKey)}">إلغاء التشييك</button>` : ''}
+          </div>
+        `;
+      }
+
+      const checkboxClass = isDone ? 'task-checkbox is-checked' : 'task-checkbox';
+
       return `
-        <div class="task-item" data-task-id="${escapeHTML(t.id || '')}">
+        <div class="${classes.join(' ')}" data-doc-id="${escapeHTML(docId)}">
           <span class="task-item-num">${n}</span>
           <div class="task-item-body">
             <div class="task-item-label">${escapeHTML(t.label || '')}</div>
             ${hint}
+            ${doneMeta}
+          </div>
+          <div class="${checkboxClass}"
+               role="checkbox" aria-checked="${isDone}" tabindex="0"
+               data-doc-id="${escapeHTML(docId)}"
+               data-task-id="${escapeHTML(t.id)}"
+               data-period-key="${escapeHTML(periodKey)}"
+               data-category="${escapeHTML(category)}">
+            ${ICON_CHECK}
           </div>
         </div>
       `;
     }
 
-    // ═══ Bootstrap ═══
+    // ════════════════════════════════════════════════════
+    //  أحداث التشييك (Optimistic UI)
+    // ════════════════════════════════════════════════════
+
+    function attachCheckboxEvents() {
+      document.querySelectorAll('.task-checkbox').forEach(cb => {
+        cb.addEventListener('click', handleCheckboxClick);
+        cb.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCheckboxClick.call(cb, e);
+          }
+        });
+      });
+    }
+
+    function attachUnmarkEvents() {
+      document.querySelectorAll('.unmark-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const docId = btn.dataset.docId;
+          const taskId = btn.dataset.taskId;
+          const periodKey = btn.dataset.periodKey;
+          unmarkTask(docId, taskId, periodKey);
+        });
+      });
+    }
+
+    async function handleCheckboxClick(e) {
+      e.stopPropagation();
+      const cb = e.currentTarget || this;
+      const docId = cb.dataset.docId;
+      const taskId = cb.dataset.taskId;
+      const periodKey = cb.dataset.periodKey;
+      const category = cb.dataset.category;
+
+      // منع النقرات المتسارعة على نفس المهمة
+      if (state.pendingTasks.has(docId)) return;
+
+      const isCurrentlyDone = !!(state.completions[docId] && state.completions[docId].done);
+
+      if (isCurrentlyDone) {
+        // المربع متشيَّك أصلاً — حاول إلغاء التشييك
+        unmarkTask(docId, taskId, periodKey);
+      } else {
+        // غير متشيَّك — شيِّكه
+        markTask(docId, taskId, periodKey, category);
+      }
+    }
+
+    async function markTask(docId, taskId, periodKey, category) {
+      // Optimistic: حدّث الواجهة فوراً
+      state.pendingTasks.add(docId);
+      const previousState = state.completions[docId] || null;
+      state.completions[docId] = {
+        taskId: taskId,
+        periodKey: periodKey,
+        category: category,
+        done: true,
+        lastDoneAt: new Date().toISOString(),
+        lastDoneByUid: me.uid,
+        lastDoneByName: me.name
+      };
+      renderTasks();
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+
+        const res = await fetch(`${COMPANIES_API_URL}?action=markTaskDone`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: {
+              companyId: companyId,
+              taskId: taskId,
+              periodKey: periodKey,
+              category: category
+            }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || 'فشل التشييك');
+
+        // تحديث بالقيم من الخادم (timestamp رسمي)
+        state.completions[docId] = {
+          taskId: taskId,
+          periodKey: periodKey,
+          category: category,
+          done: true,
+          lastDoneAt: data.lastDoneAt,
+          lastDoneByUid: me.uid,
+          lastDoneByName: data.lastDoneByName || me.name
+        };
+      } catch (err) {
+        // فشل — تراجع
+        if (previousState) {
+          state.completions[docId] = previousState;
+        } else {
+          delete state.completions[docId];
+        }
+        toast('فشل التشييك: ' + err.message, 'error', 4500);
+      } finally {
+        state.pendingTasks.delete(docId);
+        renderTasks();
+      }
+    }
+
+    async function unmarkTask(docId, taskId, periodKey) {
+      if (state.pendingTasks.has(docId)) return;
+      state.pendingTasks.add(docId);
+
+      const previousState = state.completions[docId];
+      // Optimistic: أزل التشييك من الواجهة
+      delete state.completions[docId];
+      renderTasks();
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+
+        const res = await fetch(`${COMPANIES_API_URL}?action=unmarkTaskDone`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: {
+              companyId: companyId,
+              taskId: taskId,
+              periodKey: periodKey
+            }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || 'فشل إلغاء التشييك');
+
+        toast('تم إلغاء التشييك', 'info');
+      } catch (err) {
+        // تراجع
+        if (previousState) {
+          state.completions[docId] = previousState;
+        }
+        toast(err.message || 'تعذّر إلغاء التشييك', 'error', 5000);
+      } finally {
+        state.pendingTasks.delete(docId);
+        renderTasks();
+      }
+    }
+
+    // ════════════════════════════════════════════════════
+    //  العدّاد التنازلي (تحديث كل دقيقة)
+    // ════════════════════════════════════════════════════
+
+    function startCountdownTimer() {
+      if (state.countdownTimer) clearInterval(state.countdownTimer);
+      state.countdownTimer = setInterval(() => {
+        // إعادة رسم البطاقات لتحديث العدّادات والوقت النسبي
+        renderTasks();
+      }, 60 * 1000);
+    }
+
+    // ════════════════════════════════════════════════════
+    //  Bootstrap
+    // ════════════════════════════════════════════════════
+
     onAuthStateChanged(auth, (user) => {
       if (user && companyId) {
         loadAll();
