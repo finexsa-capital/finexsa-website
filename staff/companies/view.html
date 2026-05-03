@@ -159,6 +159,25 @@
       stroke-linecap: round; stroke-linejoin: round;
       flex-shrink: 0;
     }
+    .nav-link span:first-of-type { flex: 1; }
+    .nav-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 7px;
+      background: var(--warning);
+      color: var(--bg-void);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+    .nav-badge.zero {
+      background: rgba(139, 146, 168, 0.15);
+      color: var(--text-dim);
+    }
 
     .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
     .sidebar-version { font-size: 11px; color: var(--text-dim); text-align: center; }
@@ -1132,6 +1151,11 @@
 
       <div class="sidebar-section-label" id="adminSection" style="display:none">الإدارة</div>
       <ul class="nav-list" id="adminNavList" style="display:none">
+        <li><a href="approvals.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>مركز الموافقات</span>
+          <span class="nav-badge zero" id="navPendingBadge">0</span>
+        </a></li>
         <li><a href="default-tasks.html" class="nav-link">
           <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>المهام الافتراضية</span>
@@ -2382,6 +2406,8 @@
         toast(data.message || 'تمت الإضافة', 'success');
         closeAddTaskModal();
         await reloadCustomTasks();
+        // الشارة تتحدّث فقط للأدمن (الموظف لا يرى الشارة أصلاً)
+        if (isAdmin) refreshPendingBadge();
       } catch (err) {
         toast(err.message || 'تعذّر إضافة المهمة', 'error', 5000);
       } finally {
@@ -2431,6 +2457,7 @@
         if (!data.ok) throw new Error(data.message);
         toast('تمت الموافقة على المهمة', 'success');
         await reloadCustomTasks();
+        refreshPendingBadge();
       } catch (err) {
         toast(err.message || 'فشلت الموافقة', 'error');
       }
@@ -2454,6 +2481,7 @@
         if (!data.ok) throw new Error(data.message);
         toast('تم رفض المهمة وحذفها', 'info');
         await reloadCustomTasks();
+        refreshPendingBadge();
       } catch (err) {
         toast(err.message || 'فشل الرفض', 'error');
       }
@@ -2481,12 +2509,37 @@
     }
 
     // ════════════════════════════════════════════════════
+    //  شارة عدد المعلَّقات (للأدمن فقط)
+    // ════════════════════════════════════════════════════
+
+    async function refreshPendingBadge() {
+      if (!isAdmin) return;
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=listAllPendingTasks&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (!data.ok) return;
+        const n = data.count || 0;
+        const badge = document.getElementById('navPendingBadge');
+        if (badge) {
+          badge.textContent = n;
+          badge.classList.toggle('zero', n === 0);
+        }
+      } catch (err) {
+        // فشل صامت — الشارة تبقى على آخر قيمة معروفة
+      }
+    }
+
+    // ════════════════════════════════════════════════════
     //  Bootstrap
     // ════════════════════════════════════════════════════
 
     onAuthStateChanged(auth, (user) => {
       if (user && companyId) {
         loadAll();
+        refreshPendingBadge();
       }
     });
   </script>
