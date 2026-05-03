@@ -700,6 +700,63 @@
       border-color: rgba(245, 158, 11, 0.3);
       border-style: dashed;
     }
+
+    /* Unified actions row for custom tasks */
+    .task-actions-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .task-action-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      color: var(--text-dim);
+    }
+    .task-action-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+    .task-action-btn.edit:hover {
+      color: var(--gold);
+      background: var(--gold-muted);
+    }
+    .task-action-btn.delete {
+      color: var(--text-dim);
+    }
+    .task-action-btn.delete:hover {
+      color: var(--error);
+      border-color: rgba(255, 107, 107, 0.4);
+      background: rgba(255, 107, 107, 0.05);
+    }
+    .task-action-btn.approve {
+      color: var(--success);
+      border-color: rgba(74, 222, 128, 0.4);
+    }
+    .task-action-btn.approve:hover {
+      background: rgba(74, 222, 128, 0.1);
+    }
+    .task-action-btn.reject {
+      color: var(--error);
+      border-color: rgba(255, 107, 107, 0.4);
+    }
+    .task-action-btn.reject:hover {
+      background: rgba(255, 107, 107, 0.1);
+    }
+    .task-action-btn.deactivate:hover, .task-action-btn.reactivate:hover {
+      color: var(--warning);
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
     .pending-meta {
       display: flex;
       align-items: center;
@@ -854,6 +911,19 @@
       flex: 1;
       height: 1px;
       background: var(--border);
+    }
+    .tasks-divider svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .tasks-divider span {
+      flex-shrink: 0;
     }
 
     /* Modal */
@@ -1167,7 +1237,7 @@
       </ul>
 
       <div class="sidebar-footer">
-        <div class="sidebar-version">Companies v1.3.0</div>
+        <div class="sidebar-version">Companies v1.4.0</div>
       </div>
     </aside>
 
@@ -1245,7 +1315,7 @@
     <div class="modal">
       <div class="modal-head">
         <div>
-          <h2>إضافة مهمة خاصة بهذه الشركة</h2>
+          <h2 id="modalTitle">إضافة مهمة خاصة بهذه الشركة</h2>
           <p id="modalSubtitle">المهمة ستُضاف للمهام <span id="modalCategoryName">—</span></p>
         </div>
         <button class="modal-close" id="modalCloseBtn" aria-label="إغلاق">
@@ -1277,6 +1347,9 @@
       </div>
       <div class="form-hint" id="employeeHint" style="display:none">
         ستُرسَل المهمة إلى الإدارة <strong style="color: var(--warning)">بانتظار الموافقة</strong>. لن تتمكّن من تشييكها حتى يوافق عليها الأدمن.
+      </div>
+      <div class="form-hint" id="editToBackPendingHint" style="display:none; padding: 10px 12px; background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px;">
+        ⚠️ <strong style="color: var(--warning)">تنبيه:</strong> تعديل هذه المهمة سيعيدها إلى قائمة الانتظار، حتى يوافق عليها الأدمن من جديد.
       </div>
 
       <div class="modal-actions">
@@ -1345,7 +1418,9 @@
       completions: {},          // مفتاح: taskId__periodKey
       pendingTasks: new Set(),  // tasks قيد الإرسال
       countdownTimer: null,
-      modalCategory: null       // الفئة المختارة عند فتح modal الإضافة
+      modalCategory: null,      // الفئة المختارة عند فتح modal الإضافة
+      modalMode: 'add',         // 'add' أو 'edit'
+      modalEditTaskId: null     // معرّف المهمة عند التعديل
     };
 
     // ═══ المساعدات الأساسية ═══
@@ -1789,14 +1864,20 @@
 
     /**
      * يجمع كل المهام المخصَّصة لتصنيف معيّن مفصولة حسب الحالة
+     *   - الموظف يرى المعطّلة الخاصة به فقط (ليستطيع إعادة تفعيلها)
+     *   - الأدمن يرى كل المعطّلة
      */
     function getCategoryTasks(category) {
       const defaults = state.defaultTasks[category] || [];
       const custom = state.customTasks.filter(t => t.category === category);
+      const inactiveAll = custom.filter(t => t.status === 'approved' && t.active === false);
+      const visibleInactive = isAdmin
+        ? inactiveAll
+        : inactiveAll.filter(t => t.createdByUid === me.uid);
       return {
         defaults: defaults,
         customApproved: custom.filter(t => t.status === 'approved' && t.active !== false),
-        customInactive: custom.filter(t => t.status === 'approved' && t.active === false),
+        customInactive: visibleInactive,
         customPending:  custom.filter(t => t.status === 'pending')
       };
     }
@@ -1849,14 +1930,14 @@
 
       // المعلَّقات (مرة واحدة، ليست مرتبطة بفترة)
       if (cat.customPending.length > 0) {
-        body += `<div class="tasks-divider">${ICON_HOURGLASS}<span style="margin:0 8px">معلَّقات بانتظار الموافقة</span></div>`;
+        body += `<div class="tasks-divider">${ICON_HOURGLASS}<span>معلَّقات بانتظار الموافقة</span></div>`;
         body += `<div class="task-list">${cat.customPending.map(t =>
           taskItemHTML(t, null, 'monthly', monthly.primary, 'custom-pending')
         ).join('')}</div>`;
       }
 
       // المعطّلة (للأدمن فقط)
-      if (isAdmin && cat.customInactive.length > 0) {
+      if (cat.customInactive.length > 0) {
         body += `<div class="tasks-divider">مهام مخصَّصة معطّلة</div>`;
         body += `<div class="task-list">${cat.customInactive.map(t =>
           taskItemHTML(t, null, 'monthly', monthly.primary, 'custom-inactive')
@@ -1958,14 +2039,14 @@
 
       // المعلَّقات
       if (cat.customPending.length > 0) {
-        html += `<div class="tasks-divider">${ICON_HOURGLASS}<span style="margin:0 8px">معلَّقات بانتظار الموافقة</span></div>`;
+        html += `<div class="tasks-divider">${ICON_HOURGLASS}<span>معلَّقات بانتظار الموافقة</span></div>`;
         html += `<div class="task-list">${cat.customPending.map(t =>
           taskItemHTML(t, null, category, periodKey, 'custom-pending')
         ).join('')}</div>`;
       }
 
       // المعطّلة (للأدمن فقط)
-      if (isAdmin && cat.customInactive.length > 0) {
+      if (cat.customInactive.length > 0) {
         html += `<div class="tasks-divider">مهام مخصَّصة معطّلة</div>`;
         html += `<div class="task-list">${cat.customInactive.map(t =>
           taskItemHTML(t, null, category, periodKey, 'custom-inactive')
@@ -2042,7 +2123,7 @@
         `;
       }
 
-      // سطر المعلَّقة
+      // سطر المعلَّقة (معلومات فقط، الأزرار في actions row)
       let pendingMeta = '';
       if (kind === 'custom-pending') {
         const byName = t.createdByName || '—';
@@ -2051,29 +2132,12 @@
           <div class="pending-meta">
             <span class="pending-tag">${ICON_HOURGLASS}<span>بانتظار الموافقة</span></span>
             <span class="by-info">طلبها: ${escapeHTML(byName)} · ${escapeHTML(when)}</span>
-            ${isAdmin ? `
-              <div class="pending-meta-actions">
-                <button class="pending-action-btn approve" data-task-id="${escapeHTML(t.id)}" data-action="approve">موافقة</button>
-                <button class="pending-action-btn reject" data-task-id="${escapeHTML(t.id)}" data-action="reject">رفض</button>
-              </div>
-            ` : ''}
           </div>
         `;
       }
 
-      // سطر إدارة المهمة المخصَّصة (للأدمن: تعطيل / إعادة تفعيل)
-      let adminCustomMeta = '';
-      if (isAdmin && (kind === 'custom-approved' || kind === 'custom-inactive')) {
-        const newActiveValue = kind === 'custom-approved' ? false : true;
-        const btnLabel = kind === 'custom-approved' ? 'تعطيل المهمة' : 'إعادة تفعيل';
-        adminCustomMeta = `
-          <div style="margin-top: 8px; display: flex; justify-content: flex-end;">
-            <button class="custom-admin-btn" data-task-id="${escapeHTML(t.id)}" data-action="toggle-custom-active" data-new-active="${newActiveValue}">
-              ${btnLabel}
-            </button>
-          </div>
-        `;
-      }
+      // صف الإجراءات الموحَّد للمهام المخصَّصة
+      const actionsRow = renderTaskActions(t, kind);
 
       // محتوى عمود الترقيم
       let numCol;
@@ -2098,7 +2162,6 @@
           </div>
         `;
       } else {
-        // لا مربع تشييك للمهام المعلَّقة أو المعطّلة
         checkboxCol = `<div style="width: 28px; flex-shrink: 0;"></div>`;
       }
 
@@ -2110,11 +2173,64 @@
             ${hint}
             ${doneMeta}
             ${pendingMeta}
-            ${adminCustomMeta}
+            ${actionsRow}
           </div>
           ${checkboxCol}
         </div>
       `;
+    }
+
+    /**
+     * يبني صف أزرار الإجراءات للمهمة المخصَّصة
+     *   - معلَّقة: تعديل/حذف (لصاحبها أو الأدمن) + موافقة/رفض (للأدمن)
+     *   - موافَقة نشطة: تعديل/تعطيل (لصاحبها أو الأدمن) + حذف (أدمن فقط)
+     *   - معطّلة: تعديل/إعادة تفعيل (لصاحبها أو الأدمن) + حذف (أدمن فقط)
+     */
+    function renderTaskActions(t, kind) {
+      if (kind !== 'custom-pending' && kind !== 'custom-approved' && kind !== 'custom-inactive') {
+        return '';
+      }
+
+      const isOwner = t.createdByUid === me.uid;
+      const canEdit = isAdmin || isOwner;
+      const canToggleActive = isAdmin || isOwner;
+      const buttons = [];
+
+      const taskIdAttr = `data-task-id="${escapeHTML(t.id)}"`;
+
+      if (kind === 'custom-pending') {
+        if (canEdit) {
+          buttons.push(`<button class="task-action-btn edit" data-action="edit" ${taskIdAttr}>تعديل</button>`);
+          buttons.push(`<button class="task-action-btn delete" data-action="delete" ${taskIdAttr}>حذف</button>`);
+        }
+        if (isAdmin) {
+          buttons.push(`<button class="task-action-btn approve" data-action="approve" ${taskIdAttr}>موافقة</button>`);
+          buttons.push(`<button class="task-action-btn reject" data-action="reject" ${taskIdAttr}>رفض</button>`);
+        }
+      } else if (kind === 'custom-approved') {
+        if (canEdit) {
+          buttons.push(`<button class="task-action-btn edit" data-action="edit" ${taskIdAttr}>تعديل</button>`);
+        }
+        if (canToggleActive) {
+          buttons.push(`<button class="task-action-btn deactivate" data-action="toggle-active" data-new-active="false" ${taskIdAttr}>تعطيل</button>`);
+        }
+        if (isAdmin) {
+          buttons.push(`<button class="task-action-btn delete" data-action="delete" ${taskIdAttr}>حذف</button>`);
+        }
+      } else if (kind === 'custom-inactive') {
+        if (canEdit) {
+          buttons.push(`<button class="task-action-btn edit" data-action="edit" ${taskIdAttr}>تعديل</button>`);
+        }
+        if (canToggleActive) {
+          buttons.push(`<button class="task-action-btn reactivate" data-action="toggle-active" data-new-active="true" ${taskIdAttr}>إعادة تفعيل</button>`);
+        }
+        if (isAdmin) {
+          buttons.push(`<button class="task-action-btn delete" data-action="delete" ${taskIdAttr}>حذف</button>`);
+        }
+      }
+
+      if (buttons.length === 0) return '';
+      return `<div class="task-actions-row">${buttons.join('')}</div>`;
     }
 
     // ════════════════════════════════════════════════════
@@ -2149,24 +2265,24 @@
         });
       });
 
-      // أزرار الموافقة/الرفض على المعلَّقات
-      document.querySelectorAll('.pending-action-btn').forEach(btn => {
+      // أزرار الإجراءات الموحَّدة على المهام المخصَّصة
+      document.querySelectorAll('.task-action-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const taskId = btn.dataset.taskId;
           const action = btn.dataset.action;
-          if (action === 'approve') approveCustomTask(taskId);
-          else if (action === 'reject') rejectCustomTask(taskId);
-        });
-      });
-
-      // أزرار تعطيل/تفعيل المهام المخصَّصة (للأدمن)
-      document.querySelectorAll('.custom-admin-btn[data-action="toggle-custom-active"]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const taskId = btn.dataset.taskId;
-          const newActive = btn.dataset.newActive === 'true';
-          toggleCustomTaskActive(taskId, newActive);
+          if (action === 'edit') {
+            openEditTaskModal(taskId);
+          } else if (action === 'delete') {
+            deleteCustomTaskAction(taskId);
+          } else if (action === 'approve') {
+            approveCustomTask(taskId);
+          } else if (action === 'reject') {
+            rejectCustomTask(taskId);
+          } else if (action === 'toggle-active') {
+            const newActive = btn.dataset.newActive === 'true';
+            toggleCustomTaskActive(taskId, newActive);
+          }
         });
       });
     }
@@ -2306,7 +2422,7 @@
     }
 
     // ════════════════════════════════════════════════════
-    //  Modal — إضافة مهمة مخصَّصة
+    //  Modal — إضافة وتعديل المهام المخصَّصة
     // ════════════════════════════════════════════════════
 
     const CAT_LABEL = {
@@ -2316,8 +2432,12 @@
     };
 
     function openAddTaskModal(category) {
+      state.modalMode = 'add';
       state.modalCategory = category;
-      document.getElementById('modalCategoryName').textContent = CAT_LABEL[category] || '—';
+      state.modalEditTaskId = null;
+
+      document.getElementById('modalTitle').textContent = 'إضافة مهمة خاصة بهذه الشركة';
+      document.getElementById('modalSubtitle').innerHTML = `المهمة ستُضاف للمهام <span id="modalCategoryName">${escapeHTML(CAT_LABEL[category] || '—')}</span>`;
       document.getElementById('taskLabelInput').value = '';
       document.getElementById('taskHintInput').value = '';
       document.getElementById('labelCounter').textContent = '0 / 200';
@@ -2325,7 +2445,42 @@
 
       document.getElementById('adminHint').style.display    = isAdmin ? 'block' : 'none';
       document.getElementById('employeeHint').style.display = isAdmin ? 'none'  : 'block';
+      document.getElementById('editToBackPendingHint').style.display = 'none';
       document.getElementById('modalSubmitText').textContent = isAdmin ? 'إضافة المهمة' : 'إرسال للموافقة';
+
+      document.getElementById('addTaskModal').classList.add('is-open');
+      setTimeout(() => document.getElementById('taskLabelInput').focus(), 50);
+    }
+
+    function openEditTaskModal(taskId) {
+      const task = state.customTasks.find(t => t.id === taskId);
+      if (!task) {
+        toast('المهمة غير موجودة', 'error');
+        return;
+      }
+
+      state.modalMode = 'edit';
+      state.modalEditTaskId = taskId;
+      state.modalCategory = task.category;
+
+      document.getElementById('modalTitle').textContent = 'تعديل مهمة خاصة';
+      document.getElementById('modalSubtitle').innerHTML = `ضمن المهام <span>${escapeHTML(CAT_LABEL[task.category] || '—')}</span>`;
+      document.getElementById('taskLabelInput').value = task.label || '';
+      document.getElementById('taskHintInput').value = task.hint || '';
+      document.getElementById('labelCounter').textContent = `${(task.label || '').length} / 200`;
+      document.getElementById('hintCounter').textContent = `${(task.hint || '').length} / 300`;
+
+      // أخفِ تلميحات الإضافة
+      document.getElementById('adminHint').style.display = 'none';
+      document.getElementById('employeeHint').style.display = 'none';
+
+      // أظهر تحذير الإعادة لـ pending إن كان الموظف يعدّل مهمة موافَقة
+      const willRevertToPending = !isAdmin && task.status === 'approved';
+      document.getElementById('editToBackPendingHint').style.display = willRevertToPending ? 'block' : 'none';
+
+      document.getElementById('modalSubmitText').textContent = willRevertToPending
+        ? 'حفظ وإرسال للمراجعة'
+        : 'حفظ التعديلات';
 
       document.getElementById('addTaskModal').classList.add('is-open');
       setTimeout(() => document.getElementById('taskLabelInput').focus(), 50);
@@ -2334,6 +2489,8 @@
     function closeAddTaskModal() {
       document.getElementById('addTaskModal').classList.remove('is-open');
       state.modalCategory = null;
+      state.modalMode = 'add';
+      state.modalEditTaskId = null;
     }
 
     document.getElementById('modalCloseBtn').addEventListener('click', closeAddTaskModal);
@@ -2361,20 +2518,14 @@
       counter.classList.toggle('warn', n > 270);
     });
 
-    // إرسال المهمة
-    document.getElementById('modalSubmitBtn').addEventListener('click', submitNewTask);
+    document.getElementById('modalSubmitBtn').addEventListener('click', submitTaskModal);
 
-    async function submitNewTask() {
+    async function submitTaskModal() {
       const label = document.getElementById('taskLabelInput').value.trim();
       const hint = document.getElementById('taskHintInput').value.trim();
-      const category = state.modalCategory;
 
       if (!label) {
         toast('نص المهمة مطلوب', 'error');
-        return;
-      }
-      if (!category) {
-        toast('حدث خطأ في الفئة', 'error');
         return;
       }
 
@@ -2387,32 +2538,83 @@
         const user = auth.currentUser;
         const token = await user.getIdToken();
 
-        const res = await fetch(`${COMPANIES_API_URL}?action=addCustomTask`, {
+        if (state.modalMode === 'add') {
+          if (!state.modalCategory) throw new Error('فئة غير محدَّدة');
+          const res = await fetch(`${COMPANIES_API_URL}?action=addCustomTask`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              token: token,
+              data: {
+                companyId: companyId,
+                category: state.modalCategory,
+                label: label,
+                hint: hint
+              }
+            })
+          });
+          const data = await res.json();
+          if (!data.ok) throw new Error(data.message || 'فشل إضافة المهمة');
+          toast(data.message || 'تمت الإضافة', 'success');
+        } else if (state.modalMode === 'edit') {
+          if (!state.modalEditTaskId) throw new Error('معرّف المهمة غير محدَّد');
+          const res = await fetch(`${COMPANIES_API_URL}?action=updateCustomTask`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              token: token,
+              data: {
+                companyId: companyId,
+                taskId: state.modalEditTaskId,
+                label: label,
+                hint: hint
+              }
+            })
+          });
+          const data = await res.json();
+          if (!data.ok) throw new Error(data.message || 'فشل التعديل');
+          toast(data.message || 'تم الحفظ', 'success', 4500);
+        }
+
+        closeAddTaskModal();
+        await reloadCustomTasks();
+        if (isAdmin) refreshPendingBadge();
+      } catch (err) {
+        toast(err.message || 'تعذّر إتمام العملية', 'error', 5000);
+      } finally {
+        submitBtn.disabled = false;
+        document.getElementById('modalSubmitText').textContent = originalText;
+      }
+    }
+
+    // ════════════════════════════════════════════════════
+    //  حذف المهام المخصَّصة
+    // ════════════════════════════════════════════════════
+
+    async function deleteCustomTaskAction(taskId) {
+      const task = state.customTasks.find(t => t.id === taskId);
+      const taskName = task ? task.label : 'هذه المهمة';
+      const ok = confirm(`هل تريد حذف:\n"${taskName}"\n\nسجلات الإنجاز السابقة (إن وُجدت) تبقى محفوظة في النظام لكن لن تظهر في الواجهة.`);
+      if (!ok) return;
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=deleteCustomTask`, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             token: token,
-            data: {
-              companyId: companyId,
-              category: category,
-              label: label,
-              hint: hint
-            }
+            data: { companyId: companyId, taskId: taskId }
           })
         });
         const data = await res.json();
-        if (!data.ok) throw new Error(data.message || 'فشل إضافة المهمة');
-
-        toast(data.message || 'تمت الإضافة', 'success');
-        closeAddTaskModal();
+        if (!data.ok) throw new Error(data.message);
+        toast('تم حذف المهمة', 'info');
         await reloadCustomTasks();
-        // الشارة تتحدّث فقط للأدمن (الموظف لا يرى الشارة أصلاً)
         if (isAdmin) refreshPendingBadge();
       } catch (err) {
-        toast(err.message || 'تعذّر إضافة المهمة', 'error', 5000);
-      } finally {
-        submitBtn.disabled = false;
-        document.getElementById('modalSubmitText').textContent = originalText;
+        toast(err.message || 'فشل الحذف', 'error', 5000);
       }
     }
 
