@@ -650,6 +650,286 @@
       border-radius: 10px;
     }
 
+    /* Custom task badge */
+    .custom-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 8px;
+      background: rgba(167, 139, 250, 0.12);
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      color: var(--purple);
+      border-radius: 100px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .custom-badge svg {
+      width: 10px; height: 10px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Pending state */
+    .task-item.is-pending-approval {
+      background: rgba(245, 158, 11, 0.04) !important;
+      border-color: rgba(245, 158, 11, 0.3);
+      border-style: dashed;
+    }
+    .pending-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: var(--warning);
+      font-weight: 600;
+      flex-wrap: wrap;
+    }
+    .pending-meta .pending-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: var(--warning);
+      border-radius: 100px;
+      font-weight: 700;
+    }
+    .pending-meta .pending-tag svg {
+      width: 11px; height: 11px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .pending-meta .by-info {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .pending-meta-actions {
+      display: flex;
+      gap: 6px;
+      margin-right: auto;
+    }
+    .pending-action-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .pending-action-btn.approve {
+      color: var(--success);
+      border-color: rgba(74, 222, 128, 0.4);
+    }
+    .pending-action-btn.approve:hover {
+      background: rgba(74, 222, 128, 0.1);
+    }
+    .pending-action-btn.reject {
+      color: var(--error);
+      border-color: rgba(255, 107, 107, 0.4);
+    }
+    .pending-action-btn.reject:hover {
+      background: rgba(255, 107, 107, 0.1);
+    }
+
+    /* Inactive custom task */
+    .task-item.is-inactive {
+      opacity: 0.55;
+      background: var(--bg-deep) !important;
+    }
+    .task-item.is-inactive .task-item-label {
+      text-decoration: line-through;
+      text-decoration-color: var(--text-dim);
+      color: var(--text-dim);
+    }
+    .task-inactive-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 8px;
+      background: rgba(139, 146, 168, 0.12);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-dim);
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    /* Admin actions on custom tasks */
+    .custom-admin-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-dim);
+      font-size: 10.5px;
+      padding: 2px 9px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .custom-admin-btn:hover {
+      color: var(--gold);
+      border-color: var(--border-strong);
+    }
+
+    /* Add custom task button */
+    .add-custom-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px 14px;
+      background: transparent;
+      border: 1.5px dashed var(--border-strong);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .add-custom-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-muted);
+    }
+    .add-custom-btn svg {
+      width: 14px; height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Section divider inside card */
+    .tasks-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0 10px;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .tasks-divider::before, .tasks-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(10, 14, 26, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-overlay.is-open { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 28px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-head h2 { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .modal-head p { font-size: 12.5px; color: var(--text-muted); }
+    .modal-close {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .modal-close:hover { background: var(--bg-card-hover); color: var(--error); }
+    .modal-close svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 0.15s ease;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-hint { font-size: 11.5px; color: var(--text-dim); margin-top: 5px; }
+    .form-counter {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: left;
+      margin-top: 4px;
+      direction: ltr;
+    }
+    .form-counter.warn { color: var(--warning); }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
     /* Skeleton */
     .skeleton {
       background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
@@ -863,7 +1143,7 @@
       </ul>
 
       <div class="sidebar-footer">
-        <div class="sidebar-version">Companies v1.2.0</div>
+        <div class="sidebar-version">Companies v1.3.0</div>
       </div>
     </aside>
 
@@ -936,6 +1216,55 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
+  <!-- Modal: إضافة مهمة مخصَّصة -->
+  <div class="modal-overlay" id="addTaskModal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2>إضافة مهمة خاصة بهذه الشركة</h2>
+          <p id="modalSubtitle">المهمة ستُضاف للمهام <span id="modalCategoryName">—</span></p>
+        </div>
+        <button class="modal-close" id="modalCloseBtn" aria-label="إغلاق">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="taskLabelInput">نص المهمة *</label>
+        <input
+          type="text" id="taskLabelInput" class="form-input"
+          maxlength="200"
+          placeholder="مثلاً: متابعة عقد الإيجار الإضافي للمستودع"
+          autocomplete="off">
+        <div class="form-counter" id="labelCounter">0 / 200</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="taskHintInput">ملاحظة (اختياري)</label>
+        <textarea
+          id="taskHintInput" class="form-textarea"
+          maxlength="300"
+          placeholder="تفاصيل إضافية تساعد على إنجاز المهمة بدقة"></textarea>
+        <div class="form-counter" id="hintCounter">0 / 300</div>
+      </div>
+
+      <div class="form-hint" id="adminHint" style="display:none">
+        <strong style="color: var(--success)">ستُضاف مباشرةً</strong> لأنك أدمن — لا تحتاج لموافقة.
+      </div>
+      <div class="form-hint" id="employeeHint" style="display:none">
+        ستُرسَل المهمة إلى الإدارة <strong style="color: var(--warning)">بانتظار الموافقة</strong>. لن تتمكّن من تشييكها حتى يوافق عليها الأدمن.
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modalCancelBtn">إلغاء</button>
+        <button class="btn btn-primary" id="modalSubmitBtn">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span id="modalSubmitText">إضافة المهمة</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged }
@@ -988,9 +1317,11 @@
     const state = {
       company: null,
       defaultTasks: { daily: [], weekly: [], monthly: [] },
+      customTasks: [],          // كل المهام المخصَّصة (نشطة، معطّلة، معلَّقة)
       completions: {},          // مفتاح: taskId__periodKey
       pendingTasks: new Set(),  // tasks قيد الإرسال
-      countdownTimer: null
+      countdownTimer: null,
+      modalCategory: null       // الفئة المختارة عند فتح modal الإضافة
     };
 
     // ═══ المساعدات الأساسية ═══
@@ -1298,8 +1629,8 @@
         const periodKeys = [getDailyKey(), getWeeklyKey(), monthly.primary];
         if (monthly.reviewing) periodKeys.push(monthly.reviewing);
 
-        // 3 استدعاءات بالتوازي
-        const [compRes, tasksRes, completionsRes] = await Promise.all([
+        // 4 استدعاءات بالتوازي
+        const [compRes, tasksRes, completionsRes, customRes] = await Promise.all([
           fetch(`${COMPANIES_API_URL}?action=getCompanies&token=${tokenEnc}`),
           fetch(`${COMPANIES_API_URL}?action=getDefaultTasks&token=${tokenEnc}`),
           fetch(`${COMPANIES_API_URL}?action=listCompletions`, {
@@ -1309,16 +1640,26 @@
               token: token,
               data: { companyId: companyId, periodKeys: periodKeys }
             })
+          }),
+          fetch(`${COMPANIES_API_URL}?action=listCustomTasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              token: token,
+              data: { companyId: companyId }
+            })
           })
         ]);
 
         const compData        = await compRes.json();
         const tasksData       = await tasksRes.json();
         const completionsData = await completionsRes.json();
+        const customData      = await customRes.json();
 
         if (!compData.ok)        throw new Error(compData.message || 'فشل تحميل بيانات الشركة');
         if (!tasksData.ok)       throw new Error(tasksData.message || 'فشل تحميل المهام الافتراضية');
         if (!completionsData.ok) throw new Error(completionsData.message || 'فشل تحميل سجلات الإنجاز');
+        if (!customData.ok)      throw new Error(customData.message || 'فشل تحميل المهام المخصَّصة');
 
         const company = (compData.companies || []).find(c => c.id === companyId);
         if (!company) {
@@ -1337,6 +1678,7 @@
           monthly: (tasksData.tasks.monthly || []).filter(t => t.active !== false)
         };
         state.completions = completionsData.completions || {};
+        state.customTasks = Array.isArray(customData.tasks) ? customData.tasks : [];
 
         renderCompany();
         renderTasks();
@@ -1418,6 +1760,22 @@
 
     const ICON_CLOCK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
     const ICON_CHECK = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+    const ICON_STAR  = '<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    const ICON_HOURGLASS = '<svg viewBox="0 0 24 24"><path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 12 0V2M6 22v-6a6 6 0 0 1 12 0v6"/></svg>';
+
+    /**
+     * يجمع كل المهام المخصَّصة لتصنيف معيّن مفصولة حسب الحالة
+     */
+    function getCategoryTasks(category) {
+      const defaults = state.defaultTasks[category] || [];
+      const custom = state.customTasks.filter(t => t.category === category);
+      return {
+        defaults: defaults,
+        customApproved: custom.filter(t => t.status === 'approved' && t.active !== false),
+        customInactive: custom.filter(t => t.status === 'approved' && t.active === false),
+        customPending:  custom.filter(t => t.status === 'pending')
+      };
+    }
 
     function renderTasks() {
       const grid = document.getElementById('tasksGrid');
@@ -1425,69 +1783,67 @@
         renderDailyCard() +
         renderWeeklyCard() +
         renderMonthlyCard();
-      attachCheckboxEvents();
-      attachUnmarkEvents();
+      attachAllEvents();
     }
 
     function renderDailyCard() {
-      const tasks = state.defaultTasks.daily;
       const periodKey = getDailyKey();
       const cd = getDailyCountdown();
-      return cardWrap(
-        'daily', tasks.length,
-        cd, false,
-        renderTaskList(tasks, 'daily', periodKey)
-      );
+      return cardWrap('daily', cd, false, renderCardBody('daily', periodKey));
     }
 
     function renderWeeklyCard() {
-      const tasks = state.defaultTasks.weekly;
       const periodKey = getWeeklyKey();
       const cd = getWeeklyCountdown();
-      return cardWrap(
-        'weekly', tasks.length,
-        cd, false,
-        renderTaskList(tasks, 'weekly', periodKey)
-      );
+      return cardWrap('weekly', cd, false, renderCardBody('weekly', periodKey));
     }
 
     function renderMonthlyCard() {
-      const tasks = state.defaultTasks.monthly;
       const monthly = getMonthlyKeys();
       const conf = CAT_CONFIG.monthly;
-
-      // إن وُجدت نافذة مراجعة، اعرض قسمين
-      let body = '';
+      const cat = getCategoryTasks('monthly');
       const cdCurrent = getMonthlyCurrentCountdown();
+
+      // المهام القابلة للتشييك (الافتراضية + الخاصة الموافَقة النشطة)
+      const tickableTasks = [...cat.defaults.map(t => ({...t, _kind: 'default'})),
+                             ...cat.customApproved.map(t => ({...t, _kind: 'custom-approved'}))];
+
+      let body = '';
 
       if (monthly.reviewing) {
         const cdReview = getMonthlyReviewCountdown();
-        // الشهر الجاري أولاً (الأهم)
-        body += `
-          <div class="monthly-period">
-            <div class="monthly-period-head">
-              <div class="monthly-period-name">${escapeHTML(formatMonthName(monthly.primary))}</div>
-              ${countdownPill(cdCurrent, false)}
-            </div>
-            <div class="task-list">${renderTaskItems(tasks, 'monthly', monthly.primary)}</div>
-          </div>
-          <div class="monthly-period review">
-            <div class="monthly-period-head">
-              <div class="monthly-period-name">
-                <span>${escapeHTML(formatMonthName(monthly.reviewing))}</span>
-                <span class="review-tag">نافذة المراجعة</span>
-              </div>
-              ${countdownPill(cdReview, true)}
-            </div>
-            <div class="task-list">${renderTaskItems(tasks, 'monthly', monthly.reviewing)}</div>
-          </div>
-        `;
+        body += renderMonthlyPeriodSection(monthly.primary, formatMonthName(monthly.primary), cdCurrent, false, tickableTasks, 'monthly');
+        body += renderMonthlyPeriodSection(monthly.reviewing, formatMonthName(monthly.reviewing), cdReview, true, tickableTasks, 'monthly');
       } else {
-        body = `<div class="task-list">${renderTaskItems(tasks, 'monthly', monthly.primary)}</div>`;
+        // قسم واحد بدون إطار خاص
+        body += `<div class="task-list">${
+          tickableTasks.length === 0
+            ? `<div class="task-empty-cat">لا توجد مهام في هذا القسم بعد.</div>`
+            : tickableTasks.map((t, i) => taskItemHTML(t, i + 1, 'monthly', monthly.primary, t._kind)).join('')
+        }</div>`;
       }
 
-      // العدّاد الرئيسي للبطاقة (يُخفى لو هناك قسمان داخل البطاقة)
+      // المعلَّقات (مرة واحدة، ليست مرتبطة بفترة)
+      if (cat.customPending.length > 0) {
+        body += `<div class="tasks-divider">${ICON_HOURGLASS}<span style="margin:0 8px">معلَّقات بانتظار الموافقة</span></div>`;
+        body += `<div class="task-list">${cat.customPending.map(t =>
+          taskItemHTML(t, null, 'monthly', monthly.primary, 'custom-pending')
+        ).join('')}</div>`;
+      }
+
+      // المعطّلة (للأدمن فقط)
+      if (isAdmin && cat.customInactive.length > 0) {
+        body += `<div class="tasks-divider">مهام مخصَّصة معطّلة</div>`;
+        body += `<div class="task-list">${cat.customInactive.map(t =>
+          taskItemHTML(t, null, 'monthly', monthly.primary, 'custom-inactive')
+        ).join('')}</div>`;
+      }
+
+      // زر الإضافة
+      body += renderAddButton('monthly');
+
       const headerCountdown = monthly.reviewing ? null : cdCurrent;
+      const totalCount = cat.defaults.length + cat.customApproved.length;
 
       return `
         <div class="task-card">
@@ -1496,7 +1852,7 @@
             <div class="task-card-title">
               <div class="task-card-name">${escapeHTML(conf.label)}</div>
               <div class="task-card-meta">
-                <span>${tasks.length} مهمة</span>
+                <span>${totalCount} مهمة</span>
                 <span>·</span>
                 <span>${escapeHTML(conf.sub)}</span>
                 ${headerCountdown ? '<span>·</span>' + countdownPill(headerCountdown, false) : ''}
@@ -1508,8 +1864,31 @@
       `;
     }
 
-    function cardWrap(cat, count, countdown, isUrgent, listHTML) {
+    function renderMonthlyPeriodSection(periodKey, monthName, countdown, isReview, tasks, category) {
+      const reviewClass = isReview ? ' review' : '';
+      const reviewTag = isReview ? '<span class="review-tag">نافذة المراجعة</span>' : '';
+      const tasksHTML = tasks.length === 0
+        ? `<div class="task-empty-cat">لا توجد مهام في هذا القسم بعد.</div>`
+        : tasks.map((t, i) => taskItemHTML(t, i + 1, category, periodKey, t._kind)).join('');
+
+      return `
+        <div class="monthly-period${reviewClass}">
+          <div class="monthly-period-head">
+            <div class="monthly-period-name">
+              <span>${escapeHTML(monthName)}</span>
+              ${reviewTag}
+            </div>
+            ${countdownPill(countdown, isReview)}
+          </div>
+          <div class="task-list">${tasksHTML}</div>
+        </div>
+      `;
+    }
+
+    function cardWrap(cat, countdown, isUrgent, bodyHTML) {
       const conf = CAT_CONFIG[cat];
+      const catTasks = getCategoryTasks(cat);
+      const totalCount = catTasks.defaults.length + catTasks.customApproved.length;
       return `
         <div class="task-card">
           <div class="task-card-head">
@@ -1517,7 +1896,7 @@
             <div class="task-card-title">
               <div class="task-card-name">${escapeHTML(conf.label)}</div>
               <div class="task-card-meta">
-                <span>${count} مهمة</span>
+                <span>${totalCount} مهمة</span>
                 <span>·</span>
                 <span>${escapeHTML(conf.sub)}</span>
                 <span>·</span>
@@ -1525,8 +1904,62 @@
               </div>
             </div>
           </div>
-          <div class="task-list">${listHTML}</div>
+          ${bodyHTML}
         </div>
+      `;
+    }
+
+    /**
+     * يبني محتوى البطاقة (للـ daily و weekly فقط — monthly له منطق خاص)
+     */
+    function renderCardBody(category, periodKey) {
+      const cat = getCategoryTasks(category);
+      const tickableTasks = [
+        ...cat.defaults.map(t => ({...t, _kind: 'default'})),
+        ...cat.customApproved.map(t => ({...t, _kind: 'custom-approved'}))
+      ];
+
+      let html = '';
+
+      // المهام القابلة للتشييك
+      if (tickableTasks.length === 0 && cat.customPending.length === 0 && cat.customInactive.length === 0) {
+        html += `<div class="task-empty-cat">لا توجد مهام في هذا القسم بعد.</div>`;
+      } else {
+        if (tickableTasks.length > 0) {
+          html += `<div class="task-list">${tickableTasks.map((t, i) =>
+            taskItemHTML(t, i + 1, category, periodKey, t._kind)
+          ).join('')}</div>`;
+        }
+      }
+
+      // المعلَّقات
+      if (cat.customPending.length > 0) {
+        html += `<div class="tasks-divider">${ICON_HOURGLASS}<span style="margin:0 8px">معلَّقات بانتظار الموافقة</span></div>`;
+        html += `<div class="task-list">${cat.customPending.map(t =>
+          taskItemHTML(t, null, category, periodKey, 'custom-pending')
+        ).join('')}</div>`;
+      }
+
+      // المعطّلة (للأدمن فقط)
+      if (isAdmin && cat.customInactive.length > 0) {
+        html += `<div class="tasks-divider">مهام مخصَّصة معطّلة</div>`;
+        html += `<div class="task-list">${cat.customInactive.map(t =>
+          taskItemHTML(t, null, category, periodKey, 'custom-inactive')
+        ).join('')}</div>`;
+      }
+
+      // زر الإضافة
+      html += renderAddButton(category);
+
+      return html;
+    }
+
+    function renderAddButton(category) {
+      return `
+        <button class="add-custom-btn" data-category="${escapeHTML(category)}">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>إضافة مهمة خاصة بالشركة</span>
+        </button>
       `;
     }
 
@@ -1535,34 +1968,41 @@
       return `<span class="${cls}">${ICON_CLOCK} <span>${escapeHTML(text)}</span></span>`;
     }
 
-    function renderTaskList(tasks, category, periodKey) {
-      if (!tasks || tasks.length === 0) {
-        return `<div class="task-empty-cat">لا توجد مهام مفعَّلة في هذا القسم.</div>`;
-      }
-      return renderTaskItems(tasks, category, periodKey);
-    }
+    /**
+     * يبني عنصر مهمة واحد بحسب نوعها
+     *   kinds: default, custom-approved, custom-pending, custom-inactive
+     */
+    function taskItemHTML(t, n, category, periodKey, kind) {
+      kind = kind || 'default';
 
-    function renderTaskItems(tasks, category, periodKey) {
-      if (!tasks || tasks.length === 0) {
-        return `<div class="task-empty-cat">لا توجد مهام مفعَّلة في هذا القسم.</div>`;
-      }
-      return tasks.map((t, i) => taskItemHTML(t, i + 1, category, periodKey)).join('');
-    }
+      // المهام المعلَّقة والمعطّلة لا تُشيَّك
+      const isTickable = (kind === 'default' || kind === 'custom-approved');
 
-    function taskItemHTML(t, n, category, periodKey) {
       const docId = t.id + '__' + periodKey;
-      const completion = state.completions[docId];
+      const completion = isTickable ? state.completions[docId] : null;
       const isDone = !!(completion && completion.done);
       const isPending = state.pendingTasks.has(docId);
 
       const classes = ['task-item'];
       if (isDone) classes.push('is-done');
       if (isPending) classes.push('is-pending');
+      if (kind === 'custom-pending') classes.push('is-pending-approval');
+      if (kind === 'custom-inactive') classes.push('is-inactive');
 
       const hint = t.hint && String(t.hint).trim()
         ? `<div class="task-item-hint">${escapeHTML(t.hint)}</div>`
         : '';
 
+      // الشارة (خاصة / معطّلة)
+      let badges = '';
+      if (kind === 'custom-approved' || kind === 'custom-inactive') {
+        badges += `<span class="custom-badge">${ICON_STAR}<span>خاصة</span></span>`;
+      }
+      if (kind === 'custom-inactive') {
+        badges += `<span class="task-inactive-tag">معطَّلة</span>`;
+      }
+
+      // سطر الـ done meta (للمهام المُنجزة)
       let doneMeta = '';
       if (isDone) {
         const byName = completion.lastDoneByName || '—';
@@ -1578,16 +2018,52 @@
         `;
       }
 
-      const checkboxClass = isDone ? 'task-checkbox is-checked' : 'task-checkbox';
-
-      return `
-        <div class="${classes.join(' ')}" data-doc-id="${escapeHTML(docId)}">
-          <span class="task-item-num">${n}</span>
-          <div class="task-item-body">
-            <div class="task-item-label">${escapeHTML(t.label || '')}</div>
-            ${hint}
-            ${doneMeta}
+      // سطر المعلَّقة
+      let pendingMeta = '';
+      if (kind === 'custom-pending') {
+        const byName = t.createdByName || '—';
+        const when = timeAgo(t.createdAt);
+        pendingMeta = `
+          <div class="pending-meta">
+            <span class="pending-tag">${ICON_HOURGLASS}<span>بانتظار الموافقة</span></span>
+            <span class="by-info">طلبها: ${escapeHTML(byName)} · ${escapeHTML(when)}</span>
+            ${isAdmin ? `
+              <div class="pending-meta-actions">
+                <button class="pending-action-btn approve" data-task-id="${escapeHTML(t.id)}" data-action="approve">موافقة</button>
+                <button class="pending-action-btn reject" data-task-id="${escapeHTML(t.id)}" data-action="reject">رفض</button>
+              </div>
+            ` : ''}
           </div>
+        `;
+      }
+
+      // سطر إدارة المهمة المخصَّصة (للأدمن: تعطيل / إعادة تفعيل)
+      let adminCustomMeta = '';
+      if (isAdmin && (kind === 'custom-approved' || kind === 'custom-inactive')) {
+        const newActiveValue = kind === 'custom-approved' ? false : true;
+        const btnLabel = kind === 'custom-approved' ? 'تعطيل المهمة' : 'إعادة تفعيل';
+        adminCustomMeta = `
+          <div style="margin-top: 8px; display: flex; justify-content: flex-end;">
+            <button class="custom-admin-btn" data-task-id="${escapeHTML(t.id)}" data-action="toggle-custom-active" data-new-active="${newActiveValue}">
+              ${btnLabel}
+            </button>
+          </div>
+        `;
+      }
+
+      // محتوى عمود الترقيم
+      let numCol;
+      if (n === null) {
+        numCol = `<span class="task-item-num" style="background: transparent; border: none; color: var(--text-dim);">·</span>`;
+      } else {
+        numCol = `<span class="task-item-num">${n}</span>`;
+      }
+
+      // عمود التشييك (مربع أو فراغ)
+      let checkboxCol;
+      if (isTickable) {
+        const checkboxClass = isDone ? 'task-checkbox is-checked' : 'task-checkbox';
+        checkboxCol = `
           <div class="${checkboxClass}"
                role="checkbox" aria-checked="${isDone}" tabindex="0"
                data-doc-id="${escapeHTML(docId)}"
@@ -1596,15 +2072,33 @@
                data-category="${escapeHTML(category)}">
             ${ICON_CHECK}
           </div>
+        `;
+      } else {
+        // لا مربع تشييك للمهام المعلَّقة أو المعطّلة
+        checkboxCol = `<div style="width: 28px; flex-shrink: 0;"></div>`;
+      }
+
+      return `
+        <div class="${classes.join(' ')}" data-doc-id="${escapeHTML(docId)}">
+          ${numCol}
+          <div class="task-item-body">
+            <div class="task-item-label">${badges}${escapeHTML(t.label || '')}</div>
+            ${hint}
+            ${doneMeta}
+            ${pendingMeta}
+            ${adminCustomMeta}
+          </div>
+          ${checkboxCol}
         </div>
       `;
     }
 
     // ════════════════════════════════════════════════════
-    //  أحداث التشييك (Optimistic UI)
+    //  ربط جميع الأحداث (Checkboxes, buttons)
     // ════════════════════════════════════════════════════
 
-    function attachCheckboxEvents() {
+    function attachAllEvents() {
+      // مربعات التشييك
       document.querySelectorAll('.task-checkbox').forEach(cb => {
         cb.addEventListener('click', handleCheckboxClick);
         cb.addEventListener('keydown', (e) => {
@@ -1614,16 +2108,41 @@
           }
         });
       });
-    }
 
-    function attachUnmarkEvents() {
+      // أزرار إلغاء التشييك
       document.querySelectorAll('.unmark-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const docId = btn.dataset.docId;
+          unmarkTask(btn.dataset.docId, btn.dataset.taskId, btn.dataset.periodKey);
+        });
+      });
+
+      // أزرار الإضافة
+      document.querySelectorAll('.add-custom-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openAddTaskModal(btn.dataset.category);
+        });
+      });
+
+      // أزرار الموافقة/الرفض على المعلَّقات
+      document.querySelectorAll('.pending-action-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
           const taskId = btn.dataset.taskId;
-          const periodKey = btn.dataset.periodKey;
-          unmarkTask(docId, taskId, periodKey);
+          const action = btn.dataset.action;
+          if (action === 'approve') approveCustomTask(taskId);
+          else if (action === 'reject') rejectCustomTask(taskId);
+        });
+      });
+
+      // أزرار تعطيل/تفعيل المهام المخصَّصة (للأدمن)
+      document.querySelectorAll('.custom-admin-btn[data-action="toggle-custom-active"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const taskId = btn.dataset.taskId;
+          const newActive = btn.dataset.newActive === 'true';
+          toggleCustomTaskActive(taskId, newActive);
         });
       });
     }
@@ -1760,6 +2279,205 @@
         // إعادة رسم البطاقات لتحديث العدّادات والوقت النسبي
         renderTasks();
       }, 60 * 1000);
+    }
+
+    // ════════════════════════════════════════════════════
+    //  Modal — إضافة مهمة مخصَّصة
+    // ════════════════════════════════════════════════════
+
+    const CAT_LABEL = {
+      daily: 'اليومية',
+      weekly: 'الأسبوعية',
+      monthly: 'الشهرية'
+    };
+
+    function openAddTaskModal(category) {
+      state.modalCategory = category;
+      document.getElementById('modalCategoryName').textContent = CAT_LABEL[category] || '—';
+      document.getElementById('taskLabelInput').value = '';
+      document.getElementById('taskHintInput').value = '';
+      document.getElementById('labelCounter').textContent = '0 / 200';
+      document.getElementById('hintCounter').textContent = '0 / 300';
+
+      document.getElementById('adminHint').style.display    = isAdmin ? 'block' : 'none';
+      document.getElementById('employeeHint').style.display = isAdmin ? 'none'  : 'block';
+      document.getElementById('modalSubmitText').textContent = isAdmin ? 'إضافة المهمة' : 'إرسال للموافقة';
+
+      document.getElementById('addTaskModal').classList.add('is-open');
+      setTimeout(() => document.getElementById('taskLabelInput').focus(), 50);
+    }
+
+    function closeAddTaskModal() {
+      document.getElementById('addTaskModal').classList.remove('is-open');
+      state.modalCategory = null;
+    }
+
+    document.getElementById('modalCloseBtn').addEventListener('click', closeAddTaskModal);
+    document.getElementById('modalCancelBtn').addEventListener('click', closeAddTaskModal);
+    document.getElementById('addTaskModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('addTaskModal')) closeAddTaskModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('addTaskModal').classList.contains('is-open')) {
+        closeAddTaskModal();
+      }
+    });
+
+    // عدّاد الأحرف
+    document.getElementById('taskLabelInput').addEventListener('input', (e) => {
+      const n = e.target.value.length;
+      const counter = document.getElementById('labelCounter');
+      counter.textContent = `${n} / 200`;
+      counter.classList.toggle('warn', n > 180);
+    });
+    document.getElementById('taskHintInput').addEventListener('input', (e) => {
+      const n = e.target.value.length;
+      const counter = document.getElementById('hintCounter');
+      counter.textContent = `${n} / 300`;
+      counter.classList.toggle('warn', n > 270);
+    });
+
+    // إرسال المهمة
+    document.getElementById('modalSubmitBtn').addEventListener('click', submitNewTask);
+
+    async function submitNewTask() {
+      const label = document.getElementById('taskLabelInput').value.trim();
+      const hint = document.getElementById('taskHintInput').value.trim();
+      const category = state.modalCategory;
+
+      if (!label) {
+        toast('نص المهمة مطلوب', 'error');
+        return;
+      }
+      if (!category) {
+        toast('حدث خطأ في الفئة', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('modalSubmitBtn');
+      const originalText = document.getElementById('modalSubmitText').textContent;
+      submitBtn.disabled = true;
+      document.getElementById('modalSubmitText').textContent = 'جاري الإرسال...';
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+
+        const res = await fetch(`${COMPANIES_API_URL}?action=addCustomTask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: {
+              companyId: companyId,
+              category: category,
+              label: label,
+              hint: hint
+            }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || 'فشل إضافة المهمة');
+
+        toast(data.message || 'تمت الإضافة', 'success');
+        closeAddTaskModal();
+        await reloadCustomTasks();
+      } catch (err) {
+        toast(err.message || 'تعذّر إضافة المهمة', 'error', 5000);
+      } finally {
+        submitBtn.disabled = false;
+        document.getElementById('modalSubmitText').textContent = originalText;
+      }
+    }
+
+    // ════════════════════════════════════════════════════
+    //  موافقة / رفض / تفعيل / تعطيل المهام المخصَّصة
+    // ════════════════════════════════════════════════════
+
+    async function reloadCustomTasks() {
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=listCustomTasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        state.customTasks = data.tasks || [];
+        renderTasks();
+      } catch (err) {
+        toast('فشل تحديث المهام: ' + err.message, 'error');
+      }
+    }
+
+    async function approveCustomTask(taskId) {
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=approveCustomTask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: taskId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        toast('تمت الموافقة على المهمة', 'success');
+        await reloadCustomTasks();
+      } catch (err) {
+        toast(err.message || 'فشلت الموافقة', 'error');
+      }
+    }
+
+    async function rejectCustomTask(taskId) {
+      const ok = confirm('هل تريد رفض هذه المهمة وحذفها نهائياً؟');
+      if (!ok) return;
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=rejectCustomTask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: taskId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        toast('تم رفض المهمة وحذفها', 'info');
+        await reloadCustomTasks();
+      } catch (err) {
+        toast(err.message || 'فشل الرفض', 'error');
+      }
+    }
+
+    async function toggleCustomTaskActive(taskId, newActive) {
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=toggleCustomTaskActive`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: taskId, active: newActive }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        toast(data.message || 'تم', 'success');
+        await reloadCustomTasks();
+      } catch (err) {
+        toast(err.message || 'فشلت العملية', 'error');
+      }
     }
 
     // ════════════════════════════════════════════════════
