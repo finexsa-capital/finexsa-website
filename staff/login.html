@@ -630,11 +630,40 @@
         }
 
         // 4) حفظ بيانات الجلسة
-        const staff = data.user;
-        sessionStorage.setItem('finexsa_staff_uid', staff.uid);
-        sessionStorage.setItem('finexsa_staff_email', staff.email);
+        // ⚠️ ملاحظة: Apps Script يُرجع البيانات بصيغة Firestore (ملفوفة)
+        // مثل: {stringValue: "ALAA"} بدلاً من "ALAA"
+        // لذلك نحتاج فك القيم قبل الحفظ
+        function unwrapFsValue(v) {
+          if (v == null) return null;
+          if (typeof v !== 'object') return v;
+          if (v.stringValue !== undefined) return v.stringValue;
+          if (v.integerValue !== undefined) return Number(v.integerValue);
+          if (v.doubleValue !== undefined) return v.doubleValue;
+          if (v.booleanValue !== undefined) return v.booleanValue;
+          if (v.timestampValue !== undefined) return v.timestampValue;
+          if (v.nullValue !== undefined) return null;
+          if (v.arrayValue !== undefined) {
+            return (v.arrayValue.values || []).map(unwrapFsValue);
+          }
+          if (v.mapValue !== undefined) {
+            const obj = {};
+            const f = v.mapValue.fields || {};
+            for (const k in f) obj[k] = unwrapFsValue(f[k]);
+            return obj;
+          }
+          return v;
+        }
+
+        const rawStaff = data.user;
+        const staff = {};
+        for (const key in rawStaff) {
+          staff[key] = unwrapFsValue(rawStaff[key]);
+        }
+
+        sessionStorage.setItem('finexsa_staff_uid', staff.uid || '');
+        sessionStorage.setItem('finexsa_staff_email', staff.email || '');
         sessionStorage.setItem('finexsa_staff_name', staff.displayName || '');
-        sessionStorage.setItem('finexsa_staff_role', staff.role);
+        sessionStorage.setItem('finexsa_staff_role', staff.role || 'accountant');
         sessionStorage.setItem('finexsa_staff_branch', staff.branch || '');
         sessionStorage.setItem('finexsa_staff_allowed', JSON.stringify(staff.allowedBoxes || []));
 
