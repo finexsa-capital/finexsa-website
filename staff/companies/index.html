@@ -1049,6 +1049,20 @@
           <input type="hidden" id="inAssignee" value="">
         </div>
 
+        <div class="field-group">
+          <label class="field-label" for="supSearch">
+            المشرف <span class="field-label-hint" style="font-weight: 500; color: var(--text-dim)">— اختياري · يستعرض ويضيف فقط</span>
+          </label>
+          <div class="modal-search-wrap">
+            <input type="text" id="supSearch" class="modal-search-input" placeholder="ابحث بالاسم أو الإيميل…" autocomplete="off">
+          </div>
+          <div class="staff-list" id="supList"></div>
+          <input type="hidden" id="inSupervisor" value="">
+          <button type="button" id="clearSupervisor" style="margin-top: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; font-family: inherit; cursor: pointer; display: none;">
+            إلغاء اختيار المشرف
+          </button>
+        </div>
+
       </div>
       <div class="modal-footer">
         <button class="btn btn-ghost" id="btnCancel">إلغاء</button>
@@ -1141,6 +1155,21 @@
           <div class="staff-list" id="editStaffList"></div>
           <input type="hidden" id="editAssignee" value="">
           <div id="editAssigneeCurrent" style="margin-top:8px; font-size: 12px; color: var(--text-dim);"></div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="editSupSearch">
+            المشرف <span class="field-label-hint" style="font-weight: 500; color: var(--text-dim)">— اختياري · يستعرض ويضيف فقط</span>
+          </label>
+          <div class="modal-search-wrap">
+            <input type="text" id="editSupSearch" class="modal-search-input" placeholder="ابحث بالاسم أو الإيميل…" autocomplete="off">
+          </div>
+          <div class="staff-list" id="editSupList"></div>
+          <input type="hidden" id="editSupervisor" value="">
+          <div id="editSupervisorCurrent" style="margin-top:8px; font-size: 12px; color: var(--text-dim);"></div>
+          <button type="button" id="editClearSupervisor" style="margin-top: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; font-family: inherit; cursor: pointer; display: none;">
+            إلغاء اختيار المشرف
+          </button>
         </div>
 
       </div>
@@ -1505,6 +1534,15 @@
             <div class="company-assignee-avatar">${assigneeInitials}</div>
             <span class="company-assignee-name">${escapeHTML(c.assigneeName || '—')}</span>
           </div>
+          ${c.supervisorUid ? `
+            <div class="company-assignee" style="margin-top: 4px; opacity: 0.85;">
+              <div class="company-assignee-avatar" style="background: rgba(167, 139, 250, 0.18); color: #C4B5FD;">${getInitials(c.supervisorName || '')}</div>
+              <span class="company-assignee-name" style="font-size: 12px;">
+                <span style="color: var(--text-dim); font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;">مشرف:</span>
+                ${escapeHTML(c.supervisorName || '—')}
+              </span>
+            </div>
+          ` : ''}
           ${actionsHTML}
         </div>
       `;
@@ -1522,7 +1560,11 @@
       document.getElementById('inName').value = '';
       document.getElementById('inAssignee').value = '';
       document.getElementById('staffSearch').value = '';
+      document.getElementById('inSupervisor').value = '';
+      document.getElementById('supSearch').value = '';
+      document.getElementById('clearSupervisor').style.display = 'none';
       populateStaffList('', 'staffList', 'inAssignee', '');
+      populateStaffList('', 'supList', 'inSupervisor', '');
       modal.classList.add('is-open');
       setTimeout(() => document.getElementById('inName').focus(), 200);
     }
@@ -1534,6 +1576,22 @@
     // ربط البحث في مودال الإضافة
     document.getElementById('staffSearch').addEventListener('input', (e) => {
       populateStaffList(e.target.value, 'staffList', 'inAssignee', '');
+    });
+    document.getElementById('supSearch').addEventListener('input', (e) => {
+      populateStaffList(e.target.value, 'supList', 'inSupervisor', '');
+    });
+    // مراقبة اختيار المشرف لإظهار زر الإلغاء
+    document.getElementById('supList').addEventListener('click', () => {
+      setTimeout(() => {
+        const has = document.getElementById('inSupervisor').value;
+        document.getElementById('clearSupervisor').style.display = has ? 'inline-block' : 'none';
+      }, 50);
+    });
+    document.getElementById('clearSupervisor').addEventListener('click', () => {
+      document.getElementById('inSupervisor').value = '';
+      document.getElementById('supSearch').value = '';
+      document.getElementById('clearSupervisor').style.display = 'none';
+      populateStaffList('', 'supList', 'inSupervisor', '');
     });
 
     // إغلاق بالـ Escape
@@ -1551,6 +1609,7 @@
     async function saveCompany() {
       const name = document.getElementById('inName').value.trim();
       const assigneeUid = document.getElementById('inAssignee').value;
+      const supervisorUid = document.getElementById('inSupervisor').value;
 
       if (!name) {
         toast('اسم الشركة مطلوب', 'error');
@@ -1560,9 +1619,15 @@
         toast('اختر الموظف المسؤول من القائمة', 'error');
         return;
       }
+      if (supervisorUid && supervisorUid === assigneeUid) {
+        toast('لا يمكن أن يكون نفس الشخص مسؤولاً ومشرفاً', 'error', 5000);
+        return;
+      }
 
       const assignee = state.staff.find(s => s.uid === assigneeUid);
       const assigneeName = assignee ? (assignee.displayName || assignee.email) : '';
+      const supervisor = supervisorUid ? state.staff.find(s => s.uid === supervisorUid) : null;
+      const supervisorName = supervisor ? (supervisor.displayName || supervisor.email) : '';
 
       const btn = document.getElementById('btnSave');
       const txt = document.getElementById('saveBtnText');
@@ -1582,7 +1647,9 @@
             data: {
               name: name,
               assigneeUid: assigneeUid,
-              assigneeName: assigneeName
+              assigneeName: assigneeName,
+              supervisorUid: supervisorUid,
+              supervisorName: supervisorName
             }
           })
         });
@@ -1619,6 +1686,16 @@
       document.getElementById('editStaffSearch').value = company.assigneeName || '';
       document.getElementById('editAssigneeCurrent').textContent = `الحالي: ${company.assigneeName || '—'}`;
       populateStaffList('', 'editStaffList', 'editAssignee', company.assigneeUid);
+
+      // المشرف
+      document.getElementById('editSupervisor').value = company.supervisorUid || '';
+      document.getElementById('editSupSearch').value = company.supervisorName || '';
+      document.getElementById('editSupervisorCurrent').textContent = company.supervisorUid
+        ? `الحالي: ${company.supervisorName || '—'}`
+        : 'لا يوجد مشرف معيَّن';
+      document.getElementById('editClearSupervisor').style.display = company.supervisorUid ? 'inline-block' : 'none';
+      populateStaffList('', 'editSupList', 'editSupervisor', company.supervisorUid);
+
       editModal.classList.add('is-open');
     }
 
@@ -1630,6 +1707,22 @@
     document.getElementById('editStaffSearch').addEventListener('input', (e) => {
       populateStaffList(e.target.value, 'editStaffList', 'editAssignee', '');
     });
+    document.getElementById('editSupSearch').addEventListener('input', (e) => {
+      populateStaffList(e.target.value, 'editSupList', 'editSupervisor', '');
+    });
+    document.getElementById('editSupList').addEventListener('click', () => {
+      setTimeout(() => {
+        const has = document.getElementById('editSupervisor').value;
+        document.getElementById('editClearSupervisor').style.display = has ? 'inline-block' : 'none';
+      }, 50);
+    });
+    document.getElementById('editClearSupervisor').addEventListener('click', () => {
+      document.getElementById('editSupervisor').value = '';
+      document.getElementById('editSupSearch').value = '';
+      document.getElementById('editClearSupervisor').style.display = 'none';
+      document.getElementById('editSupervisorCurrent').textContent = 'لا يوجد مشرف معيَّن';
+      populateStaffList('', 'editSupList', 'editSupervisor', '');
+    });
 
     document.getElementById('editSave').addEventListener('click', saveEdit);
 
@@ -1637,12 +1730,19 @@
       if (!editingCompanyId) return;
       const name = document.getElementById('editName').value.trim();
       const assigneeUid = document.getElementById('editAssignee').value;
+      const supervisorUid = document.getElementById('editSupervisor').value;
 
       if (!name) { toast('اسم الشركة مطلوب', 'error'); return; }
       if (!assigneeUid) { toast('اختر الموظف المسؤول', 'error'); return; }
+      if (supervisorUid && supervisorUid === assigneeUid) {
+        toast('لا يمكن أن يكون نفس الشخص مسؤولاً ومشرفاً', 'error', 5000);
+        return;
+      }
 
       const assignee = state.staff.find(s => s.uid === assigneeUid);
       const assigneeName = assignee ? (assignee.displayName || assignee.email) : '';
+      const supervisor = supervisorUid ? state.staff.find(s => s.uid === supervisorUid) : null;
+      const supervisorName = supervisor ? (supervisor.displayName || supervisor.email) : '';
 
       const btn = document.getElementById('editSave');
       const txt = document.getElementById('editBtnText');
@@ -1663,7 +1763,9 @@
               id: editingCompanyId,
               name: name,
               assigneeUid: assigneeUid,
-              assigneeName: assigneeName
+              assigneeName: assigneeName,
+              supervisorUid: supervisorUid,
+              supervisorName: supervisorName
             }
           })
         });
