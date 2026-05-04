@@ -5,7 +5,7 @@
  * - عند الفشل، يستخدم النسخة المحفوظة محلياً
  */
 
-const CACHE_VERSION = 'finexsa-staff-v1';
+const CACHE_VERSION = 'finexsa-staff-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -15,7 +15,6 @@ const CORE_FILES = [
   './dashboard.html',
   './cash.html',
   './cash-report.html',
-  './tasks.html',
   './admin-users.html',
   './manifest.json',
   './icons/icon-192.png',
