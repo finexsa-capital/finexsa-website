@@ -1201,8 +1201,14 @@
         renderStats();
         applyFilters();
 
-        document.getElementById('appLoader').classList.add('is-hidden');
-        setTimeout(() => document.getElementById('appLoader').remove(), 400);
+        const loader = document.getElementById('appLoader');
+        if (loader) {
+          loader.classList.add('is-hidden');
+          setTimeout(() => {
+            const stillThere = document.getElementById('appLoader');
+            if (stillThere) stillThere.remove();
+          }, 400);
+        }
       } catch (err) {
         toast('فشل التحميل: ' + err.message, 'error', 5000);
       }
