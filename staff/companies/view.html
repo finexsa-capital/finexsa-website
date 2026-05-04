@@ -1281,6 +1281,17 @@
           </div>
         </div>
 
+        <!-- بانر تنبيه للمشرف -->
+        <div id="supervisorBanner" style="display:none; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(167, 139, 250, 0.08); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 12px; margin-bottom: 18px;">
+          <div style="width: 32px; height: 32px; background: rgba(167, 139, 250, 0.18); color: #C4B5FD; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 13.5px; font-weight: 700; color: #C4B5FD; margin-bottom: 2px;">أنت في وضع المشرف</div>
+            <div style="font-size: 12px; color: var(--text-muted);">يمكنك استعراض كل شيء وإضافة المهام (تذهب لقائمة الانتظار). لا يمكنك التشييك أو التعديل أو الحذف.</div>
+          </div>
+        </div>
+
         <!-- Tasks section -->
         <div class="section-title-row">
           <span class="section-title-text">المهام المعتمدة</span>
@@ -1400,6 +1411,21 @@
     });
 
     const isAdmin = me.role === 'admin';
+
+    // ═══ تحديد دور المستخدم على هذه الشركة ═══
+    // يُحدَّث بعد جلب بيانات الشركة من Firestore
+    let isSupervisorOnly = false;  // المستخدم مشرف فقط (يستعرض ويضيف، لا يعدّل)
+    let isAssignee = false;         // المستخدم مسؤول (صلاحيات كاملة على المهام)
+    function refreshRoleFlags() {
+      if (!state.company) {
+        isSupervisorOnly = false;
+        isAssignee = false;
+        return;
+      }
+      isAssignee = state.company.assigneeUid === me.uid;
+      // المشرف فقط = مشرف وليس مسؤولاً وليس أدمن
+      isSupervisorOnly = !isAdmin && !isAssignee && state.company.supervisorUid === me.uid;
+    }
 
     // ═══ معرّف الشركة من الرابط ═══
     const params = new URLSearchParams(window.location.search);
@@ -1690,6 +1716,7 @@
      */
     function canUnmark(completion) {
       if (!completion || !completion.done) return false;
+      if (isSupervisorOnly) return false; // المشرف لا يلغي التشييك
       if (isAdmin) return true;
       if (completion.lastDoneByUid !== me.uid) return false;
       if (!completion.lastDoneAt) return false;
@@ -1770,6 +1797,7 @@
         }
 
         state.company = company;
+        refreshRoleFlags();
         state.defaultTasks = {
           daily:   (tasksData.tasks.daily   || []).filter(t => t.active !== false),
           weekly:  (tasksData.tasks.weekly  || []).filter(t => t.active !== false),
@@ -1822,6 +1850,21 @@
             <span class="meta-value">${escapeHTML(c.assigneeName || '—')}</span>
           </span>
         </div>
+      `;
+      // عرض المشرف إن وُجد
+      if (c.supervisorUid && c.supervisorName) {
+        const supInitials = getInitials(c.supervisorName);
+        html += `
+          <div class="meta-item">
+            <span class="meta-label">المشرف:</span>
+            <span class="assignee-chip" style="background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.3);">
+              <span class="assignee-chip-avatar" style="background: rgba(167, 139, 250, 0.25); color: #C4B5FD;">${escapeHTML(supInitials)}</span>
+              <span class="meta-value">${escapeHTML(c.supervisorName)}</span>
+            </span>
+          </div>
+        `;
+      }
+      html += `
         <div class="meta-item">
           <span class="meta-label">تاريخ الإنشاء:</span>
           <span class="meta-value">${escapeHTML(createdDate)}</span>
@@ -1836,6 +1879,12 @@
         `;
       }
       metaEl.innerHTML = html;
+
+      // بانر تنبيه للمشرف
+      const banner = document.getElementById('supervisorBanner');
+      if (banner) {
+        banner.style.display = isSupervisorOnly ? 'flex' : 'none';
+      }
     }
 
     const CAT_CONFIG = {
@@ -2079,8 +2128,8 @@
     function taskItemHTML(t, n, category, periodKey, kind) {
       kind = kind || 'default';
 
-      // المهام المعلَّقة والمعطّلة لا تُشيَّك
-      const isTickable = (kind === 'default' || kind === 'custom-approved');
+      // المهام المعلَّقة والمعطّلة لا تُشيَّك. والمشرف لا يشيِّك أبداً.
+      const isTickable = !isSupervisorOnly && (kind === 'default' || kind === 'custom-approved');
 
       const docId = t.id + '__' + periodKey;
       const completion = isTickable ? state.completions[docId] : null;
@@ -2189,6 +2238,8 @@
       if (kind !== 'custom-pending' && kind !== 'custom-approved' && kind !== 'custom-inactive') {
         return '';
       }
+      // المشرف لا يرى أيّ زر إجراء (لا تعديل، لا حذف، لا موافقة)
+      if (isSupervisorOnly) return '';
 
       const isOwner = t.createdByUid === me.uid;
       const canEdit = isAdmin || isOwner;

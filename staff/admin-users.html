@@ -1047,6 +1047,16 @@
           <div class="form-hint">سيستخدمها الموظف للدخول. يُفضّل أن يغيّرها لاحقاً.</div>
         </div>
 
+        <!-- زر إعادة تعيين كلمة السر (في وضع التعديل فقط) -->
+        <div class="form-group" id="resetPasswordGroup" style="display: none;">
+          <label class="form-label">كلمة المرور</label>
+          <button type="button" id="btnResetPassword" style="width: 100%; padding: 12px; background: var(--bg-deep); border: 1px solid var(--border); color: var(--text-primary); border-radius: 10px; font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.18s ease;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            <span>إرسال رابط إعادة تعيين كلمة السر</span>
+          </button>
+          <div class="form-hint">سيُرسَل إيميل للموظف ليغيّر كلمته بنفسه. لا يمكنك رؤية كلمة السر القديمة.</div>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="inRole"><span class="required">*</span> الدور</label>
@@ -1056,6 +1066,9 @@
               <option value="manager">مدير قسم</option>
               <option value="viewer">مشاهد</option>
             </select>
+            <div id="roleDescription" style="margin-top: 8px; padding: 10px 12px; background: var(--bg-deep); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.65;">
+              <!-- يُملأ ديناميكياً من JS -->
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label" for="inBranch">الفرع</label>
@@ -1110,7 +1123,7 @@
   <!-- Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged }
+    import { getAuth, onAuthStateChanged, sendPasswordResetEmail }
       from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -1431,9 +1444,11 @@
       document.getElementById('inName').value = '';
       document.getElementById('inPassword').value = '';
       document.getElementById('passwordGroup').style.display = 'block';
+      document.getElementById('resetPasswordGroup').style.display = 'none';
       document.getElementById('inRole').value = 'accountant';
       document.getElementById('inBranch').value = '';
       document.getElementById('saveBtnText').textContent = 'إنشاء الحساب';
+      updateRoleDescription();
       renderBoxesSelector([]);
       modal.classList.add('is-open');
     }
@@ -1447,9 +1462,11 @@
       document.getElementById('inEmail').disabled = true; // لا يمكن تعديل الإيميل
       document.getElementById('inName').value = s.displayName || '';
       document.getElementById('passwordGroup').style.display = 'none'; // لا تغيير كلمة سر من هنا
+      document.getElementById('resetPasswordGroup').style.display = 'block'; // لكن إعادة التعيين متاحة
       document.getElementById('inRole').value = s.role || 'accountant';
       document.getElementById('inBranch').value = s.branch || '';
       document.getElementById('saveBtnText').textContent = 'حفظ التعديلات';
+      updateRoleDescription();
       const allowed = Array.isArray(s.allowedBoxes) ? s.allowedBoxes : [];
       renderBoxesSelector(allowed);
       modal.classList.add('is-open');
@@ -1519,6 +1536,70 @@
         applyFilters();
       }
     }
+
+    // ═══════ شرح الأدوار الديناميكي ═══════
+    const ROLE_DESCRIPTIONS = {
+      admin: {
+        title: '👑 مدير النظام',
+        body: 'صلاحيات كاملة: يضيف/يعدّل/يحذف الموظفين والشركات والمهام، يوافق على الطلبات، يُصدِر التقارير الإدارية، ويصل لكل الصناديق.'
+      },
+      manager: {
+        title: '🎯 مدير قسم',
+        body: 'يدير شركاته المُسنَدة كموظف عادي. لا يملك صلاحية الموظفين أو التقارير الإدارية. يستخدم لتنظيم فريق محدود.'
+      },
+      accountant: {
+        title: '🧾 محاسب',
+        body: 'الدور الأكثر شيوعاً. يدخل الحركات في الصناديق المسموحة، ينفّذ مهام شركاته، يضيف مهام خاصة (تحتاج موافقة الأدمن).'
+      },
+      viewer: {
+        title: '👁️ مشاهد',
+        body: 'صلاحية قراءة فقط. يستعرض الصناديق المسموحة وكشف الحساب دون أيّ تعديل. مناسب للمراجعين الخارجيين.'
+      }
+    };
+
+    function updateRoleDescription() {
+      const role = document.getElementById('inRole').value;
+      const desc = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.accountant;
+      const el = document.getElementById('roleDescription');
+      if (!el) return;
+      el.innerHTML = `
+        <div style="font-weight: 800; color: var(--gold-bright); margin-bottom: 4px; font-size: 12.5px;">${desc.title}</div>
+        <div>${desc.body}</div>
+      `;
+    }
+
+    document.getElementById('inRole').addEventListener('change', updateRoleDescription);
+
+    // ═══════ إعادة تعيين كلمة السر ═══════
+    document.getElementById('btnResetPassword').addEventListener('click', async () => {
+      if (!state.editingUid) return;
+      const s = state.staff.find(x => x.uid === state.editingUid);
+      if (!s || !s.email) {
+        toast('لا يمكن إعادة التعيين: الإيميل غير متوفر', 'error');
+        return;
+      }
+      const ok = confirm(`سيُرسَل رابط إعادة تعيين كلمة السر إلى:\n${s.email}\n\nهل تريد المتابعة؟`);
+      if (!ok) return;
+
+      const btn = document.getElementById('btnResetPassword');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>جاري الإرسال...</span>';
+
+      try {
+        await sendPasswordResetEmail(auth, s.email);
+        toast(`✓ تم إرسال رابط إعادة التعيين إلى ${s.email}`, 'success', 5000);
+      } catch (err) {
+        let msg = 'فشل الإرسال';
+        if (err.code === 'auth/user-not-found') msg = 'الحساب غير موجود في Firebase Auth';
+        else if (err.code === 'auth/invalid-email') msg = 'صيغة الإيميل غير صحيحة';
+        else if (err.code === 'auth/too-many-requests') msg = 'محاولات كثيرة، حاول لاحقاً';
+        toast(msg, 'error', 5000);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    });
 
     document.getElementById('btnAddStaff').addEventListener('click', openAddModal);
     document.getElementById('modalClose').addEventListener('click', closeModal);
