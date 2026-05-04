@@ -975,7 +975,7 @@
 
         <!-- Search -->
         <div class="search-bar">
-          <input type="text" id="searchInput" class="search-input" placeholder="بحث بالاسم أو البريد الإلكتروني…" autocomplete="off" name="search-staff-q">
+          <input type="search" id="searchInput" class="search-input" placeholder="بحث بالاسم أو البريد الإلكتروني…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" name="staff_filter_q_xyz">
           <select id="filterRole" class="form-select" style="max-width: 180px;">
             <option value="">كل الأدوار</option>
             <option value="admin">مدير النظام</option>
@@ -1006,7 +1006,7 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="inEmail"><span class="required">*</span> البريد الإلكتروني</label>
-            <input type="email" id="inEmail" class="form-input" placeholder="name@finexsacapitalnet.com">
+            <input type="email" id="inEmail" class="form-input" placeholder="name@finexsacapitalnet.com" autocomplete="off" data-lpignore="true" data-form-type="other" name="staff_email_field_xyz">
           </div>
           <div class="form-group">
             <label class="form-label" for="inName"><span class="required">*</span> الاسم الكامل</label>
@@ -1170,7 +1170,8 @@
       staff: [],
       boxes: [],
       filteredStaff: [],
-      editingUid: null
+      editingUid: null,
+      userTypedQuery: false  // يصبح true فقط عند كتابة المستخدم في حقل البحث
     };
 
     // ═══════ Load data ═══════
@@ -1260,11 +1261,20 @@
     }
 
     // ═══════ Filters ═══════
+    // حدث 'input' يُطلق من Autofill أيضاً، لذا نعتمد على keydown لتأكيد كتابة المستخدم
+    document.getElementById('searchInput').addEventListener('keydown', () => {
+      state.userTypedQuery = true;
+    });
     document.getElementById('searchInput').addEventListener('input', applyFilters);
-    document.getElementById('filterRole').addEventListener('change', applyFilters);
+    document.getElementById('filterRole').addEventListener('change', () => {
+      state.userTypedQuery = true; // تغيير الفلتر يدوياً
+      applyFilters();
+    });
 
     function applyFilters() {
-      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const searchEl = document.getElementById('searchInput');
+      // إن لم يكتب المستخدم بنفسه، نتجاهل أيّ قيمة قد يكون المتصفح حقنها
+      const q = state.userTypedQuery ? searchEl.value.trim().toLowerCase() : '';
       const role = document.getElementById('filterRole').value;
       state.filteredStaff = state.staff.filter(s => {
         if (role && s.role !== role) return false;
@@ -1454,6 +1464,13 @@
     function closeModal() {
       modal.classList.remove('is-open');
       state.editingUid = null;
+      // حماية ضد Browser Autofill: لو المتصفح ملأ حقل البحث أثناء فتح النموذج،
+      // نُلغي الفلتر ونستعيد العرض الكامل.
+      const searchEl = document.getElementById('searchInput');
+      if (searchEl && searchEl.value && !state.userTypedQuery) {
+        searchEl.value = '';
+        applyFilters();
+      }
     }
 
     document.getElementById('btnAddStaff').addEventListener('click', openAddModal);
