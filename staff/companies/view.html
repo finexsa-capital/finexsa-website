@@ -1434,12 +1434,14 @@
     // ═══ الثوابت ═══
     const UNMARK_GRACE_HOURS = 1;
     const MONTHLY_REVIEW_DAYS = 10;
+    const TEMP_HIDE_AFTER_HOURS = 1;
 
     // ═══ حالة التطبيق ═══
     const state = {
       company: null,
       defaultTasks: { daily: [], weekly: [], monthly: [] },
       customTasks: [],          // كل المهام المخصَّصة (نشطة، معطّلة، معلَّقة)
+      tempTasks: [],            // المهام المؤقتة المرئية
       completions: {},          // مفتاح: taskId__periodKey
       pendingTasks: new Set(),  // tasks قيد الإرسال
       countdownTimer: null,
@@ -1754,8 +1756,8 @@
         const periodKeys = [getDailyKey(), getWeeklyKey(), monthly.primary];
         if (monthly.reviewing) periodKeys.push(monthly.reviewing);
 
-        // 4 استدعاءات بالتوازي
-        const [compRes, tasksRes, completionsRes, customRes] = await Promise.all([
+        // 5 استدعاءات بالتوازي
+        const [compRes, tasksRes, completionsRes, customRes, tempRes] = await Promise.all([
           fetch(`${COMPANIES_API_URL}?action=getCompanies&token=${tokenEnc}`),
           fetch(`${COMPANIES_API_URL}?action=getDefaultTasks&token=${tokenEnc}`),
           fetch(`${COMPANIES_API_URL}?action=listCompletions`, {
@@ -1773,6 +1775,14 @@
               token: token,
               data: { companyId: companyId }
             })
+          }),
+          fetch(`${COMPANIES_API_URL}?action=listTempTasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              token: token,
+              data: { companyId: companyId }
+            })
           })
         ]);
 
@@ -1780,11 +1790,13 @@
         const tasksData       = await tasksRes.json();
         const completionsData = await completionsRes.json();
         const customData      = await customRes.json();
+        const tempData        = await tempRes.json();
 
         if (!compData.ok)        throw new Error(compData.message || 'فشل تحميل بيانات الشركة');
         if (!tasksData.ok)       throw new Error(tasksData.message || 'فشل تحميل المهام الافتراضية');
         if (!completionsData.ok) throw new Error(completionsData.message || 'فشل تحميل سجلات الإنجاز');
         if (!customData.ok)      throw new Error(customData.message || 'فشل تحميل المهام المخصَّصة');
+        if (!tempData.ok)        throw new Error(tempData.message || 'فشل تحميل المهام المؤقتة');
 
         const company = (compData.companies || []).find(c => c.id === companyId);
         if (!company) {
@@ -1805,6 +1817,7 @@
         };
         state.completions = completionsData.completions || {};
         state.customTasks = Array.isArray(customData.tasks) ? customData.tasks : [];
+        state.tempTasks   = Array.isArray(tempData.tasks)   ? tempData.tasks   : [];
 
         renderCompany();
         renderTasks();
@@ -1893,6 +1906,11 @@
         sub:   'تُنفَّذ في كل يوم عمل',
         icon:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
       },
+      temp: {
+        label: 'المهام المؤقتة',
+        sub:   'مهام عابرة بدون فترة زمنية — تختفي بعد ساعة من التشييك',
+        icon:  '<svg viewBox="0 0 24 24"><polyline points="12 8 12 12 14 14"/><path d="M3 12a9 9 0 0 1 9-9c2.5 0 4.8 1 6.5 2.6L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-9 9c-2.5 0-4.8-1-6.5-2.6L3 16"/><polyline points="3 21 3 16 8 16"/></svg>'
+      },
       weekly: {
         label: 'المهام الأسبوعية',
         sub:   'تُنفَّذ مرة في الأسبوع',
@@ -1934,6 +1952,7 @@
       const grid = document.getElementById('tasksGrid');
       grid.innerHTML =
         renderDailyCard() +
+        renderTempCard() +
         renderWeeklyCard() +
         renderMonthlyCard();
       attachAllEvents();
@@ -2121,6 +2140,186 @@
       return `<span class="${cls}">${ICON_CLOCK} <span>${escapeHTML(text)}</span></span>`;
     }
 
+    // ════════════════════════════════════════════════════
+    //  المهام المؤقتة — البطاقة
+    // ════════════════════════════════════════════════════
+
+    /**
+     * يحسب الوقت المتبقّي قبل اختفاء مهمة مؤقتة مُشيَّكة
+     */
+    function getTempHideRemaining(doneAt) {
+      if (!doneAt) return null;
+      const elapsedMs = Date.now() - new Date(doneAt).getTime();
+      const remainingMs = TEMP_HIDE_AFTER_HOURS * 3600000 - elapsedMs;
+      if (remainingMs <= 0) return null;
+      const minutes = Math.ceil(remainingMs / 60000);
+      if (minutes >= 60) return 'تختفي خلال ساعة';
+      return `تختفي خلال ${minutes} دقيقة`;
+    }
+
+    function renderTempCard() {
+      const conf = CAT_CONFIG.temp;
+      const tasks = state.tempTasks || [];
+      const activeCount = tasks.filter(t => !t.done).length;
+      const doneCount = tasks.filter(t => t.done).length;
+
+      let body = '';
+      if (tasks.length === 0) {
+        body += `<div class="task-empty-cat">لا توجد مهام مؤقتة. أضف واحدة بالضغط على الزر أدناه.</div>`;
+      } else {
+        body += `<div class="task-list">${tasks.map((t, i) =>
+          taskItemTempHTML(t, i + 1)
+        ).join('')}</div>`;
+      }
+
+      // زر الإضافة (يظهر للجميع باستثناء المشرف ممنوع — لا، المشرف يستطيع)
+      body += `
+        <button class="add-custom-btn" data-temp-add="1">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>إضافة مهمة مؤقتة</span>
+        </button>
+      `;
+
+      const totalCount = tasks.length;
+      const subText = activeCount > 0 || doneCount > 0
+        ? `${activeCount} نشطة · ${doneCount} منجزة`
+        : 'لا مهام بعد';
+
+      return `
+        <div class="task-card">
+          <div class="task-card-head">
+            <div class="task-card-icon" style="background: rgba(96, 165, 250, 0.12); color: var(--info, #60A5FA);">${conf.icon}</div>
+            <div class="task-card-title">
+              <div class="task-card-name">${escapeHTML(conf.label)}</div>
+              <div class="task-card-meta">
+                <span>${totalCount} مهمة</span>
+                <span>·</span>
+                <span>${escapeHTML(subText)}</span>
+              </div>
+              <div class="task-card-meta" style="margin-top: 4px; font-size: 11.5px; color: var(--text-dim);">${escapeHTML(conf.sub)}</div>
+            </div>
+          </div>
+          ${body}
+        </div>
+      `;
+    }
+
+    /**
+     * يبني عنصر مهمة مؤقتة
+     */
+    function taskItemTempHTML(t, n) {
+      const isDone = !!t.done;
+      const isTickable = !isSupervisorOnly && !isDone;
+      const showUnmark = canUnmarkTemp(t);
+      const isPending = state.pendingTasks.has('temp:' + t.id);
+      const isOwner = t.createdByUid === me.uid;
+      const canEdit = isAdmin || isOwner;
+      const canDelete = isAdmin || isOwner;
+
+      const classes = ['task-item'];
+      if (isDone) classes.push('is-done');
+      if (isPending) classes.push('is-pending');
+
+      // عمود الترقيم
+      const numCol = `<span class="task-item-num">${n}</span>`;
+
+      // عمود التشييك
+      let checkboxCol;
+      if (isTickable) {
+        checkboxCol = `
+          <div class="task-checkbox" role="checkbox" aria-checked="false" tabindex="0"
+               data-temp-id="${escapeHTML(t.id)}">
+            ${ICON_CHECK}
+          </div>
+        `;
+      } else if (isDone && !isSupervisorOnly) {
+        // المنجزة: مربع مُشيَّك (لا يُلغى إلا بزر الإلغاء)
+        checkboxCol = `<div class="task-checkbox is-checked" aria-checked="true">${ICON_CHECK}</div>`;
+      } else {
+        checkboxCol = `<div style="width: 28px; flex-shrink: 0;"></div>`;
+      }
+
+      // hint
+      const hint = t.hint
+        ? `<div class="task-item-hint">${escapeHTML(t.hint)}</div>`
+        : '';
+
+      // شارة «أُضيفت بدون موافقة» (للأدمن فقط، رقابة)
+      const unsupervisedBadge = (isAdmin && t.addedWithoutApproval)
+        ? `<span style="display:inline-block; font-size:10px; font-weight:800; color:#B45309; background:rgba(245,158,11,0.15); padding:1px 7px; border-radius:99px; margin-inline-start:6px;" title="أضافها الموظف/المشرف بنفسه">⚠ بدون موافقة</span>`
+        : '';
+
+      // doneMeta
+      let doneMeta = '';
+      if (isDone) {
+        const doneByName = t.doneByName || '—';
+        const doneAt = t.doneAt ? formatRelativeTime(t.doneAt) : '—';
+        const remaining = getTempHideRemaining(t.doneAt);
+        doneMeta = `
+          <div class="task-done-meta">
+            <span class="done-tag">${ICON_CHECK} <span>أُنجزت</span></span>
+            <span class="by-info">بواسطة: ${escapeHTML(doneByName)} · ${escapeHTML(doneAt)}</span>
+            ${remaining ? `<span style="color: var(--info, #60A5FA); font-size: 11px;">⏱ ${escapeHTML(remaining)}</span>` : ''}
+            ${showUnmark ? `<button class="unmark-btn" data-temp-unmark="${escapeHTML(t.id)}">إلغاء التشييك</button>` : ''}
+          </div>
+        `;
+      }
+
+      // أزرار التعديل/الحذف (تظهر للمالك أو الأدمن، وليس للمشرف)
+      let actionsRow = '';
+      if (!isSupervisorOnly && (canEdit || canDelete)) {
+        const buttons = [];
+        if (canEdit && !isDone) {
+          buttons.push(`<button class="task-action-btn edit" data-temp-edit="${escapeHTML(t.id)}">تعديل</button>`);
+        }
+        if (canDelete) {
+          buttons.push(`<button class="task-action-btn delete" data-temp-delete="${escapeHTML(t.id)}">حذف</button>`);
+        }
+        if (buttons.length > 0) {
+          actionsRow = `<div class="task-actions-row">${buttons.join('')}</div>`;
+        }
+      }
+
+      return `
+        <div class="${classes.join(' ')}" data-temp-id="${escapeHTML(t.id)}">
+          ${numCol}
+          <div class="task-item-body">
+            <div class="task-item-label">${escapeHTML(t.label || '')}${unsupervisedBadge}</div>
+            ${hint}
+            ${doneMeta}
+            ${actionsRow}
+          </div>
+          ${checkboxCol}
+        </div>
+      `;
+    }
+
+    /**
+     * هل يمكن للمستخدم إلغاء تشييك مهمة مؤقتة؟
+     */
+    function canUnmarkTemp(t) {
+      if (!t || !t.done) return false;
+      if (isSupervisorOnly) return false;
+      if (isAdmin) return true;
+      if (t.doneByUid !== me.uid) return false;
+      if (!t.doneAt) return false;
+      const ageMs = Date.now() - new Date(t.doneAt).getTime();
+      return ageMs <= UNMARK_GRACE_HOURS * 3600000;
+    }
+
+    function formatRelativeTime(iso) {
+      try {
+        const d = new Date(iso);
+        const diffMs = Date.now() - d.getTime();
+        const minutes = Math.floor(diffMs / 60000);
+        if (minutes < 1) return 'الآن';
+        if (minutes < 60) return `منذ ${minutes} دقيقة`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `منذ ${hours} ساعة`;
+        return formatArabicDate(iso);
+      } catch { return '—'; }
+    }
+
     /**
      * يبني عنصر مهمة واحد بحسب نوعها
      *   kinds: default, custom-approved, custom-pending, custom-inactive
@@ -2299,16 +2498,28 @@
         });
       });
 
-      // أزرار إلغاء التشييك
+      // أزرار إلغاء التشييك (للمهام العادية)
       document.querySelectorAll('.unmark-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          unmarkTask(btn.dataset.docId, btn.dataset.taskId, btn.dataset.periodKey);
+          if (btn.dataset.tempUnmark) {
+            unmarkTempTaskAction(btn.dataset.tempUnmark);
+          } else {
+            unmarkTask(btn.dataset.docId, btn.dataset.taskId, btn.dataset.periodKey);
+          }
         });
       });
 
-      // أزرار الإضافة
-      document.querySelectorAll('.add-custom-btn').forEach(btn => {
+      // زر إضافة مهمة مؤقتة
+      document.querySelectorAll('.add-custom-btn[data-temp-add]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openAddTempModal();
+        });
+      });
+
+      // أزرار الإضافة العادية (المهام الخاصة)
+      document.querySelectorAll('.add-custom-btn[data-category]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           openAddTaskModal(btn.dataset.category);
@@ -2316,7 +2527,7 @@
       });
 
       // أزرار الإجراءات الموحَّدة على المهام المخصَّصة
-      document.querySelectorAll('.task-action-btn').forEach(btn => {
+      document.querySelectorAll('.task-action-btn[data-action]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const taskId = btn.dataset.taskId;
@@ -2335,11 +2546,34 @@
           }
         });
       });
+
+      // أزرار تعديل وحذف المهام المؤقتة
+      document.querySelectorAll('[data-temp-edit]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openEditTempModal(btn.dataset.tempEdit);
+        });
+      });
+      document.querySelectorAll('[data-temp-delete]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteTempTaskAction(btn.dataset.tempDelete);
+        });
+      });
     }
 
     async function handleCheckboxClick(e) {
       e.stopPropagation();
       const cb = e.currentTarget || this;
+
+      // المهام المؤقتة لها معالج خاص
+      if (cb.dataset.tempId) {
+        const tempId = cb.dataset.tempId;
+        if (state.pendingTasks.has('temp:' + tempId)) return;
+        markTempTask(tempId);
+        return;
+      }
+
       const docId = cb.dataset.docId;
       const taskId = cb.dataset.taskId;
       const periodKey = cb.dataset.periodKey;
@@ -2351,10 +2585,8 @@
       const isCurrentlyDone = !!(state.completions[docId] && state.completions[docId].done);
 
       if (isCurrentlyDone) {
-        // المربع متشيَّك أصلاً — حاول إلغاء التشييك
         unmarkTask(docId, taskId, periodKey);
       } else {
-        // غير متشيَّك — شيِّكه
         markTask(docId, taskId, periodKey, category);
       }
     }
@@ -2571,6 +2803,11 @@
     document.getElementById('modalSubmitBtn').addEventListener('click', submitTaskModal);
 
     async function submitTaskModal() {
+      // المهام المؤقتة لها مسار منفصل
+      if (state.modalMode === 'temp-add' || state.modalMode === 'temp-edit') {
+        return submitTempTask();
+      }
+
       const label = document.getElementById('taskLabelInput').value.trim();
       const hint = document.getElementById('taskHintInput').value.trim();
 
@@ -2690,6 +2927,195 @@
         renderTasks();
       } catch (err) {
         toast('فشل تحديث المهام: ' + err.message, 'error');
+      }
+    }
+
+    // ════════════════════════════════════════════════════
+    //  المهام المؤقتة — العمليات
+    // ════════════════════════════════════════════════════
+
+    async function reloadTempTasks() {
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=listTempTasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        state.tempTasks = data.tasks || [];
+        renderTasks();
+      } catch (err) {
+        toast('فشل تحديث المهام المؤقتة: ' + err.message, 'error');
+      }
+    }
+
+    async function markTempTask(tempId) {
+      const key = 'temp:' + tempId;
+      state.pendingTasks.add(key);
+
+      // optimistic
+      const idx = state.tempTasks.findIndex(t => t.id === tempId);
+      const previous = idx >= 0 ? { ...state.tempTasks[idx] } : null;
+      if (idx >= 0) {
+        state.tempTasks[idx] = {
+          ...state.tempTasks[idx],
+          done: true,
+          doneAt: new Date().toISOString(),
+          doneByUid: me.uid,
+          doneByName: me.displayName || me.email
+        };
+        renderTasks();
+      }
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=markTempTaskDone`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: tempId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        toast('✓ تم تشييك المهمة', 'success');
+      } catch (err) {
+        // rollback
+        if (idx >= 0 && previous) state.tempTasks[idx] = previous;
+        renderTasks();
+        toast('فشل التشييك: ' + err.message, 'error');
+      } finally {
+        state.pendingTasks.delete(key);
+      }
+    }
+
+    async function unmarkTempTaskAction(tempId) {
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=unmarkTempTaskDone`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: tempId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        toast('✓ تم إلغاء التشييك', 'success');
+        await reloadTempTasks();
+      } catch (err) {
+        toast('فشل الإلغاء: ' + err.message, 'error', 5000);
+      }
+    }
+
+    async function deleteTempTaskAction(tempId) {
+      const t = state.tempTasks.find(x => x.id === tempId);
+      const label = t ? (t.label || 'هذه المهمة') : 'هذه المهمة';
+      if (!confirm(`هل تريد حذف:\n"${label}"\n\nلا يمكن التراجع.`)) return;
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=deleteTempTask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: tempId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        toast('✓ تم حذف المهمة', 'success');
+        await reloadTempTasks();
+      } catch (err) {
+        toast('فشل الحذف: ' + err.message, 'error', 5000);
+      }
+    }
+
+    function openAddTempModal() {
+      // نُعيد استخدام مودال المهام الخاصة لكن في وضع 'temp-add'
+      state.modalMode = 'temp-add';
+      state.editingTempId = null;
+      document.getElementById('modalTitle').textContent = 'إضافة مهمة مؤقتة';
+      document.getElementById('modalSubtitle').textContent = 'مهمة عابرة، تختفي بعد ساعة من تشييكها';
+      document.getElementById('taskLabelInput').value = '';
+      document.getElementById('taskHintInput').value = '';
+      document.getElementById('labelCounter').textContent = '0 / 200';
+      document.getElementById('hintCounter').textContent = '0 / 300';
+      document.getElementById('modalSubmitText').textContent = 'إضافة المهمة المؤقتة';
+      // إخفاء التلميحات الخاصة بالمهام العادية
+      document.getElementById('adminHint').style.display = 'none';
+      document.getElementById('employeeHint').style.display = 'none';
+      document.getElementById('editToBackPendingHint').style.display = 'none';
+      document.getElementById('addTaskModal').classList.add('is-open');
+      setTimeout(() => document.getElementById('taskLabelInput').focus(), 200);
+    }
+
+    function openEditTempModal(tempId) {
+      const t = state.tempTasks.find(x => x.id === tempId);
+      if (!t) return;
+      state.modalMode = 'temp-edit';
+      state.editingTempId = tempId;
+      document.getElementById('modalTitle').textContent = 'تعديل المهمة المؤقتة';
+      document.getElementById('modalSubtitle').textContent = 'مهمة مؤقتة';
+      document.getElementById('taskLabelInput').value = t.label || '';
+      document.getElementById('taskHintInput').value = t.hint || '';
+      document.getElementById('labelCounter').textContent = (t.label || '').length + ' / 200';
+      document.getElementById('hintCounter').textContent = (t.hint || '').length + ' / 300';
+      document.getElementById('modalSubmitText').textContent = 'حفظ التعديلات';
+      document.getElementById('adminHint').style.display = 'none';
+      document.getElementById('employeeHint').style.display = 'none';
+      document.getElementById('editToBackPendingHint').style.display = 'none';
+      document.getElementById('addTaskModal').classList.add('is-open');
+      setTimeout(() => document.getElementById('taskLabelInput').focus(), 200);
+    }
+
+    async function submitTempTask() {
+      const label = document.getElementById('taskLabelInput').value.trim();
+      const hint = document.getElementById('taskHintInput').value.trim();
+      if (!label) { toast('نص المهمة مطلوب', 'error'); return; }
+
+      const btn = document.getElementById('modalSubmitBtn');
+      const txt = document.getElementById('modalSubmitText');
+      btn.disabled = true;
+      const originalText = txt.textContent;
+      txt.textContent = 'جاري...';
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const isEdit = state.modalMode === 'temp-edit';
+        const action = isEdit ? 'updateTempTask' : 'addTempTask';
+        const data = isEdit
+          ? { companyId: companyId, taskId: state.editingTempId, label: label, hint: hint }
+          : { companyId: companyId, label: label, hint: hint };
+
+        const res = await fetch(`${COMPANIES_API_URL}?action=${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ token: token, data: data })
+        });
+        const result = await res.json();
+        if (!result.ok) throw new Error(result.message);
+        toast(isEdit ? '✓ تم حفظ التعديلات' : '✓ تمت الإضافة', 'success');
+        closeAddTaskModal();
+        await reloadTempTasks();
+      } catch (err) {
+        toast('فشل: ' + err.message, 'error', 5000);
+      } finally {
+        btn.disabled = false;
+        txt.textContent = originalText;
       }
     }
 
