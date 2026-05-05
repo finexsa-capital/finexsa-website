@@ -960,13 +960,22 @@
             <h2>إدارة الموظفين</h2>
             <p class="page-subtitle">إضافة، تعديل، تفعيل، وإدارة صلاحيات فريق العمل</p>
           </div>
-          <button class="btn-primary" id="btnAddStaff">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            إضافة موظف جديد
-          </button>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <!-- ★ NEW v1.2.0 — زر مزامنة -->
+            <button type="button" id="btnSyncAdmin" title="تحديث القائمة من السيرفر" style="background: var(--bg-deep); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 14px; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.18s ease;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.85.97 6.6 2.55L21 8"/><polyline points="21 3 21 8 16 8"/></svg>
+              <span>مزامنة</span>
+            </button>
+            <button class="btn-primary" id="btnAddStaff">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              إضافة موظف جديد
+            </button>
+          </div>
         </div>
+        <!-- ★ NEW v1.2.0 — شارة حالة الكاش -->
+        <div id="cacheStatusBadge" style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px; opacity: 0; transition: opacity 0.3s;"></div>
 
         <!-- Stats -->
         <div class="stats-row">
@@ -1215,10 +1224,75 @@
     };
 
     // ═══════ Load data ═══════
-    async function loadAll() {
+
+    // ★ NEW v1.2.0 — كاش متصفح لقائمة الموظفين والصناديق
+    const ADMIN_CACHE_KEY = 'admin_users_cache';
+    const ADMIN_CACHE_TTL_MS = 2 * 60 * 1000; // دقيقتان
+
+    function getCachedAdminData() {
+      try {
+        const raw = sessionStorage.getItem(ADMIN_CACHE_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (Date.now() - obj.savedAt > ADMIN_CACHE_TTL_MS) {
+          sessionStorage.removeItem(ADMIN_CACHE_KEY);
+          return null;
+        }
+        return obj;
+      } catch (e) { return null; }
+    }
+
+    function setCachedAdminData(staff, boxes) {
+      try {
+        sessionStorage.setItem(ADMIN_CACHE_KEY, JSON.stringify({
+          savedAt: Date.now(),
+          staff: staff,
+          boxes: boxes
+        }));
+      } catch (e) {}
+    }
+
+    function clearCachedAdminData() {
+      try { sessionStorage.removeItem(ADMIN_CACHE_KEY); } catch (e) {}
+    }
+
+    async function loadAll(forceRefresh) {
       try {
         const user = auth.currentUser;
         if (!user) return;
+
+        // ★ NEW — محاولة الكاش أوّلاً
+        if (!forceRefresh) {
+          const cached = getCachedAdminData();
+          if (cached) {
+            state.staff = cached.staff;
+            state.boxes = cached.boxes;
+            document.getElementById('statBoxes').textContent = state.boxes.length;
+            renderStats();
+            applyFilters();
+            refreshPendingBadge();
+
+            const loader = document.getElementById('appLoader');
+            if (loader) {
+              loader.classList.add('is-hidden');
+              setTimeout(() => {
+                const stillThere = document.getElementById('appLoader');
+                if (stillThere) stillThere.remove();
+              }, 400);
+            }
+
+            // إخبار المستخدم
+            const ageSec = Math.round((Date.now() - cached.savedAt) / 1000);
+            const badge = document.getElementById('cacheStatusBadge');
+            if (badge) {
+              badge.textContent = `📦 من الكاش (${ageSec} ثانية)`;
+              badge.style.opacity = '1';
+              setTimeout(() => { badge.style.opacity = '0.4'; }, 3000);
+            }
+            return;
+          }
+        }
+
         const token = await user.getIdToken();
 
         const [staffRes, boxesRes] = await Promise.all([
@@ -1238,10 +1312,21 @@
         // فك ترميز Firestore لكل موظف
         state.staff = state.staff.map(s => unwrapStaff(s));
 
+        // ★ NEW — حفظ في الكاش
+        setCachedAdminData(state.staff, state.boxes);
+
         document.getElementById('statBoxes').textContent = state.boxes.length;
         renderStats();
         applyFilters();
         refreshPendingBadge();
+
+        // شارة الحالة
+        const badge = document.getElementById('cacheStatusBadge');
+        if (badge) {
+          badge.textContent = '✓ بيانات حديثة';
+          badge.style.opacity = '1';
+          setTimeout(() => { badge.style.opacity = '0.4'; }, 3000);
+        }
 
         const loader = document.getElementById('appLoader');
         if (loader) {
@@ -1679,7 +1764,9 @@
 
         toast(isEdit ? '✓ تم حفظ التعديلات' : '✓ تم إنشاء الحساب بنجاح', 'success');
         closeModal();
-        await loadAll();
+        // ★ NEW v1.2.0 — مسح الكاش لضمان التحديث الفوري
+        clearCachedAdminData();
+        await loadAll(true);
 
       } catch (err) {
         toast(err.message, 'error', 5000);
@@ -1732,7 +1819,9 @@
         const result = await res.json();
         if (!result.ok) throw new Error(result.message);
         toast(active ? '✓ تم التفعيل' : '✓ تم التعطيل', 'success');
-        await loadAll();
+        // ★ NEW v1.2.0 — مسح الكاش
+        clearCachedAdminData();
+        await loadAll(true);
       } catch (err) {
         toast(err.message, 'error');
       }
@@ -1747,6 +1836,24 @@
 
     onAuthStateChanged(auth, (user) => {
       if (user) loadAll();
+    });
+
+    // ★ NEW v1.2.0 — زر المزامنة اليدوي
+    document.getElementById('btnSyncAdmin').addEventListener('click', async () => {
+      const btn = document.getElementById('btnSyncAdmin');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span style="display:inline-block; width:13px; height:13px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation: spin 0.6s linear infinite;"></span> جاري المزامنة...';
+      try {
+        clearCachedAdminData();
+        await loadAll(true);
+        toast('✓ تمت المزامنة', 'success', 2500);
+      } catch (e) {
+        toast('فشل المزامنة', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
     });
   </script>
 
