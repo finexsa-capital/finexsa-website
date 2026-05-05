@@ -540,7 +540,9 @@
 
     // ───────── إذا كان مسجّلاً مسبقاً، حوّل للوحة التحكم ─────────
     onAuthStateChanged(auth, async (user) => {
-      if (user && sessionStorage.getItem('finexsa_staff_uid')) {
+      // ★ يقرأ من localStorage (الجديد) أو sessionStorage (للجلسات القديمة)
+      const hasSession = localStorage.getItem('finexsa_staff_uid') || sessionStorage.getItem('finexsa_staff_uid');
+      if (user && hasSession) {
         // مسجّل دخول بالفعل وعنده جلسة نشطة
         window.location.replace('dashboard.html');
       }
@@ -660,12 +662,22 @@
           staff[key] = unwrapFsValue(rawStaff[key]);
         }
 
-        sessionStorage.setItem('finexsa_staff_uid', staff.uid || '');
-        sessionStorage.setItem('finexsa_staff_email', staff.email || '');
-        sessionStorage.setItem('finexsa_staff_name', staff.displayName || '');
-        sessionStorage.setItem('finexsa_staff_role', staff.role || 'accountant');
-        sessionStorage.setItem('finexsa_staff_branch', staff.branch || '');
-        sessionStorage.setItem('finexsa_staff_allowed', JSON.stringify(staff.allowedBoxes || []));
+        // ★ حفظ في localStorage (تُشارَك بين تبويبات المتصفّح)
+        // كان sessionStorage يحدّ الجلسة بتبويب واحد فقط
+        localStorage.setItem('finexsa_staff_uid', staff.uid || '');
+        localStorage.setItem('finexsa_staff_email', staff.email || '');
+        localStorage.setItem('finexsa_staff_name', staff.displayName || '');
+        localStorage.setItem('finexsa_staff_role', staff.role || 'accountant');
+        localStorage.setItem('finexsa_staff_branch', staff.branch || '');
+        localStorage.setItem('finexsa_staff_allowed', JSON.stringify(staff.allowedBoxes || []));
+
+        // مسح أيّ بيانات قديمة في sessionStorage لتفادي التعارض
+        sessionStorage.removeItem('finexsa_staff_uid');
+        sessionStorage.removeItem('finexsa_staff_email');
+        sessionStorage.removeItem('finexsa_staff_name');
+        sessionStorage.removeItem('finexsa_staff_role');
+        sessionStorage.removeItem('finexsa_staff_branch');
+        sessionStorage.removeItem('finexsa_staff_allowed');
 
         // 5) رسالة نجاح ثم التحويل
         showAlert('تم الدخول بنجاح. جاري التحويل…', 'success');
