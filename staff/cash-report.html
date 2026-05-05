@@ -722,8 +722,14 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
               تحميل
             </button>
+            <button class="btn-secondary" id="btnRefreshReport" style="display:none" title="مزامنة فورية مع السيرفر (تجاوز الكاش)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.85.97 6.6 2.55L21 8"/><polyline points="21 3 21 8 16 8"/></svg>
+              مزامنة
+            </button>
             <button class="btn-secondary" id="btnPrint" disabled>طباعة</button>
           </div>
+          <!-- ★ NEW v1.2.0 — شارة حالة الكاش -->
+          <div id="cacheBadge" style="margin-top: 10px; font-size: 11.5px; color: var(--text-muted); opacity: 0; transition: opacity 0.3s;"></div>
         </div>
 
         <!-- Filters -->
@@ -876,8 +882,28 @@
 
     // ═══════ شارة عدد المهام المعلَّقة (للأدمن) ═══════
     const COMPANIES_API_URL = 'https://script.google.com/macros/s/AKfycbzCfc35oOsexj1Oy6GffXvffDR56u_V42m9AX2D4apMoVF7MB-c9EU9zWMLzLfmO1M77Q/exec';
+
+    // ★ NEW v1.2.0 — كاش العدّاد في sessionStorage
+    const PENDING_CACHE_KEY = 'pending_count_cache';
+    const PENDING_CACHE_TTL_MS = 60 * 1000;
+
     async function refreshPendingBadge() {
       try {
+        try {
+          const raw = sessionStorage.getItem(PENDING_CACHE_KEY);
+          if (raw) {
+            const obj = JSON.parse(raw);
+            if (Date.now() - obj.savedAt < PENDING_CACHE_TTL_MS) {
+              const badge = document.getElementById('navPendingBadge');
+              if (badge) {
+                badge.textContent = obj.count;
+                badge.classList.toggle('zero', obj.count === 0);
+              }
+              return;
+            }
+          }
+        } catch (e) {}
+
         const user = auth.currentUser;
         if (!user) return;
         const token = await user.getIdToken();
@@ -885,12 +911,20 @@
         const data = await res.json();
         if (!data.ok) return;
         const n = data.count || 0;
+
+        try {
+          sessionStorage.setItem(PENDING_CACHE_KEY, JSON.stringify({
+            savedAt: Date.now(),
+            count: n
+          }));
+        } catch (e) {}
+
         const badge = document.getElementById('navPendingBadge');
         if (badge) {
           badge.textContent = n;
           badge.classList.toggle('zero', n === 0);
         }
-      } catch (err) { /* فشل صامت */ }
+      } catch (err) {}
     }
 
     // Sidebar toggle
@@ -961,9 +995,50 @@
     });
 
     // Load report
-    document.getElementById('btnLoad').addEventListener('click', loadReport);
+    document.getElementById('btnLoad').addEventListener('click', () => loadReport(false));
+    // ★ NEW v1.2.0 — زر المزامنة يجبر التحديث من السيرفر
+    document.getElementById('btnRefreshReport').addEventListener('click', () => {
+      const box = document.getElementById('boxSelect').value;
+      if (box) {
+        clearCachedReport(box);
+        loadReport(true);
+      }
+    });
 
-    async function loadReport() {
+    // ★ NEW v1.2.0 — كاش التقارير في sessionStorage
+    const REPORT_CACHE_TTL_MS = 60 * 1000; // 60 ثانية
+
+    function getCachedReport(box) {
+      try {
+        const key = 'cash_report_' + box;
+        const raw = sessionStorage.getItem(key);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (Date.now() - obj.savedAt > REPORT_CACHE_TTL_MS) {
+          sessionStorage.removeItem(key);
+          return null;
+        }
+        return obj;
+      } catch (e) { return null; }
+    }
+
+    function setCachedReport(box, data) {
+      try {
+        const key = 'cash_report_' + box;
+        sessionStorage.setItem(key, JSON.stringify({
+          savedAt: Date.now(),
+          data: data
+        }));
+      } catch (e) {}
+    }
+
+    function clearCachedReport(box) {
+      try {
+        sessionStorage.removeItem('cash_report_' + box);
+      } catch (e) {}
+    }
+
+    async function loadReport(forceRefresh) {
       const box = document.getElementById('boxSelect').value;
       if (!box) return;
 
@@ -972,13 +1047,31 @@
       btn.innerHTML = '<span class="loader-spinner" style="width:14px;height:14px;border-width:2px;"></span> جاري التحميل…';
 
       try {
-        const user = auth.currentUser;
-        const token = await user.getIdToken();
-        const url = `${STAFF_API_URL}?action=getReport&token=${encodeURIComponent(token)}&box=${encodeURIComponent(box)}`;
-        const res = await fetch(url);
-        const data = await res.json();
+        // ★ NEW — محاولة استخدام الكاش
+        let data = null;
+        if (!forceRefresh) {
+          const cached = getCachedReport(box);
+          if (cached) {
+            data = cached.data;
+            // إخبار المستخدم أنّ البيانات من الكاش
+            setTimeout(() => {
+              const ageSec = Math.round((Date.now() - cached.savedAt) / 1000);
+              showCacheBadge(`📦 من الكاش (${ageSec} ثانية)`);
+            }, 100);
+          }
+        }
 
-        if (!data.ok) throw new Error(data.message);
+        if (!data) {
+          const user = auth.currentUser;
+          const token = await user.getIdToken();
+          const url = `${STAFF_API_URL}?action=getReport&token=${encodeURIComponent(token)}&box=${encodeURIComponent(box)}`;
+          const res = await fetch(url);
+          data = await res.json();
+          if (!data.ok) throw new Error(data.message);
+          // ★ NEW — حفظ في الكاش
+          setCachedReport(box, data);
+          showCacheBadge('✓ بيانات حديثة');
+        }
 
         state.currentBox = data.boxName;
         state.currentCurrency = data.currency || '';
@@ -988,6 +1081,7 @@
         document.getElementById('statsGrid').style.display = 'grid';
         document.getElementById('tableCard').style.display = 'block';
         document.getElementById('btnPrint').disabled = false;
+        document.getElementById('btnRefreshReport').style.display = 'inline-flex'; // ★ NEW
         document.getElementById('tableTitle').textContent = `حركات ${state.currentBox}`;
 
         if (data.summary) {
@@ -1003,6 +1097,15 @@
         btn.disabled = false;
         btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> تحميل';
       }
+    }
+
+    // ★ NEW v1.2.0 — شارة حالة الكاش
+    function showCacheBadge(text) {
+      const badge = document.getElementById('cacheBadge');
+      if (!badge) return;
+      badge.textContent = text;
+      badge.style.opacity = '1';
+      setTimeout(() => { badge.style.opacity = '0.5'; }, 3000);
     }
 
     // Filters

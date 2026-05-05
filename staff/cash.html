@@ -825,6 +825,11 @@
             <h2>إدخال الحركات</h2>
             <p class="page-subtitle">أضف حركات قبض ودفع — تُحفَظ مباشرة في Google Sheet</p>
           </div>
+          <!-- ★ NEW v1.2.0 — زر مزامنة القوائم -->
+          <button type="button" id="btnSyncLists" title="تحديث الصناديق والعملات من السيرفر" style="background: var(--bg-deep); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 14px; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.18s ease;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.85.97 6.6 2.55L21 8"/><polyline points="21 3 21 8 16 8"/></svg>
+            <span>مزامنة</span>
+          </button>
         </div>
 
         <div class="cash-grid">
@@ -1021,8 +1026,29 @@
 
     // ═══════ شارة عدد المهام المعلَّقة (للأدمن) ═══════
     const COMPANIES_API_URL = 'https://script.google.com/macros/s/AKfycbzCfc35oOsexj1Oy6GffXvffDR56u_V42m9AX2D4apMoVF7MB-c9EU9zWMLzLfmO1M77Q/exec';
+
+    // ★ NEW v1.2.0 — كاش العدّاد في sessionStorage
+    const PENDING_CACHE_KEY = 'pending_count_cache';
+    const PENDING_CACHE_TTL_MS = 60 * 1000;
+
     async function refreshPendingBadge() {
       try {
+        // ★ NEW — استخدام الكاش أوّلاً
+        try {
+          const raw = sessionStorage.getItem(PENDING_CACHE_KEY);
+          if (raw) {
+            const obj = JSON.parse(raw);
+            if (Date.now() - obj.savedAt < PENDING_CACHE_TTL_MS) {
+              const badge = document.getElementById('navPendingBadge');
+              if (badge) {
+                badge.textContent = obj.count;
+                badge.classList.toggle('zero', obj.count === 0);
+              }
+              return;
+            }
+          }
+        } catch (e) {}
+
         const user = auth.currentUser;
         if (!user) return;
         const token = await user.getIdToken();
@@ -1030,6 +1056,14 @@
         const data = await res.json();
         if (!data.ok) return;
         const n = data.count || 0;
+
+        try {
+          sessionStorage.setItem(PENDING_CACHE_KEY, JSON.stringify({
+            savedAt: Date.now(),
+            count: n
+          }));
+        } catch (e) {}
+
         const badge = document.getElementById('navPendingBadge');
         if (badge) {
           badge.textContent = n;
@@ -1076,21 +1110,70 @@
     };
 
     // ═══════ تحميل القوائم ═══════
-    async function loadLists() {
+    // ★ NEW v1.2.0 — كاش القوائم في sessionStorage
+    const LISTS_CACHE_KEY = 'cash_lists_cache';
+    const LISTS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 دقائق
+
+    function getCachedLists() {
+      try {
+        const raw = sessionStorage.getItem(LISTS_CACHE_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (Date.now() - obj.savedAt > LISTS_CACHE_TTL_MS) {
+          sessionStorage.removeItem(LISTS_CACHE_KEY);
+          return null;
+        }
+        return obj.lists;
+      } catch (e) { return null; }
+    }
+
+    function setCachedLists(lists) {
+      try {
+        sessionStorage.setItem(LISTS_CACHE_KEY, JSON.stringify({
+          savedAt: Date.now(),
+          lists: lists
+        }));
+      } catch (e) {}
+    }
+
+    function clearCachedLists() {
+      try { sessionStorage.removeItem(LISTS_CACHE_KEY); } catch (e) {}
+    }
+
+    async function loadLists(forceRefresh) {
       try {
         const user = auth.currentUser;
         if (!user) return;
+
+        // ★ NEW — محاولة الكاش
+        if (!forceRefresh) {
+          const cached = getCachedLists();
+          if (cached) {
+            state.lists = cached;
+            populateBoxes(cached['الصناديق'] || []);
+            populateCurrencies(cached['العملات'] || []);
+            document.getElementById('appLoader').classList.add('is-hidden');
+            setTimeout(() => document.getElementById('appLoader').remove(), 400);
+            return;
+          }
+        }
+
         const token = await user.getIdToken();
         const res = await fetch(`${STAFF_API_URL}?action=getLists&token=${encodeURIComponent(token)}`);
         const data = await res.json();
         if (!data.ok) throw new Error(data.message || 'تعذّر جلب القوائم');
 
         state.lists = data.lists || {};
+        // ★ NEW — حفظ في الكاش
+        setCachedLists(state.lists);
         populateBoxes(data.lists['الصناديق'] || []);
         populateCurrencies(data.lists['العملات'] || []);
 
-        document.getElementById('appLoader').classList.add('is-hidden');
-        setTimeout(() => document.getElementById('appLoader').remove(), 400);
+        const loader = document.getElementById('appLoader');
+        if (loader) {
+          loader.classList.add('is-hidden');
+          setTimeout(() => loader.remove(), 400);
+        }
       } catch (err) {
         console.error(err);
         toast('فشل تحميل القوائم: ' + err.message, 'error', 5000);
@@ -1509,6 +1592,20 @@
         state.drafts = [];
         renderDrafts();
 
+        // ★ NEW v1.2.0 — مسح كاش التقارير للصناديق المتأثّرة
+        // (عند فتح cash-report لاحقاً نعرض البيانات الحديثة)
+        try {
+          const affectedBoxes = new Set();
+          state.drafts.forEach(d => affectedBoxes.add(d.box));
+          // أيضاً مسح كل التقارير لأنّ saveBatch قد يؤثّر على الحساب المقابل
+          for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            if (key && key.startsWith('cash_report_')) {
+              sessionStorage.removeItem(key);
+            }
+          }
+        } catch (e) {}
+
       } catch (err) {
         console.error(err);
         toast('فشل الحفظ: ' + err.message, 'error', 5000);
@@ -1537,6 +1634,24 @@
     // ═══════ Init ═══════
     onAuthStateChanged(auth, (user) => {
       if (user) loadLists();
+    });
+
+    // ★ NEW v1.2.0 — زر مزامنة القوائم
+    document.getElementById('btnSyncLists').addEventListener('click', async () => {
+      const btn = document.getElementById('btnSyncLists');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span style="display:inline-block; width:13px; height:13px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation: spin 0.6s linear infinite;"></span> جاري المزامنة...';
+      try {
+        clearCachedLists();
+        await loadLists(true);
+        toast('✓ تمت المزامنة بنجاح', 'success', 2500);
+      } catch (e) {
+        toast('فشل المزامنة', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
     });
   </script>
 

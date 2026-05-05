@@ -1258,8 +1258,28 @@
 
     // ═══════ شارة عدد المهام المعلَّقة (للأدمن) ═══════
     const COMPANIES_API_URL = 'https://script.google.com/macros/s/AKfycbzCfc35oOsexj1Oy6GffXvffDR56u_V42m9AX2D4apMoVF7MB-c9EU9zWMLzLfmO1M77Q/exec';
+
+    // ★ NEW v1.2.0 — كاش العدّاد في sessionStorage
+    const PENDING_CACHE_KEY = 'pending_count_cache';
+    const PENDING_CACHE_TTL_MS = 60 * 1000;
+
     async function refreshPendingBadge() {
       try {
+        try {
+          const raw = sessionStorage.getItem(PENDING_CACHE_KEY);
+          if (raw) {
+            const obj = JSON.parse(raw);
+            if (Date.now() - obj.savedAt < PENDING_CACHE_TTL_MS) {
+              const badge = document.getElementById('navPendingBadge');
+              if (badge) {
+                badge.textContent = obj.count;
+                badge.classList.toggle('zero', obj.count === 0);
+              }
+              return;
+            }
+          }
+        } catch (e) {}
+
         const user = auth.currentUser;
         if (!user) return;
         const token = await user.getIdToken();
@@ -1267,12 +1287,20 @@
         const data = await res.json();
         if (!data.ok) return;
         const n = data.count || 0;
+
+        try {
+          sessionStorage.setItem(PENDING_CACHE_KEY, JSON.stringify({
+            savedAt: Date.now(),
+            count: n
+          }));
+        } catch (e) {}
+
         const badge = document.getElementById('navPendingBadge');
         if (badge) {
           badge.textContent = n;
           badge.classList.toggle('zero', n === 0);
         }
-      } catch (err) { /* فشل صامت */ }
+      } catch (err) {}
     }
 
     /**
