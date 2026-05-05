@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <title>حركة جديدة — FINEXSA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="m.css">
+
+  <style>
+    *, *::before, *::after { font-feature-settings: "lnum"; font-variant-numeric: lining-nums; }
+
+    /* ═══ زرّا قبض/دفع ═══ */
+    .direction-toggle {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-bottom: 16px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 14px; padding: 6px;
+    }
+    .dir-btn {
+      padding: 14px 12px; background: transparent; border: none;
+      border-radius: 10px; color: var(--text-muted);
+      font-size: 14px; font-weight: 800; font-family: inherit;
+      cursor: pointer; transition: all 0.2s ease;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .dir-btn svg {
+      width: 22px; height: 22px; stroke-width: 2.2;
+      stroke: currentColor; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .dir-btn:active { transform: scale(0.96); }
+    .dir-btn.is-active.receive {
+      background: linear-gradient(135deg, var(--success), #5fe890);
+      color: var(--bg-void);
+      box-shadow: 0 6px 14px -4px rgba(74,222,128,0.4);
+    }
+    .dir-btn.is-active.pay {
+      background: linear-gradient(135deg, var(--error), #ff8e8e);
+      color: white;
+      box-shadow: 0 6px 14px -4px rgba(255,107,107,0.4);
+    }
+
+    /* صف مبلغ + عملة */
+    .amount-currency-row {
+      display: grid; grid-template-columns: 1.6fr 1fr; gap: 8px;
+    }
+
+    /* ═══ تصحيح حقل التاريخ ═══ */
+    .field-input[type="date"] {
+      direction: ltr !important;
+      text-align: left !important;
+      font-size: 16px !important;
+      letter-spacing: 0.04em !important;
+      padding: 14px 16px !important;
+      font-variant-numeric: lining-nums tabular-nums !important;
+      font-feature-settings: "lnum" "tnum" !important;
+      min-height: 50px;
+    }
+    .field-input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.7) sepia(1) saturate(5) hue-rotate(15deg);
+      cursor: pointer;
+      opacity: 0.85;
+      margin-right: 8px;
+    }
+
+    /* ═══ Autocomplete suggestions ═══ */
+    .acc-input-wrapper {
+      position: relative;
+    }
+    .suggestions {
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      margin-top: 4px;
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 20;
+      display: none;
+      box-shadow: 0 12px 30px -8px rgba(0,0,0,0.5);
+    }
+    .suggestions.is-open { display: block; }
+    .search-suggestion {
+      padding: 12px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-suggestion:last-child { border-bottom: none; }
+    .search-suggestion:active,
+    .search-suggestion.is-highlighted {
+      background: var(--gold-muted);
+    }
+    .search-suggestion > div:first-child {
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .search-suggestion-meta {
+      font-size: 10.5px;
+      color: var(--gold);
+      background: var(--gold-muted);
+      padding: 2px 8px;
+      border-radius: 100px;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    /* ═══ بطاقة المعادل ═══ */
+    .conversion-card {
+      background: var(--bg-deep);
+      border: 1.5px dashed var(--border-strong);
+      border-radius: 14px; padding: 14px; margin-bottom: 16px;
+    }
+    .conversion-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 10px;
+    }
+    .conversion-title {
+      font-size: 12px; font-weight: 800; color: var(--gold);
+      letter-spacing: 0.05em;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .conversion-title svg {
+      width: 14px; height: 14px; stroke-width: 2;
+      stroke: currentColor; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .mode-toggle {
+      display: flex; gap: 4px;
+      background: var(--bg-void); padding: 3px; border-radius: 8px;
+    }
+    .mode-btn {
+      padding: 5px 12px; background: transparent; border: none;
+      border-radius: 5px; font-size: 11.5px; font-weight: 700;
+      color: var(--text-dim); cursor: pointer; font-family: inherit;
+    }
+    .mode-btn.is-active {
+      background: var(--gold-muted); color: var(--gold-bright);
+    }
+    .conv-hint {
+      font-size: 11.5px;
+      margin-top: 4px;
+      padding: 8px 10px;
+      background: rgba(201, 162, 39, 0.08);
+      border-radius: 8px;
+      line-height: 1.5;
+      display: none;
+    }
+    .conv-hint.show { display: block; }
+
+    /* ═══ Drafts ═══ */
+    .drafts-section {
+      margin-top: 24px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .drafts-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 12px;
+    }
+    .drafts-title { font-size: 14px; font-weight: 800; }
+    .drafts-count {
+      font-size: 11px; padding: 3px 10px;
+      background: var(--gold-muted); color: var(--gold-bright);
+      border: 1px solid var(--border-strong); border-radius: 100px;
+      font-weight: 700;
+    }
+    .draft-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .draft-card.is-removing { animation: slideOut 0.2s ease forwards; }
+    @keyframes slideOut { to { opacity: 0; transform: translateX(20px); } }
+
+    .draft-row1 {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 6px;
+    }
+    .draft-dir-badge {
+      font-size: 11px; font-weight: 800;
+      padding: 3px 12px; border-radius: 100px; letter-spacing: 0.05em;
+    }
+    .draft-dir-badge.rec {
+      background: rgba(74,222,128,0.15); color: var(--success);
+      border: 1px solid rgba(74,222,128,0.3);
+    }
+    .draft-dir-badge.pay {
+      background: rgba(255,107,107,0.15); color: var(--error);
+      border: 1px solid rgba(255,107,107,0.3);
+    }
+    .draft-amount {
+      font-size: 15px; font-weight: 800;
+      direction: ltr; font-variant-numeric: tabular-nums;
+    }
+    .draft-amount-curr {
+      font-size: 11px; color: var(--text-muted);
+      margin-right: 4px; font-weight: 600;
+    }
+    .draft-row2 {
+      font-size: 12.5px; color: var(--text-muted);
+      margin-bottom: 4px; line-height: 1.5;
+    }
+    .draft-row2 strong { color: var(--text-primary); font-weight: 700; }
+    .draft-meta {
+      display: flex; justify-content: space-between;
+      align-items: center; font-size: 11px; color: var(--text-dim);
+      margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border);
+    }
+    .draft-delete {
+      width: 28px; height: 28px; background: transparent;
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text-dim); cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .draft-delete:active {
+      background: rgba(255, 107, 107, 0.1);
+      border-color: var(--error); color: var(--error);
+    }
+    .draft-delete svg {
+      width: 14px; height: 14px; stroke-width: 2.2;
+      stroke: currentColor; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .save-bar {
+      position: fixed;
+      bottom: calc(var(--tab-h) + var(--safe-bottom));
+      left: 0; right: 0; padding: 12px 16px;
+      background: rgba(15, 18, 32, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      z-index: 90; display: none;
+    }
+    .save-bar.is-visible { display: block; }
+    .save-bar .btn { padding: 16px; font-size: 15px; }
+    .save-bar .btn.is-saving { pointer-events: none; opacity: 0.7; }
+  </style>
+</head>
+<body>
+
+  <div class="app-loader" id="appLoader"><div class="spinner"></div></div>
+
+  <header class="app-header">
+    <div class="header-left">
+      <button class="icon-btn" onclick="window.location.href='index.html'" aria-label="رجوع">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="app-title">حركة جديدة</h1>
+    </div>
+    <div class="header-right"></div>
+  </header>
+
+  <main class="app-content">
+
+    <!-- الصندوق -->
+    <div class="field-group">
+      <label class="field-label" for="boxSelect">
+        <span class="required">*</span> الصندوق
+      </label>
+      <select id="boxSelect" class="field-select">
+        <option value="">— اختر الصندوق —</option>
+      </select>
+    </div>
+
+    <!-- اتجاه -->
+    <div class="direction-toggle">
+      <button class="dir-btn receive" data-dir="قبض">
+        <svg viewBox="0 0 24 24"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        قبض
+      </button>
+      <button class="dir-btn pay" data-dir="دفع">
+        <svg viewBox="0 0 24 24"><polyline points="5 12 12 5 19 12"/><line x1="12" y1="19" x2="12" y2="5"/></svg>
+        دفع
+      </button>
+    </div>
+
+    <!-- المبلغ + عملة الصندوق -->
+    <div class="field-group">
+      <label class="field-label">
+        <span class="required">*</span> المبلغ
+      </label>
+      <div class="amount-currency-row">
+        <input type="number" id="amountA" class="field-input" placeholder="0" inputmode="decimal" step="any">
+        <select id="currencyA" class="field-select"></select>
+      </div>
+    </div>
+
+    <!-- الحساب المقابل + autocomplete -->
+    <div class="field-group">
+      <label class="field-label" for="accCP">
+        <span class="required">*</span> الحساب المقابل
+      </label>
+      <div class="acc-input-wrapper">
+        <input type="text" id="accCP" class="field-input" placeholder="ابدأ بالكتابة للبحث…" autocomplete="off">
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+    </div>
+
+    <!-- المبلغ المقابل + عملته -->
+    <div class="field-group">
+      <label class="field-label">
+        <span class="required">*</span> المبلغ المقابل
+      </label>
+      <div class="amount-currency-row">
+        <input type="number" id="amountB" class="field-input" placeholder="0" inputmode="decimal" step="any">
+        <select id="currencyB" class="field-select"></select>
+      </div>
+    </div>
+
+    <!-- بطاقة التحويل (تظهر عند اختلاف العملتين) -->
+    <div class="conversion-card" id="conversionCard" style="display:none">
+      <div class="conversion-header">
+        <span class="conversion-title">
+          <svg viewBox="0 0 24 24"><path d="M16 3l4 4-4 4"/><path d="M20 7H4"/><path d="M8 21l-4-4 4-4"/><path d="M4 17h16"/></svg>
+          تحويل عملة
+        </span>
+        <div class="mode-toggle" id="conversionToggle">
+          <button class="mode-btn is-active" data-mode="direct">مبلغ</button>
+          <button class="mode-btn" data-mode="rate">سعر صرف</button>
+        </div>
+      </div>
+      <div class="conv-hint" id="rateHint"></div>
+    </div>
+
+    <!-- التاريخ -->
+    <div class="field-group">
+      <label class="field-label" for="dateInput">
+        <span class="required">*</span> التاريخ
+      </label>
+      <input type="date" id="dateInput" class="field-input">
+    </div>
+
+    <!-- البيان -->
+    <div class="field-group">
+      <label class="field-label" for="note">
+        <span class="required">*</span> البيان
+      </label>
+      <textarea id="note" class="field-textarea" placeholder="وصف الحركة (يُملأ تلقائياً)"></textarea>
+    </div>
+
+    <!-- زر الإضافة -->
+    <button class="btn btn-secondary" id="btnAddDraft">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      إضافة للقائمة
+    </button>
+
+    <!-- قائمة Drafts -->
+    <div class="drafts-section" id="draftsSection" style="display:none">
+      <div class="drafts-header">
+        <span class="drafts-title">حركات جاهزة للحفظ</span>
+        <span class="drafts-count" id="draftsCount">0</span>
+      </div>
+      <div id="draftsList"></div>
+    </div>
+
+  </main>
+
+  <div class="save-bar" id="saveBar">
+    <button class="btn btn-primary" id="btnSaveAll">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <span id="saveBtnText">حفظ الكل</span>
+    </button>
+  </div>
+
+  <nav class="tabbar">
+    <a href="index.html" class="tab">
+      <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+      <span>الرئيسية</span>
+    </a>
+    <a href="cash.html" class="tab is-active">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="12" cy="15" r="2"/></svg>
+      <span>حركة</span>
+    </a>
+    <a href="report.html" class="tab">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>كشف</span>
+    </a>
+    <a href="tasks.html" class="tab">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>المهام</span>
+    </a>
+  </nav>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDynBPUjrpBHmPc6EGwHyOZmkEiv-pNhR0",
+      authDomain: "finexsa-capital.firebaseapp.com",
+      projectId: "finexsa-capital",
+      storageBucket: "finexsa-capital.firebasestorage.app",
+      messagingSenderId: "225933147484",
+      appId: "1:225933147484:web:b71f87f0705553062ed599",
+      measurementId: "G-8V2H675WN1"
+    };
+
+    const STAFF_API_URL = 'https://script.google.com/macros/s/AKfycbyNz55961uxn0OTfj55vrpxvX6HCMybXOxpkotlLBOr5rmUieyTR_g4cCAvOSc_oUvN/exec';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    function getStorage() {
+      if (localStorage.getItem('finexsa_m_uid')) return localStorage;
+      if (sessionStorage.getItem('finexsa_m_uid')) return sessionStorage;
+      return null;
+    }
+    const storage = getStorage();
+    if (!storage) window.location.replace('login.html');
+
+    function safeParseArray(raw) {
+      try { const p = JSON.parse(raw || '[]'); return Array.isArray(p) ? p : []; }
+      catch { return []; }
+    }
+
+    const me = {
+      uid: storage.getItem('finexsa_m_uid'),
+      email: storage.getItem('finexsa_m_email') || '',
+      name: storage.getItem('finexsa_m_name') || 'موظف',
+      role: storage.getItem('finexsa_m_role') || 'accountant',
+      allowedBoxes: safeParseArray(storage.getItem('finexsa_m_allowed'))
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        localStorage.clear(); sessionStorage.clear();
+        window.location.replace('login.html');
+      }
+    });
+
+    function toast(msg, type = 'info', duration = 2500) {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      const icons = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+        info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'
+      };
+      el.innerHTML = `<div class="toast-icon">${icons[type]||icons.info}</div><span>${msg}</span>`;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => {
+        el.classList.add('is-leaving');
+        setTimeout(() => el.remove(), 200);
+      }, duration);
+    }
+
+    // ═══════ State ═══════
+    const state = {
+      lists: {},
+      currentDir: '',
+      conversionMode: 'direct',
+      drafts: []
+    };
+
+    // ═══════ تحميل القوائم (نفس API سطح المكتب) ═══════
+    async function loadLists() {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        const res = await fetch(`${STAFF_API_URL}?action=getLists&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || 'تعذّر جلب القوائم');
+
+        state.lists = data.lists || {};
+        populateBoxes(data.lists['الصناديق'] || []);
+        populateCurrencies(data.lists['العملات'] || []);
+
+        document.getElementById('appLoader').classList.add('is-hidden');
+        setTimeout(() => document.getElementById('appLoader').remove(), 400);
+      } catch (err) {
+        console.error(err);
+        toast('فشل تحميل القوائم: ' + err.message, 'error', 5000);
+      }
+    }
+
+    function populateBoxes(allBoxes) {
+      const isAll = me.role === 'admin' || me.allowedBoxes.includes('all');
+      const boxes = isAll ? allBoxes : allBoxes.filter(b => me.allowedBoxes.includes(b));
+      const sel = document.getElementById('boxSelect');
+      sel.innerHTML = '<option value="">— اختر الصندوق —</option>';
+      boxes.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b; opt.textContent = b;
+        sel.appendChild(opt);
+      });
+    }
+
+    function populateCurrencies(currs) {
+      const fallback = ['دولار', 'ليرة تركية', 'ليرة سورية', 'يورو'];
+      const list = currs.length > 0 ? currs : fallback;
+      ['currencyA', 'currencyB'].forEach(id => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '';
+        list.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c; opt.textContent = c;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    // ═══════ كشف عملة الصندوق (نفس سطح المكتب) ═══════
+    function detectBoxCurrency(boxName) {
+      const n = (boxName || '').toLowerCase();
+      if (n.includes('دولار') || n.includes('usd') || n.includes('$')) return 'دولار';
+      if (n.includes('ليرة تركي') || n.includes('try') || n.includes('tl')) return 'ليرة تركية';
+      if (n.includes('ليرة سوري') || n.includes('syp')) return 'ليرة سورية';
+      if (n.includes('يورو') || n.includes('eur')) return 'يورو';
+      return null;
+    }
+
+    // ═══════ تغيير الصندوق ═══════
+    document.getElementById('boxSelect').addEventListener('change', (e) => {
+      const c = detectBoxCurrency(e.target.value);
+      if (c) {
+        document.getElementById('currencyA').value = c;
+        // إذا الحساب المقابل لم يحدّد عملة بعد، نأخذ نفس عملة الصندوق
+        const currB = document.getElementById('currencyB');
+        if (!currB.value || currB.value === currB.options[0].value) {
+          currB.value = c;
+        }
+      }
+      updateConversionVisibility();
+      updateRateHint();
+    });
+
+    // ═══════ نوع الحركة ═══════
+    document.querySelectorAll('.dir-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        state.currentDir = btn.dataset.dir;
+        updateNote();
+      });
+    });
+
+    // ═══════ ملء البيان تلقائياً (نفس سطح المكتب) ═══════
+    function updateNote() {
+      const dir = state.currentDir;
+      const cp = document.getElementById('accCP').value.trim();
+      const note = document.getElementById('note');
+      if (dir && cp && (!note.value || note.dataset.auto === '1')) {
+        note.value = `${dir} من ${cp}`;
+        note.dataset.auto = '1';
+      }
+    }
+    document.getElementById('note').addEventListener('input', (e) => {
+      e.target.dataset.auto = '0';
+    });
+
+    // ═══════ Autocomplete الحساب المقابل (نفس سطح المكتب) ═══════
+    const accInput = document.getElementById('accCP');
+    const suggBox = document.getElementById('suggestions');
+    let highlightIdx = -1;
+
+    function getAllCounterparts() {
+      const lists = state.lists;
+      const merged = [];
+      ['الزبائن', 'الموردين', 'جاري الشركاء', 'الموظفين', 'المصاريف', 'حسابات المواد', 'الاستحقاق'].forEach(group => {
+        (lists[group] || []).forEach(name => merged.push({ name, group }));
+      });
+      // الصناديق الأخرى (تحويل بين صناديق)
+      (lists['الصناديق'] || []).forEach(b => merged.push({ name: b, group: 'صندوق' }));
+      return merged;
+    }
+
+    accInput.addEventListener('input', () => {
+      const q = accInput.value.trim();
+      if (!q) { suggBox.classList.remove('is-open'); return; }
+
+      const all = getAllCounterparts();
+      const filtered = all.filter(item =>
+        item.name.toLowerCase().includes(q.toLowerCase())
+      ).slice(0, 8);
+
+      if (filtered.length === 0) {
+        suggBox.classList.remove('is-open');
+        return;
+      }
+
+      suggBox.innerHTML = filtered.map((item, i) => `
+        <div class="search-suggestion" data-name="${escapeHTML(item.name)}" data-idx="${i}">
+          <div>${escapeHTML(item.name)}</div>
+          <div class="search-suggestion-meta">${item.group}</div>
+        </div>
+      `).join('');
+      suggBox.classList.add('is-open');
+      highlightIdx = -1;
+
+      // تحديث البيان أثناء الكتابة
+      updateNote();
+      // كشف عملة من اسم الحساب المقابل (لو فيه إشارة عملة)
+      tryDetectCounterpartCurrency(q);
+    });
+
+    suggBox.addEventListener('click', (e) => {
+      const item = e.target.closest('.search-suggestion');
+      if (!item) return;
+      accInput.value = item.dataset.name;
+      suggBox.classList.remove('is-open');
+      updateNote();
+      tryDetectCounterpartCurrency(item.dataset.name);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!suggBox.contains(e.target) && e.target !== accInput) {
+        suggBox.classList.remove('is-open');
+      }
+    });
+
+    accInput.addEventListener('keydown', (e) => {
+      if (!suggBox.classList.contains('is-open')) return;
+      const items = suggBox.querySelectorAll('.search-suggestion');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        highlightIdx = Math.min(highlightIdx + 1, items.length - 1);
+        updateHighlight(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        highlightIdx = Math.max(highlightIdx - 1, 0);
+        updateHighlight(items);
+      } else if (e.key === 'Enter' && highlightIdx >= 0) {
+        e.preventDefault();
+        items[highlightIdx].click();
+      } else if (e.key === 'Escape') {
+        suggBox.classList.remove('is-open');
+      }
+    });
+
+    function updateHighlight(items) {
+      items.forEach((it, i) => it.classList.toggle('is-highlighted', i === highlightIdx));
+    }
+
+    /**
+     * إذا الحساب المقابل صندوق آخر فيه إشارة عملة، نحدّث currencyB
+     */
+    function tryDetectCounterpartCurrency(name) {
+      const c = detectBoxCurrency(name);
+      if (c) {
+        document.getElementById('currencyB').value = c;
+        updateConversionVisibility();
+        updateRateHint();
+      }
+    }
+
+    // ═══════ منطق العملة الأقوى (نفس سطح المكتب) ═══════
+    function strongerCurrency(c1, c2) {
+      const rank = (c) => {
+        const s = (c || '').toLowerCase();
+        if (s.includes('يورو') || s.includes('eur')) return 4;
+        if (s.includes('دولار') || s.includes('usd') || s.includes('$')) return 3;
+        if (s.includes('ليرة تركي') || s.includes('try') || s.includes('tl')) return 2;
+        if (s.includes('ليرة سوري') || s.includes('syp')) return 1;
+        return 0;
+      };
+      return rank(c1) >= rank(c2) ? c1 : c2;
+    }
+
+    function computeFromRate(sourceAmount, sourceCurr, destCurr, rate) {
+      if (sourceCurr === destCurr) return sourceAmount;
+      const stronger = strongerCurrency(sourceCurr, destCurr);
+      if (stronger === sourceCurr) return sourceAmount * rate;
+      return sourceAmount / rate;
+    }
+
+    // ═══════ بطاقة التحويل ═══════
+    function updateConversionVisibility() {
+      const currA = document.getElementById('currencyA').value;
+      const currB = document.getElementById('currencyB').value;
+      const card = document.getElementById('conversionCard');
+      // تظهر فقط إذا العملتان مختلفتان
+      if (currA && currB && currA !== currB) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    }
+
+    // ═══════ سعر الصرف الضمني / المتوقع (نفس سطح المكتب) ═══════
+    function updateRateHint() {
+      const hint = document.getElementById('rateHint');
+      const amountA = parseFloat(document.getElementById('amountA').value) || 0;
+      const amountB = parseFloat(document.getElementById('amountB').value) || 0;
+      const currA = document.getElementById('currencyA').value;
+      const currB = document.getElementById('currencyB').value;
+
+      if (state.conversionMode === 'rate' && amountA > 0 && currA && currB) {
+        if (currA === currB) {
+          hint.classList.add('show');
+          hint.style.color = 'var(--text-dim)';
+          hint.textContent = 'العملتان متطابقتان، لا حاجة لسعر صرف';
+        } else if (amountB > 0) {
+          const result = computeFromRate(amountA, currA, currB, amountB);
+          hint.classList.add('show');
+          hint.style.color = 'var(--gold)';
+          hint.textContent = `سيُحفظ المقابل: ${formatNumber(result)} ${currB}`;
+        } else {
+          hint.classList.add('show');
+          hint.style.color = 'var(--text-dim)';
+          hint.textContent = 'أدخل سعر الصرف (مثلاً 44.5 للدولار/الليرة)';
+        }
+      } else if (state.conversionMode === 'direct' && currA && currB && currA !== currB && amountA > 0 && amountB > 0) {
+        hint.classList.add('show');
+        hint.style.color = 'var(--text-dim)';
+        const stronger = strongerCurrency(currA, currB);
+        let rate;
+        if (stronger === currA) rate = (amountB / amountA);
+        else rate = (amountA / amountB);
+        hint.textContent = `سعر الصرف الضمني: ${formatNumber(rate, 4)} (${stronger === currA ? currA + '/' + currB : currB + '/' + currA})`;
+      } else {
+        hint.classList.remove('show');
+      }
+    }
+
+    // ═══════ أحداث التحديث ═══════
+    document.getElementById('amountA').addEventListener('input', updateRateHint);
+    document.getElementById('amountB').addEventListener('input', updateRateHint);
+    document.getElementById('currencyA').addEventListener('change', () => { updateConversionVisibility(); updateRateHint(); });
+    document.getElementById('currencyB').addEventListener('change', () => { updateConversionVisibility(); updateRateHint(); });
+
+    // ═══════ تبديل وضع التحويل ═══════
+    document.querySelectorAll('#conversionToggle button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#conversionToggle button').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        state.conversionMode = btn.dataset.mode;
+        updateRateHint();
+      });
+    });
+
+    // ═══════ تاريخ افتراضي = اليوم ═══════
+    function setTodayDate() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      document.getElementById('dateInput').value = `${y}-${m}-${day}`;
+    }
+    setTodayDate();
+
+    // ═══════ التحقق ═══════
+    function validateForm() {
+      const box = document.getElementById('boxSelect').value;
+      const dir = state.currentDir;
+      const amountA = parseFloat(document.getElementById('amountA').value);
+      const accCP = document.getElementById('accCP').value.trim();
+      const amountB = parseFloat(document.getElementById('amountB').value);
+      const note = document.getElementById('note').value.trim();
+      const date = document.getElementById('dateInput').value;
+
+      if (!box) return 'اختر الصندوق';
+      if (!dir) return 'اختر نوع الحركة (قبض أو دفع)';
+      if (!amountA || amountA <= 0) return 'أدخل المبلغ';
+      if (!accCP) return 'اختر الحساب المقابل';
+      if (!amountB || amountB <= 0) return 'أدخل المبلغ المقابل';
+      if (!note) return 'البيان مطلوب';
+      if (!date) return 'التاريخ مطلوب';
+      return null;
+    }
+
+    // ═══════ إضافة Draft ═══════
+    document.getElementById('btnAddDraft').addEventListener('click', () => {
+      const error = validateForm();
+      if (error) { toast(error, 'error'); return; }
+
+      const draft = {
+        id: 'd_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        box: document.getElementById('boxSelect').value,
+        dir: state.currentDir,
+        valA: parseFloat(document.getElementById('amountA').value),
+        currA: document.getElementById('currencyA').value,
+        accCP: document.getElementById('accCP').value.trim(),
+        valB: parseFloat(document.getElementById('amountB').value),
+        currB: document.getElementById('currencyB').value,
+        note: document.getElementById('note').value.trim(),
+        date: document.getElementById('dateInput').value,
+        currentUser: me.email,
+        conversionMode: state.conversionMode
+      };
+
+      state.drafts.push(draft);
+      renderDrafts();
+      clearForm(true);
+      toast(`أُضيفت الحركة (${state.drafts.length} في القائمة)`, 'success', 1800);
+    });
+
+    function clearForm(keepBox = true) {
+      document.getElementById('amountA').value = '';
+      document.getElementById('amountB').value = '';
+      document.getElementById('accCP').value = '';
+      const note = document.getElementById('note');
+      note.value = '';
+      note.dataset.auto = '0';
+      document.getElementById('rateHint').classList.remove('show');
+      document.getElementById('amountA').focus();
+    }
+
+    function removeDraft(id) {
+      const idx = state.drafts.findIndex(d => d.id === id);
+      if (idx === -1) return;
+      const node = document.querySelector(`[data-draft-id="${id}"]`);
+      if (node) {
+        node.classList.add('is-removing');
+        setTimeout(() => {
+          state.drafts.splice(idx, 1);
+          renderDrafts();
+        }, 200);
+      } else {
+        state.drafts.splice(idx, 1);
+        renderDrafts();
+      }
+    }
+
+    function renderDrafts() {
+      const section = document.getElementById('draftsSection');
+      const list = document.getElementById('draftsList');
+      const count = document.getElementById('draftsCount');
+      const saveBar = document.getElementById('saveBar');
+
+      if (state.drafts.length === 0) {
+        section.style.display = 'none';
+        saveBar.classList.remove('is-visible');
+        return;
+      }
+
+      section.style.display = 'block';
+      saveBar.classList.add('is-visible');
+      count.textContent = state.drafts.length;
+      document.getElementById('saveBtnText').textContent = `حفظ ${state.drafts.length} حركة`;
+
+      list.innerHTML = '';
+      state.drafts.forEach(d => {
+        const node = document.createElement('div');
+        node.className = 'draft-card';
+        node.dataset.draftId = d.id;
+        node.innerHTML = `
+          <div class="draft-row1">
+            <span class="draft-dir-badge ${d.dir === 'قبض' ? 'rec' : 'pay'}">${d.dir}</span>
+            <span class="draft-amount">${formatNumber(d.valA)}<span class="draft-amount-curr">${d.currA}</span></span>
+          </div>
+          <div class="draft-row2"><strong>${escapeHTML(d.box)}</strong> ↔ ${escapeHTML(d.accCP)}</div>
+          <div class="draft-row2" style="font-size:11.5px; color:var(--text-dim);">${escapeHTML(d.note)}</div>
+          <div class="draft-meta">
+            <span>${formatDate(d.date)}</span>
+            <button class="draft-delete" data-del-id="${d.id}" aria-label="حذف">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            </button>
+          </div>
+        `;
+        list.appendChild(node);
+      });
+
+      list.querySelectorAll('.draft-delete').forEach(btn => {
+        btn.addEventListener('click', () => removeDraft(btn.dataset.delId));
+      });
+    }
+
+    // ═══════ حفظ الكل (نفس بنية سطح المكتب) ═══════
+    document.getElementById('btnSaveAll').addEventListener('click', async () => {
+      if (state.drafts.length === 0) return;
+
+      const btn = document.getElementById('btnSaveAll');
+      btn.classList.add('is-saving');
+      btn.disabled = true;
+      const originalText = document.getElementById('saveBtnText').textContent;
+      document.getElementById('saveBtnText').textContent = 'جاري الحفظ…';
+
+      try {
+        const user = auth.currentUser;
+        if (!user) throw new Error('انتهت الجلسة');
+        const token = await user.getIdToken();
+
+        // إذا وضع سعر الصرف، نحوّل valB من سعر صرف إلى مبلغ مقابل
+        const drafts = state.drafts.map(d => {
+          if (d.conversionMode === 'rate' && d.currA !== d.currB) {
+            return { ...d, valB: computeFromRate(d.valA, d.currA, d.currB, d.valB) };
+          }
+          const { conversionMode, ...rest } = d;
+          return rest;
+        });
+
+        const res = await fetch(`${STAFF_API_URL}?action=saveBatch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ token: token, drafts: drafts })
+        });
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.message || 'فشل الحفظ');
+
+        toast(`✓ حُفظت ${data.saved || state.drafts.length} حركة`, 'success', 3500);
+        state.drafts = [];
+        renderDrafts();
+
+      } catch (err) {
+        console.error(err);
+        toast('فشل الحفظ: ' + err.message, 'error', 4000);
+      } finally {
+        btn.classList.remove('is-saving');
+        btn.disabled = false;
+        document.getElementById('saveBtnText').textContent = originalText;
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => { if (user) loadLists(); });
+
+    // ═══════ Helpers ═══════
+    function formatNumber(n, decimals = 2) {
+      return new Intl.NumberFormat('en-US', {
+        maximumFractionDigits: decimals,
+        minimumFractionDigits: 0
+      }).format(Number(n) || 0);
+    }
+    function formatDate(s) {
+      if (!s) return '';
+      const parts = String(s).split('-');
+      if (parts.length !== 3) return s;
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    function escapeHTML(s) {
+      return String(s || '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c])
+      );
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
