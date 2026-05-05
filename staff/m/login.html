@@ -542,7 +542,7 @@
     onAuthStateChanged(auth, async (user) => {
       if (user && sessionStorage.getItem('finexsa_staff_uid')) {
         // مسجّل دخول بالفعل وعنده جلسة نشطة
-        window.location.replace('dashboard.html');
+        window.location.replace('index.html');
       }
     });
 
@@ -690,7 +690,7 @@
         // 5) رسالة نجاح ثم التحويل
         showAlert('تم الدخول بنجاح. جاري التحويل…', 'success');
         setTimeout(() => {
-          window.location.replace('dashboard.html');
+          window.location.replace('index.html');
         }, 600);
 
       } catch (err) {
