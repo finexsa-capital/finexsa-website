@@ -359,7 +359,7 @@
 
   </main>
 
-  <nav class="tabbar">
+  <nav class="tabbar tabbar-3">
     <a href="index.html" class="tab">
       <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
       <span>الرئيسية</span>
@@ -371,10 +371,6 @@
     <a href="report.html" class="tab is-active">
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       <span>كشف</span>
-    </a>
-    <a href="tasks.html" class="tab">
-      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span>المهام</span>
     </a>
   </nav>
 
@@ -459,6 +455,34 @@
       try {
         const user = auth.currentUser;
         if (!user) return;
+
+        // ★ NEW v1.2.0 — محاولة استخدام كاش القوائم نفسه (مشترك مع cash.html)
+        try {
+          const raw = sessionStorage.getItem('m_cash_lists');
+          if (raw) {
+            const obj = JSON.parse(raw);
+            if (Date.now() - obj.savedAt < 5 * 60 * 1000) {
+              const allBoxes = (obj.lists && obj.lists['الصناديق']) || [];
+              const isAll = me.role === 'admin' || me.allowedBoxes.includes('all');
+              state.boxes = isAll ? allBoxes : allBoxes.filter(b => me.allowedBoxes.includes(b));
+
+              const select = document.getElementById('boxSelect');
+              select.innerHTML = '<option value="">— اختر الصندوق —</option>';
+              state.boxes.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b; opt.textContent = b;
+                select.appendChild(opt);
+              });
+              const loader = document.getElementById('appLoader');
+              if (loader) {
+                loader.classList.add('is-hidden');
+                setTimeout(() => loader.remove(), 400);
+              }
+              return;
+            }
+          }
+        } catch (e) {}
+
         const token = await user.getIdToken();
 
         // استخدام getLists نفس سطح المكتب
@@ -469,6 +493,14 @@
         const allBoxes = (data.lists && data.lists['الصناديق']) || [];
         const isAll = me.role === 'admin' || me.allowedBoxes.includes('all');
         state.boxes = isAll ? allBoxes : allBoxes.filter(b => me.allowedBoxes.includes(b));
+
+        // ★ NEW — حفظ في الكاش المشترك
+        try {
+          sessionStorage.setItem('m_cash_lists', JSON.stringify({
+            savedAt: Date.now(),
+            lists: data.lists || {}
+          }));
+        } catch (e) {}
 
         const select = document.getElementById('boxSelect');
         select.innerHTML = '<option value="">— اختر الصندوق —</option>';
@@ -489,10 +521,35 @@
     onAuthStateChanged(auth, (user) => { if (user) loadBoxes(); });
 
     // ═══ تحميل الكشف — نفس API سطح المكتب ═══
-    document.getElementById('btnLoad').addEventListener('click', loadReport);
-    document.getElementById('refreshBtn').addEventListener('click', loadReport);
+    document.getElementById('btnLoad').addEventListener('click', () => loadReport(false));
+    document.getElementById('refreshBtn').addEventListener('click', () => loadReport(true));
 
-    async function loadReport() {
+    // ★ NEW v1.2.0 — كاش التقارير في sessionStorage
+    const REPORT_CACHE_TTL_MS = 60 * 1000;
+
+    function getCachedReport(box) {
+      try {
+        const raw = sessionStorage.getItem('m_report_' + box);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (Date.now() - obj.savedAt > REPORT_CACHE_TTL_MS) {
+          sessionStorage.removeItem('m_report_' + box);
+          return null;
+        }
+        return obj;
+      } catch (e) { return null; }
+    }
+
+    function setCachedReport(box, data) {
+      try {
+        sessionStorage.setItem('m_report_' + box, JSON.stringify({
+          savedAt: Date.now(),
+          data: data
+        }));
+      } catch (e) {}
+    }
+
+    async function loadReport(forceRefresh) {
       const box = document.getElementById('boxSelect').value;
       if (!box) { toast('اختر الصندوق أولاً', 'error'); return; }
 
@@ -510,21 +567,36 @@
       document.getElementById('txnCount').style.display = 'none';
 
       try {
-        const user = auth.currentUser;
-        const token = await user.getIdToken();
+        // ★ NEW — محاولة الكاش
+        let data = null;
+        let fromCache = false;
+        if (!forceRefresh) {
+          const cached = getCachedReport(box);
+          if (cached) {
+            data = cached.data;
+            fromCache = true;
+          }
+        }
 
-        // ✅ نفس URL سطح المكتب — بدون from/to
-        const url = `${STAFF_API_URL}?action=getReport&token=${encodeURIComponent(token)}&box=${encodeURIComponent(box)}`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        if (!data.ok) throw new Error(data.message || 'فشل التحميل');
+        if (!data) {
+          const user = auth.currentUser;
+          const token = await user.getIdToken();
+          const url = `${STAFF_API_URL}?action=getReport&token=${encodeURIComponent(token)}&box=${encodeURIComponent(box)}`;
+          const res = await fetch(url);
+          data = await res.json();
+          if (!data.ok) throw new Error(data.message || 'فشل التحميل');
+          // ★ NEW — حفظ في الكاش
+          setCachedReport(box, data);
+        }
 
         // ✅ نفس بنية البيانات: data.data و data.currency و data.boxName
         state.currentBox = data.boxName || box;
         state.currentCurrency = data.currency || '';
         state.rawData = data.data || [];
         state.summary = data.summary || null;
+
+        // ★ NEW — توست لطيف لو من الكاش
+        if (fromCache) toast('📦 من الكاش — اضغط 🔄 للتحديث', 'info', 2500);
 
         // اكتشاف الفترة تلقائياً من البيانات
         if (state.rawData.length > 0) {

@@ -3,7 +3,7 @@
  * Network First مع Cache Fallback
  */
 
-const CACHE_VERSION = 'finexsa-m-v1';
+const CACHE_VERSION = 'finexsa-m-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -12,7 +12,6 @@ const CORE_FILES = [
   './index.html',
   './cash.html',
   './report.html',
-  './tasks.html',
   './receipt.html',
   './m.css',
   './manifest.json',

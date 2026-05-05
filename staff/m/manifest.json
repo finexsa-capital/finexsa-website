@@ -48,12 +48,6 @@
       "short_name": "كشف",
       "url": "./report.html",
       "icons": [{ "src": "../icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "المهام",
-      "short_name": "مهام",
-      "url": "./tasks.html",
-      "icons": [{ "src": "../icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

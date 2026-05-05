@@ -147,6 +147,11 @@ button { font-family: inherit; }
   z-index: 100;
 }
 
+/* ★ NEW v1.2.0 — شريط بـ 3 تبويبات */
+.tabbar.tabbar-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .tab {
   display: flex;
   flex-direction: column;

@@ -384,7 +384,7 @@
     </button>
   </div>
 
-  <nav class="tabbar">
+  <nav class="tabbar tabbar-3">
     <a href="index.html" class="tab">
       <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
       <span>الرئيسية</span>
@@ -396,10 +396,6 @@
     <a href="report.html" class="tab">
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       <span>كشف</span>
-    </a>
-    <a href="tasks.html" class="tab">
-      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span>المهام</span>
     </a>
   </nav>
 
@@ -477,22 +473,74 @@
       drafts: []
     };
 
+    // ★ NEW v1.2.0 — كاش القوائم في sessionStorage
+    const LISTS_CACHE_KEY = 'm_cash_lists';
+    const LISTS_CACHE_TTL_MS = 5 * 60 * 1000;
+
+    function getCachedLists() {
+      try {
+        const raw = sessionStorage.getItem(LISTS_CACHE_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (Date.now() - obj.savedAt > LISTS_CACHE_TTL_MS) {
+          sessionStorage.removeItem(LISTS_CACHE_KEY);
+          return null;
+        }
+        return obj.lists;
+      } catch (e) { return null; }
+    }
+
+    function setCachedLists(lists) {
+      try {
+        sessionStorage.setItem(LISTS_CACHE_KEY, JSON.stringify({
+          savedAt: Date.now(),
+          lists: lists
+        }));
+      } catch (e) {}
+    }
+
+    function clearCachedLists() {
+      try { sessionStorage.removeItem(LISTS_CACHE_KEY); } catch (e) {}
+    }
+
     // ═══════ تحميل القوائم (نفس API سطح المكتب) ═══════
-    async function loadLists() {
+    async function loadLists(forceRefresh) {
       try {
         const user = auth.currentUser;
         if (!user) return;
+
+        // ★ NEW — محاولة الكاش
+        if (!forceRefresh) {
+          const cached = getCachedLists();
+          if (cached) {
+            state.lists = cached;
+            populateBoxes(cached['الصناديق'] || []);
+            populateCurrencies(cached['العملات'] || []);
+            const loader = document.getElementById('appLoader');
+            if (loader) {
+              loader.classList.add('is-hidden');
+              setTimeout(() => loader.remove(), 400);
+            }
+            return;
+          }
+        }
+
         const token = await user.getIdToken();
         const res = await fetch(`${STAFF_API_URL}?action=getLists&token=${encodeURIComponent(token)}`);
         const data = await res.json();
         if (!data.ok) throw new Error(data.message || 'تعذّر جلب القوائم');
 
         state.lists = data.lists || {};
+        // ★ NEW — حفظ في الكاش
+        setCachedLists(state.lists);
         populateBoxes(data.lists['الصناديق'] || []);
         populateCurrencies(data.lists['العملات'] || []);
 
-        document.getElementById('appLoader').classList.add('is-hidden');
-        setTimeout(() => document.getElementById('appLoader').remove(), 400);
+        const loader = document.getElementById('appLoader');
+        if (loader) {
+          loader.classList.add('is-hidden');
+          setTimeout(() => loader.remove(), 400);
+        }
       } catch (err) {
         console.error(err);
         toast('فشل تحميل القوائم: ' + err.message, 'error', 5000);
@@ -917,6 +965,14 @@
         toast(`✓ حُفظت ${data.saved || state.drafts.length} حركة`, 'success', 3500);
         state.drafts = [];
         renderDrafts();
+
+        // ★ NEW v1.2.0 — مسح كاش التقارير
+        try {
+          for (let i = sessionStorage.length - 1; i >= 0; i--) {
+            const key = sessionStorage.key(i);
+            if (key && key.startsWith('m_report_')) sessionStorage.removeItem(key);
+          }
+        } catch (e) {}
 
       } catch (err) {
         console.error(err);
