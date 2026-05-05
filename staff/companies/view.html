@@ -545,6 +545,34 @@
       pointer-events: none;
     }
 
+    /* ★ v1.10.0 — إطارات التذكير (تتدرّج مع اقتراب التاريخ) */
+    .task-item.reminder-soon {
+      border-color: #EAB308;
+      box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.25);
+    }
+    .task-item.reminder-soon:hover {
+      border-color: #FACC15;
+      box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.4);
+    }
+    .task-item.reminder-today {
+      border-color: #F97316;
+      box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.35);
+      background: rgba(249, 115, 22, 0.04);
+    }
+    .task-item.reminder-today:hover {
+      border-color: #FB923C;
+      background: rgba(249, 115, 22, 0.07);
+    }
+    .task-item.reminder-late {
+      border-color: #EF4444;
+      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.05);
+    }
+    .task-item.reminder-late:hover {
+      border-color: #F87171;
+      background: rgba(239, 68, 68, 0.08);
+    }
+
     .task-item-num {
       min-width: 26px;
       height: 26px;
@@ -1350,6 +1378,19 @@
           maxlength="300"
           placeholder="تفاصيل إضافية تساعد على إنجاز المهمة بدقة"></textarea>
         <div class="form-counter" id="hintCounter">0 / 300</div>
+      </div>
+
+      <!-- ★ v1.10.0 — تاريخ التذكير (للمهام المؤقتة فقط) -->
+      <div class="form-group" id="reminderDateGroup" style="display:none">
+        <label class="form-label" for="taskReminderInput">
+          📅 تاريخ التذكير (اختياري)
+        </label>
+        <input
+          type="date" id="taskReminderInput" class="form-input"
+          style="direction: ltr; text-align: right; cursor: pointer;">
+        <div class="form-counter" style="color: var(--text-dim); font-size: 11px;">
+          عند وصول التاريخ، سيتغيّر لون البطاقة لتنبيهك.
+        </div>
       </div>
 
       <div class="form-hint" id="adminHint" style="display:none">
@@ -2220,6 +2261,26 @@
       if (isDone) classes.push('is-done');
       if (isPending) classes.push('is-pending');
 
+      // ★ v1.10.0 — حساب حالة التذكير (لون الإطار)
+      // أصفر = يوم قبل، برتقالي = اليوم، أحمر = تأخّر
+      let reminderBadge = '';
+      if (t.reminderDate && !isDone) {
+        const status = computeReminderStatus(t.reminderDate);
+        if (status) {
+          classes.push('reminder-' + status); // reminder-soon | reminder-today | reminder-late
+          const labels = {
+            soon:  { text: '⏰ التذكير غداً',  color: '#EAB308' },
+            today: { text: '🔔 اليوم',         color: '#F97316' },
+            late:  { text: '⚠️ متأخّرة',        color: '#EF4444' }
+          };
+          const cfg = labels[status];
+          reminderBadge = `<span class="reminder-badge" style="display:inline-block; font-size:10.5px; font-weight:800; color:${cfg.color}; background:${cfg.color}1A; padding:2px 8px; border-radius:99px; margin-inline-start:6px;">${cfg.text} · ${formatArabicDate(t.reminderDate)}</span>`;
+        } else {
+          // التذكير في المستقبل البعيد (>1 يوم)
+          reminderBadge = `<span class="reminder-badge" style="display:inline-block; font-size:10.5px; font-weight:600; color: var(--text-muted); background: var(--bg-deep); padding:2px 8px; border-radius:99px; margin-inline-start:6px; border: 1px solid var(--border);">📅 ${formatArabicDate(t.reminderDate)}</span>`;
+        }
+      }
+
       // عمود الترقيم
       const numCol = `<span class="task-item-num">${n}</span>`;
 
@@ -2284,7 +2345,7 @@
         <div class="${classes.join(' ')}" data-temp-id="${escapeHTML(t.id)}">
           ${numCol}
           <div class="task-item-body">
-            <div class="task-item-label">${escapeHTML(t.label || '')}${unsupervisedBadge}</div>
+            <div class="task-item-label">${escapeHTML(t.label || '')}${unsupervisedBadge}${reminderBadge}</div>
             ${hint}
             ${doneMeta}
             ${actionsRow}
@@ -2305,6 +2366,36 @@
       if (!t.doneAt) return false;
       const ageMs = Date.now() - new Date(t.doneAt).getTime();
       return ageMs <= UNMARK_GRACE_HOURS * 3600000;
+    }
+
+    /**
+     * ★ v1.10.0 — يحسب حالة التذكير
+     *   reminderDate: yyyy-mm-dd
+     *   يُرجع: 'soon' (يوم قبل), 'today' (اليوم), 'late' (متأخّر), أو null (مستقبل بعيد)
+     */
+    function computeReminderStatus(reminderDate) {
+      if (!reminderDate) return null;
+      try {
+        // اليوم بصيغة yyyy-mm-dd حسب توقيت إسطنبول (GMT+3)
+        const now = new Date();
+        const istanbulOffset = 3 * 60; // دقائق
+        const localOffset = now.getTimezoneOffset();
+        const istanbulNow = new Date(now.getTime() + (istanbulOffset + localOffset) * 60000);
+
+        const todayStr = istanbulNow.toISOString().substring(0, 10);
+
+        // غداً
+        const tomorrow = new Date(istanbulNow);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().substring(0, 10);
+
+        if (reminderDate < todayStr) return 'late';
+        if (reminderDate === todayStr) return 'today';
+        if (reminderDate === tomorrowStr) return 'soon';
+        return null; // مستقبل بعيد
+      } catch (e) {
+        return null;
+      }
     }
 
     function formatRelativeTime(iso) {
@@ -2725,6 +2816,9 @@
       document.getElementById('labelCounter').textContent = '0 / 200';
       document.getElementById('hintCounter').textContent = '0 / 300';
 
+      // ★ v1.10.0 — إخفاء حقل التذكير (المهام العادية لا تستخدمه)
+      document.getElementById('reminderDateGroup').style.display = 'none';
+
       document.getElementById('adminHint').style.display    = isAdmin ? 'block' : 'none';
       document.getElementById('employeeHint').style.display = isAdmin ? 'none'  : 'block';
       document.getElementById('editToBackPendingHint').style.display = 'none';
@@ -2751,6 +2845,9 @@
       document.getElementById('taskHintInput').value = task.hint || '';
       document.getElementById('labelCounter').textContent = `${(task.label || '').length} / 200`;
       document.getElementById('hintCounter').textContent = `${(task.hint || '').length} / 300`;
+
+      // ★ v1.10.0 — إخفاء حقل التذكير
+      document.getElementById('reminderDateGroup').style.display = 'none';
 
       // أخفِ تلميحات الإضافة
       document.getElementById('adminHint').style.display = 'none';
@@ -3054,6 +3151,9 @@
       document.getElementById('labelCounter').textContent = '0 / 200';
       document.getElementById('hintCounter').textContent = '0 / 300';
       document.getElementById('modalSubmitText').textContent = 'إضافة المهمة المؤقتة';
+      // ★ v1.10.0 — إظهار حقل التذكير
+      document.getElementById('reminderDateGroup').style.display = '';
+      document.getElementById('taskReminderInput').value = '';
       // إخفاء التلميحات الخاصة بالمهام العادية
       document.getElementById('adminHint').style.display = 'none';
       document.getElementById('employeeHint').style.display = 'none';
@@ -3074,6 +3174,9 @@
       document.getElementById('labelCounter').textContent = (t.label || '').length + ' / 200';
       document.getElementById('hintCounter').textContent = (t.hint || '').length + ' / 300';
       document.getElementById('modalSubmitText').textContent = 'حفظ التعديلات';
+      // ★ v1.10.0 — إظهار حقل التذكير + ملء القيمة الحالية
+      document.getElementById('reminderDateGroup').style.display = '';
+      document.getElementById('taskReminderInput').value = t.reminderDate || '';
       document.getElementById('adminHint').style.display = 'none';
       document.getElementById('employeeHint').style.display = 'none';
       document.getElementById('editToBackPendingHint').style.display = 'none';
@@ -3084,6 +3187,8 @@
     async function submitTempTask() {
       const label = document.getElementById('taskLabelInput').value.trim();
       const hint = document.getElementById('taskHintInput').value.trim();
+      // ★ v1.10.0 — تاريخ التذكير
+      const reminderDate = document.getElementById('taskReminderInput').value.trim();
       if (!label) { toast('نص المهمة مطلوب', 'error'); return; }
 
       const btn = document.getElementById('modalSubmitBtn');
@@ -3098,8 +3203,8 @@
         const isEdit = state.modalMode === 'temp-edit';
         const action = isEdit ? 'updateTempTask' : 'addTempTask';
         const data = isEdit
-          ? { companyId: companyId, taskId: state.editingTempId, label: label, hint: hint }
-          : { companyId: companyId, label: label, hint: hint };
+          ? { companyId: companyId, taskId: state.editingTempId, label: label, hint: hint, reminderDate: reminderDate }
+          : { companyId: companyId, label: label, hint: hint, reminderDate: reminderDate };
 
         const res = await fetch(`${COMPANIES_API_URL}?action=${action}`, {
           method: 'POST',
