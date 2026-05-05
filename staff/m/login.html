@@ -525,7 +525,9 @@
 
     // ───────── إذا كان مسجّلاً مسبقاً، حوّل للوحة التحكم ─────────
     onAuthStateChanged(auth, async (user) => {
-      if (user && sessionStorage.getItem('finexsa_staff_uid')) {
+      // ★ FIX — فحص في كلا المخزنين (localStorage و sessionStorage)
+      const hasSession = localStorage.getItem('finexsa_m_uid') || sessionStorage.getItem('finexsa_m_uid');
+      if (user && hasSession) {
         // مسجّل دخول بالفعل وعنده جلسة نشطة
         window.location.replace('index.html');
       }
@@ -665,12 +667,22 @@
           staff[key] = unwrapFsValue(rawStaff[key]);
         }
 
-        sessionStorage.setItem('finexsa_staff_uid', staff.uid || '');
-        sessionStorage.setItem('finexsa_staff_email', staff.email || '');
-        sessionStorage.setItem('finexsa_staff_name', staff.displayName || '');
-        sessionStorage.setItem('finexsa_staff_role', staff.role || 'accountant');
-        sessionStorage.setItem('finexsa_staff_branch', staff.branch || '');
-        sessionStorage.setItem('finexsa_staff_allowed', JSON.stringify(staff.allowedBoxes || []));
+        // ★ FIX — استخدام نفس مفاتيح صفحات الموبايل (finexsa_m_*)
+        // واستخدام localStorage لو "تذكّرني" مفعّل، sessionStorage عدا ذلك
+        const targetStorage = rememberCheckbox.checked ? localStorage : sessionStorage;
+        const otherStorage  = rememberCheckbox.checked ? sessionStorage : localStorage;
+
+        // امسح المفاتيح من المخزن الآخر لتجنّب التضارب
+        ['uid','email','name','role','branch','allowed'].forEach(k => {
+          otherStorage.removeItem('finexsa_m_' + k);
+        });
+
+        targetStorage.setItem('finexsa_m_uid', staff.uid || '');
+        targetStorage.setItem('finexsa_m_email', staff.email || '');
+        targetStorage.setItem('finexsa_m_name', staff.displayName || '');
+        targetStorage.setItem('finexsa_m_role', staff.role || 'accountant');
+        targetStorage.setItem('finexsa_m_branch', staff.branch || '');
+        targetStorage.setItem('finexsa_m_allowed', JSON.stringify(staff.allowedBoxes || []));
 
         // 5) رسالة نجاح ثم التحويل
         showAlert('تم الدخول بنجاح. جاري التحويل…', 'success');
