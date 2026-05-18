@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="robots" content="noindex, nofollow">
+  <title>سجل الإنجازات — FINEXSA Staff</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      -moz-font-feature-settings: "lnum";
+      -webkit-font-feature-settings: "lnum";
+      font-feature-settings: "lnum";
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+
+    :root {
+      --bg-void: #0A0E1A;
+      --bg-deep: #0F1220;
+      --bg-card: #141827;
+      --bg-card-hover: #1A1F32;
+      --navy: #1E2A5A;
+      --navy-light: #2A3A7A;
+      --gold: #C9A227;
+      --gold-bright: #E6BC3F;
+      --gold-muted: rgba(201, 162, 39, 0.15);
+      --text-primary: #EDEEF2;
+      --text-muted: #8B92A8;
+      --text-dim: #5C6378;
+      --border: rgba(201, 162, 39, 0.12);
+      --border-strong: rgba(201, 162, 39, 0.35);
+      --error: #FF6B6B;
+      --success: #4ADE80;
+      --info: #60A5FA;
+      --warning: #F59E0B;
+      --purple: #A78BFA;
+      --sidebar-w: 280px;
+      --header-h: 72px;
+      --font-arabic: 'Tajawal', -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-arabic);
+      background: var(--bg-void);
+      color: var(--text-primary);
+      line-height: 1.6;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: var(--bg-deep);
+      border-left: 1px solid var(--border);
+      padding: 22px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .sidebar-brand-logo {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      display: grid; place-items: center;
+      color: var(--gold);
+    }
+    .sidebar-brand-logo svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .sidebar-brand-text { display: flex; flex-direction: column; }
+    .sidebar-brand-name { font-size: 15px; font-weight: 800; color: var(--gold); letter-spacing: 0.12em; line-height: 1.2; }
+    .sidebar-brand-sub { font-size: 10.5px; color: var(--text-dim); letter-spacing: 0.1em; margin-top: 2px; }
+
+    .sidebar-section-label {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      margin: 16px 8px 8px;
+    }
+
+    .nav-list { list-style: none; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+    }
+    .nav-link svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .nav-link:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+    }
+    .nav-link.is-active {
+      background: var(--gold-muted);
+      color: var(--gold);
+      border: 1px solid var(--border-strong);
+    }
+    .nav-badge {
+      margin-inline-start: auto;
+      background: var(--warning);
+      color: #000;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 1px 7px;
+      border-radius: 99px;
+      min-width: 18px;
+      text-align: center;
+    }
+    .nav-badge.zero {
+      background: var(--bg-card);
+      color: var(--text-dim);
+    }
+
+    .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+    .sidebar-version { font-size: 11px; color: var(--text-dim); text-align: center; }
+
+    /* Main */
+    .main { display: flex; flex-direction: column; min-width: 0; }
+
+    .header {
+      height: var(--header-h);
+      background: rgba(15, 18, 32, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--border-strong);
+      color: var(--gold);
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .header-title { font-size: 17px; font-weight: 800; }
+
+    .header-user {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      gap: 1px;
+    }
+    .header-user-name { font-size: 13px; font-weight: 700; }
+    .header-user-role { font-size: 11px; color: var(--gold); }
+
+    .signout-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      color: var(--error);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .signout-btn:hover { background: rgba(255, 107, 107, 0.08); }
+
+    /* Content */
+    .content { padding: 22px; max-width: 1280px; }
+
+    .page-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 22px;
+    }
+    .page-title {
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      padding: 11px 40px 11px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 0.15s ease;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: var(--bg-deep);
+    }
+    .search-input::placeholder { color: var(--text-dim); }
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+    .search-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .btn {
+      padding: 11px 18px;
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--bg-card-hover); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+      color: var(--bg-void);
+      border-color: var(--gold);
+    }
+    .btn-primary:hover { filter: brightness(1.05); }
+    .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .stat-value.gold { color: var(--gold); }
+    .stat-value.info { color: var(--info); }
+
+    /* Employee groups */
+    .employee-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .employee-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .employee-avatar {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      display: grid; place-items: center;
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .employee-name {
+      font-size: 16px;
+      font-weight: 800;
+      flex: 1;
+    }
+    .employee-count {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: var(--bg-deep);
+      padding: 4px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .company-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .company-block:last-child { margin-bottom: 0; }
+
+    .company-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
+    }
+    .company-icon {
+      width: 24px; height: 24px;
+      background: var(--gold-muted);
+      border-radius: 6px;
+      display: grid; place-items: center;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    .company-icon svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .company-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--gold);
+      flex: 1;
+    }
+    .company-count {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+
+    .entry {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+    }
+    .entry:hover { background: var(--bg-card-hover); }
+    .entry-time {
+      color: var(--text-dim);
+      font-size: 11.5px;
+      font-weight: 600;
+      min-width: 110px;
+      direction: ltr;
+      text-align: right;
+    }
+    .entry-label {
+      flex: 1;
+      color: var(--text-primary);
+    }
+    .entry-category {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .entry-category.daily { background: rgba(96, 165, 250, 0.1); color: #93C5FD; border-color: rgba(96,165,250,0.3); }
+    .entry-category.weekly { background: rgba(167, 139, 250, 0.1); color: #C4B5FD; border-color: rgba(167,139,250,0.3); }
+    .entry-category.monthly { background: rgba(245, 158, 11, 0.1); color: #FCD34D; border-color: rgba(245,158,11,0.3); }
+    .entry-category.custom { background: rgba(74, 222, 128, 0.1); color: #86EFAC; border-color: rgba(74,222,128,0.3); }
+    .entry-category.temp { background: rgba(201, 162, 39, 0.1); color: var(--gold-bright); border-color: rgba(201,162,39,0.3); }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-dim);
+    }
+    .empty-icon {
+      width: 56px; height: 56px;
+      margin: 0 auto 14px;
+      color: var(--gold);
+      opacity: 0.4;
+    }
+    .empty-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+    .empty-title { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+    .empty-msg { font-size: 12.5px; }
+
+    /* Loader */
+    .loader {
+      display: grid;
+      place-items: center;
+      padding: 60px 20px;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 12px 30px -8px rgba(0,0,0,0.6);
+      animation: toastIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: auto;
+      max-width: 400px;
+    }
+    .toast.error { border-color: var(--error); color: var(--error); }
+    .toast.success { border-color: var(--success); color: var(--success); }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: var(--sidebar-w);
+        z-index: 100;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      }
+      .sidebar.is-open { transform: translateX(0); }
+      .header-toggle { display: grid; place-items: center; }
+      .content { padding: 16px; }
+      .entry { flex-wrap: wrap; }
+      .entry-time { min-width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo">
+          <svg viewBox="0 0 24 24"><path d="M12 3v18M5 8h14M3 12l2-4 2 4M3 12c0 1.5 1 3 2 3s2-1.5 2-3M17 12l2-4 2 4M17 12c0 1.5 1 3 2 3s2-1.5 2-3M5 21h14"/></svg>
+        </div>
+        <div class="sidebar-brand-text">
+          <span class="sidebar-brand-name">FINEXSA</span>
+          <span class="sidebar-brand-sub">Activity Log</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section-label">القائمة الرئيسية</div>
+      <ul class="nav-list">
+        <li><a href="dashboard.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+          <span>الرئيسية</span>
+        </a></li>
+        <li><a href="cash.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><circle cx="12" cy="15" r="2"/></svg>
+          <span>الصناديق</span>
+        </a></li>
+        <li><a href="cash-report.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>كشف الحساب</span>
+        </a></li>
+        <li><a href="companies/index.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/><path d="M14 9h1"/><path d="M14 13h1"/><path d="M14 17h1"/></svg>
+          <span>إدارة المهام</span>
+        </a></li>
+      </ul>
+
+      <div class="sidebar-section-label">الإدارة</div>
+      <ul class="nav-list">
+        <li><a href="activity-log.html" class="nav-link is-active">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>سجل الإنجازات</span>
+        </a></li>
+        <li><a href="companies/approvals.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>مركز الموافقات</span>
+        </a></li>
+        <li><a href="companies/reports.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>التقارير الإدارية</span>
+        </a></li>
+        <li><a href="companies/default-tasks.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>المهام الافتراضية</span>
+        </a></li>
+        <li><a href="admin-users.html" class="nav-link">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <span>إدارة الموظفين</span>
+        </a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-version">Activity Log v1.0</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+      <header class="header">
+        <div class="header-left">
+          <button class="header-toggle" id="sidebarToggle" aria-label="فتح القائمة">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <span class="header-title">سجل الإنجازات</span>
+        </div>
+        <div class="header-right">
+          <div class="header-user">
+            <span class="header-user-name" id="userName">…</span>
+            <span class="header-user-role" id="userRole">…</span>
+          </div>
+          <button class="signout-btn" id="signoutBtn">خروج</button>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <div class="page-header">
+          <h1 class="page-title">سجل إنجازات الموظفين</h1>
+          <p class="page-subtitle">آخر ٣٠ يوم — مجمَّعة حسب الموظف ثم الشركة، الأحدث أولاً</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats" id="statsBox" style="display:none">
+          <div class="stat">
+            <div class="stat-label">إجمالي السجلات</div>
+            <div class="stat-value gold" id="statTotal">—</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">موظفون</div>
+            <div class="stat-value" id="statEmployees">—</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">شركات</div>
+            <div class="stat-value info" id="statCompanies">—</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">المعروض</div>
+            <div class="stat-value" id="statVisible">—</div>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-box">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="ابحث باسم موظف أو شركة أو مهمة...">
+            <span class="search-icon">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+          </div>
+          <button class="btn btn-primary" id="exportCsvBtn">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            تنزيل CSV
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div id="logsContainer">
+          <div class="loader"><div class="spinner"></div></div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDynBPUjrpBHmPc6EGwHyOZmkEiv-pNhR0",
+      authDomain: "finexsa-capital.firebaseapp.com",
+      projectId: "finexsa-capital",
+      storageBucket: "finexsa-capital.firebasestorage.app",
+      messagingSenderId: "225933147484",
+      appId: "1:225933147484:web:b71f87f0705553062ed599",
+      measurementId: "G-8V2H675WN1"
+    };
+
+    const COMPANIES_API_URL = 'https://script.google.com/macros/s/AKfycbzCfc35oOsexj1Oy6GffXvffDR56u_V42m9AX2D4apMoVF7MB-c9EU9zWMLzLfmO1M77Q/exec';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ─── الجلسة ───
+    function getSession() {
+      const get = (k) => sessionStorage.getItem(k) || localStorage.getItem(k);
+      const uid = get('finexsa_staff_uid');
+      if (!uid) return null;
+      return {
+        uid: uid,
+        email: get('finexsa_staff_email') || '',
+        name: get('finexsa_staff_name') || '',
+        role: get('finexsa_staff_role') || ''
+      };
+    }
+
+    const me = getSession();
+    if (!me || me.role !== 'admin') {
+      window.location.replace('login.html');
+    }
+
+    document.getElementById('userName').textContent = me.name || me.email;
+    document.getElementById('userRole').textContent = 'مدير النظام';
+
+    // ─── حالة الصفحة ───
+    let allEntries = [];
+
+    // ─── دوال مساعدة ───
+    function escapeHTML(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function getInitials(name) {
+      if (!name) return '?';
+      const parts = String(name).trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2);
+      return (parts[0][0] + parts[1][0]);
+    }
+
+    function formatDateTime(iso) {
+      try {
+        const d = new Date(iso);
+        const pad = (n) => String(n).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        const mm = pad(d.getMonth() + 1);
+        const dd = pad(d.getDate());
+        const hh = pad(d.getHours());
+        const min = pad(d.getMinutes());
+        return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+      } catch (e) {
+        return '—';
+      }
+    }
+
+    function getCategoryClass(cat) {
+      if (!cat) return '';
+      if (cat.indexOf('يومية') >= 0 && cat.indexOf('خاصّة') < 0) return 'daily';
+      if (cat.indexOf('أسبوعية') >= 0 && cat.indexOf('خاصّة') < 0) return 'weekly';
+      if (cat.indexOf('شهرية') >= 0 && cat.indexOf('خاصّة') < 0) return 'monthly';
+      if (cat.indexOf('خاصّة') >= 0) return 'custom';
+      if (cat.indexOf('مؤقتة') >= 0) return 'temp';
+      return '';
+    }
+
+    function toast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = message;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    // ─── جلب السجل ───
+    async function loadActivityLog() {
+      const container = document.getElementById('logsContainer');
+      container.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          window.location.replace('login.html');
+          return;
+        }
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=getActivityLog&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || 'فشل تحميل البيانات');
+
+        allEntries = data.entries || [];
+
+        renderStats();
+        renderEntries(allEntries);
+
+      } catch (err) {
+        container.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="empty-title">تعذّر تحميل السجل</div>
+            <div class="empty-msg">${escapeHTML(err.message)}</div>
+          </div>`;
+        toast('فشل التحميل: ' + err.message, 'error');
+      }
+    }
+
+    function renderStats() {
+      const employees = new Set(allEntries.map(e => e.uid));
+      const companies = new Set(allEntries.map(e => e.companyId));
+
+      document.getElementById('statTotal').textContent = allEntries.length;
+      document.getElementById('statEmployees').textContent = employees.size;
+      document.getElementById('statCompanies').textContent = companies.size;
+      document.getElementById('statVisible').textContent = allEntries.length;
+      document.getElementById('statsBox').style.display = '';
+    }
+
+    function renderEntries(entries) {
+      const container = document.getElementById('logsContainer');
+
+      document.getElementById('statVisible').textContent = entries.length;
+
+      if (entries.length === 0) {
+        container.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="empty-title">لا توجد سجلات</div>
+            <div class="empty-msg">لم يُسجَّل أيّ نشاط في آخر ٣٠ يوم${allEntries.length > 0 ? ' (مطابق للبحث)' : ''}</div>
+          </div>`;
+        return;
+      }
+
+      // تجميع حسب الموظف، ثم الشركة
+      const byEmployee = {};
+      entries.forEach(e => {
+        if (!byEmployee[e.uid]) {
+          byEmployee[e.uid] = {
+            uid: e.uid,
+            name: e.userName,
+            companies: {},
+            total: 0,
+            latestTs: 0
+          };
+        }
+        const emp = byEmployee[e.uid];
+        emp.total += 1;
+        const ts = new Date(e.timestamp).getTime();
+        if (ts > emp.latestTs) emp.latestTs = ts;
+
+        if (!emp.companies[e.companyId]) {
+          emp.companies[e.companyId] = {
+            companyId: e.companyId,
+            companyName: e.companyName,
+            entries: [],
+            latestTs: 0
+          };
+        }
+        const comp = emp.companies[e.companyId];
+        comp.entries.push(e);
+        if (ts > comp.latestTs) comp.latestTs = ts;
+      });
+
+      // ترتيب الموظفين: الأحدث نشاطاً أولاً
+      const employees = Object.values(byEmployee)
+        .sort((a, b) => b.latestTs - a.latestTs);
+
+      let html = '';
+      employees.forEach(emp => {
+        const companies = Object.values(emp.companies)
+          .sort((a, b) => b.latestTs - a.latestTs);
+
+        html += `
+          <div class="employee-block">
+            <div class="employee-head">
+              <div class="employee-avatar">${escapeHTML(getInitials(emp.name))}</div>
+              <div class="employee-name">${escapeHTML(emp.name)}</div>
+              <div class="employee-count">${emp.total} نشاط</div>
+            </div>
+        `;
+
+        companies.forEach(comp => {
+          // ترتيب السجلات داخل الشركة: الأحدث أولاً
+          const sortedEntries = comp.entries
+            .slice()
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+          html += `
+            <div class="company-block">
+              <div class="company-head">
+                <div class="company-icon">
+                  <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg>
+                </div>
+                <div class="company-name">${escapeHTML(comp.companyName)}</div>
+                <div class="company-count">${sortedEntries.length}</div>
+              </div>
+          `;
+
+          sortedEntries.forEach(e => {
+            const catClass = getCategoryClass(e.category);
+            html += `
+              <div class="entry">
+                <span class="entry-time">${formatDateTime(e.timestamp)}</span>
+                <span class="entry-label">${escapeHTML(e.label || '(بدون عنوان)')}</span>
+                <span class="entry-category ${catClass}">${escapeHTML(e.category)}</span>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        });
+
+        html += `</div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // ─── البحث ───
+    function filterEntries(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) return allEntries;
+
+      return allEntries.filter(e => {
+        return (e.userName || '').toLowerCase().indexOf(q) >= 0
+          || (e.companyName || '').toLowerCase().indexOf(q) >= 0
+          || (e.label || '').toLowerCase().indexOf(q) >= 0
+          || (e.category || '').toLowerCase().indexOf(q) >= 0;
+      });
+    }
+
+    let searchTimer = null;
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        const filtered = filterEntries(e.target.value);
+        renderEntries(filtered);
+      }, 200);
+    });
+
+    // ─── تنزيل CSV ───
+    function exportCsv() {
+      const query = document.getElementById('searchInput').value;
+      const entries = filterEntries(query);
+
+      if (entries.length === 0) {
+        toast('لا توجد بيانات للتصدير', 'error');
+        return;
+      }
+
+      // BOM لدعم العربية في Excel
+      const BOM = '\uFEFF';
+      const header = ['التاريخ والوقت', 'الموظف', 'الشركة', 'نوع المهمة', 'نص المهمة'];
+      const rows = entries.map(e => [
+        formatDateTime(e.timestamp),
+        e.userName || '',
+        e.companyName || '',
+        e.category || '',
+        e.label || ''
+      ]);
+
+      const csvLines = [header].concat(rows).map(row =>
+        row.map(cell => {
+          const s = String(cell).replace(/"/g, '""');
+          return '"' + s + '"';
+        }).join(',')
+      );
+      const csv = BOM + csvLines.join('\r\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const today = new Date().toISOString().substring(0, 10);
+      link.href = url;
+      link.download = `finexsa_activity_log_${today}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast(`✓ تم تصدير ${entries.length} سجل`, 'success');
+    }
+
+    document.getElementById('exportCsvBtn').addEventListener('click', exportCsv);
+
+    // ─── Sidebar toggle (موبايل) ───
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('is-open');
+    });
+
+    // ─── خروج ───
+    document.getElementById('signoutBtn').addEventListener('click', async () => {
+      try { await signOut(auth); } catch (e) {}
+      ['finexsa_staff_uid','finexsa_staff_email','finexsa_staff_name','finexsa_staff_role','finexsa_staff_branch','finexsa_staff_allowed'].forEach(k => {
+        sessionStorage.removeItem(k);
+        localStorage.removeItem(k);
+      });
+      window.location.replace('login.html');
+    });
+
+    // ─── انتظار المصادقة ───
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.replace('login.html');
+        return;
+      }
+      loadActivityLog();
+    });
+
+  </script>
+
+</body>
+</html>
