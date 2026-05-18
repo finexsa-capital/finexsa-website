@@ -964,6 +964,20 @@
               </div>
             </a>
 
+            <!-- ★ v1.11.0 — سجل الإنجازات (للأدمن فقط) -->
+            <a href="activity-log.html" class="quick-card" id="activityLogCard" style="display:none">
+              <div class="quick-card-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="quick-card-text">
+                <div class="quick-card-title">سجل الإنجازات</div>
+                <div class="quick-card-desc">متابعة إنجازات الموظفين اليومية</div>
+              </div>
+              <div class="quick-card-arrow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </div>
+            </a>
+
           </div>
         </section>
 
@@ -1070,6 +1084,9 @@
     if (staffData.role === 'admin') {
       document.getElementById('adminSectionLabel').style.display = 'block';
       document.getElementById('adminNavList').style.display = 'flex';
+      // ★ v1.11.0 — إظهار بطاقة سجل الإنجازات
+      const activityCard = document.getElementById('activityLogCard');
+      if (activityCard) activityCard.style.display = '';
       refreshPendingBadge();
     }
 
