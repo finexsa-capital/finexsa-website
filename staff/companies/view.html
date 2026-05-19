@@ -545,6 +545,80 @@
       pointer-events: none;
     }
 
+    /* ★ v1.14.0 — إطار أصفر للمهمة قيد التنفيذ */
+    .task-item.is-inprogress {
+      border-color: #EAB308;
+      background: rgba(234, 179, 8, 0.05);
+      box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.25);
+    }
+    .task-item.is-inprogress:hover {
+      border-color: #FACC15;
+      background: rgba(234, 179, 8, 0.08);
+    }
+
+    /* ★ v1.14.0 — زرّ قيد التنفيذ */
+    .inprogress-btn {
+      background: transparent;
+      border: 1px solid rgba(234, 179, 8, 0.4);
+      color: #EAB308;
+      padding: 4px 10px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .inprogress-btn:hover {
+      background: rgba(234, 179, 8, 0.12);
+      border-color: #FACC15;
+      color: #FACC15;
+    }
+    .inprogress-btn.is-active {
+      background: rgba(234, 179, 8, 0.18);
+      border-color: #EAB308;
+      color: #FACC15;
+    }
+    .inprogress-btn svg {
+      width: 11px;
+      height: 11px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    /* ★ v1.14.0 — شريط معلومات قيد التنفيذ (مثل task-done-meta) */
+    .task-inprogress-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      padding: 5px 9px;
+      background: rgba(234, 179, 8, 0.08);
+      border: 1px solid rgba(234, 179, 8, 0.25);
+      border-radius: 6px;
+      font-size: 11.5px;
+      color: #EAB308;
+      flex-wrap: wrap;
+    }
+    .task-inprogress-meta .ip-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 800;
+    }
+    .task-inprogress-meta svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
     /* ★ v1.10.0 — إطارات التذكير (تتدرّج مع اقتراب التاريخ) */
     .task-item.reminder-soon {
       border-color: #EAB308;
@@ -2033,6 +2107,8 @@
 
     const ICON_CLOCK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
     const ICON_CHECK = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+    // ★ v1.14.0 — أيقونة الساعة لـ «قيد التنفيذ»
+    const ICON_CLOCK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
     const ICON_STAR  = '<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
     const ICON_HOURGLASS = '<svg viewBox="0 0 24 24"><path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 12 0V2M6 22v-6a6 6 0 0 1 12 0v6"/></svg>';
 
@@ -2317,6 +2393,8 @@
      */
     function taskItemTempHTML(t, n) {
       const isDone = !!t.done;
+      // ★ v1.14.0 — حالة قيد التنفيذ
+      const isInProgress = !!t.inProgress && !isDone;
       const isTickable = !isSupervisorOnly && !isDone;
       const showUnmark = canUnmarkTemp(t);
       const isPending = state.pendingTasks.has('temp:' + t.id);
@@ -2326,6 +2404,7 @@
 
       const classes = ['task-item'];
       if (isDone) classes.push('is-done');
+      if (isInProgress) classes.push('is-inprogress'); // ★ v1.14.0
       if (isPending) classes.push('is-pending');
 
       // ★ v1.10.0 — حساب حالة التذكير (لون الإطار)
@@ -2354,10 +2433,21 @@
       // عمود التشييك
       let checkboxCol;
       if (isTickable) {
+        // ★ v1.14.0 — زرّ قيد التنفيذ يظهر فقط لو لم تكن منجزة ولا قيد التنفيذ
+        const ipBtn = (!isInProgress) ? `
+          <button class="inprogress-btn" type="button"
+                  data-temp-ip-start="${escapeHTML(t.id)}"
+                  title="قيد التنفيذ">
+            ${ICON_CLOCK}
+          </button>
+        ` : '';
         checkboxCol = `
-          <div class="task-checkbox" role="checkbox" aria-checked="false" tabindex="0"
-               data-temp-id="${escapeHTML(t.id)}">
-            ${ICON_CHECK}
+          <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+            ${ipBtn}
+            <div class="task-checkbox" role="checkbox" aria-checked="false" tabindex="0"
+                 data-temp-id="${escapeHTML(t.id)}">
+              ${ICON_CHECK}
+            </div>
           </div>
         `;
       } else if (isDone && !isSupervisorOnly) {
@@ -2394,6 +2484,21 @@
         `;
       }
 
+      // ★ v1.14.0 — سطر «قيد التنفيذ» للمؤقتة
+      let inProgressMeta = '';
+      if (isInProgress) {
+        const ipByName = t.inProgressByName || '—';
+        const ipWhen = t.inProgressAt ? formatRelativeTime(t.inProgressAt) : '—';
+        const ipRoleBadge = getRoleBadge(t.inProgressByRole);
+        inProgressMeta = `
+          <div class="task-inprogress-meta">
+            <span class="ip-tag">${ICON_CLOCK}<span>قيد التنفيذ</span></span>
+            <span>بواسطة ${escapeHTML(ipByName)}${ipRoleBadge} · ${escapeHTML(ipWhen)}</span>
+            <button class="unmark-btn" data-temp-ip-cancel="${escapeHTML(t.id)}">إلغاء قيد التنفيذ</button>
+          </div>
+        `;
+      }
+
       // أزرار التعديل/الحذف (تظهر للمالك أو الأدمن، وليس للمشرف)
       let actionsRow = '';
       if (!isSupervisorOnly && (canEdit || canDelete)) {
@@ -2416,6 +2521,7 @@
             <div class="task-item-label">${escapeHTML(t.label || '')}${unsupervisedBadge}${reminderBadge}</div>
             ${hint}
             ${doneMeta}
+            ${inProgressMeta}
             ${actionsRow}
           </div>
           ${checkboxCol}
@@ -2492,10 +2598,13 @@
       const docId = t.id + '__' + periodKey;
       const completion = isTickable ? state.completions[docId] : null;
       const isDone = !!(completion && completion.done);
+      // ★ v1.14.0 — حالة قيد التنفيذ
+      const isInProgress = !!(completion && completion.inProgress && !isDone);
       const isPending = state.pendingTasks.has(docId);
 
       const classes = ['task-item'];
       if (isDone) classes.push('is-done');
+      if (isInProgress) classes.push('is-inprogress'); // ★ v1.14.0
       if (isPending) classes.push('is-pending');
       if (kind === 'custom-pending') classes.push('is-pending-approval');
       if (kind === 'custom-inactive') classes.push('is-inactive');
@@ -2530,6 +2639,21 @@
         `;
       }
 
+      // ★ v1.14.0 — سطر «قيد التنفيذ»
+      let inProgressMeta = '';
+      if (isInProgress) {
+        const ipByName = completion.inProgressByName || '—';
+        const ipWhen = timeAgo(completion.inProgressAt);
+        const ipRoleBadge = getRoleBadge(completion.inProgressByRole);
+        inProgressMeta = `
+          <div class="task-inprogress-meta">
+            <span class="ip-tag">${ICON_CLOCK}<span>قيد التنفيذ</span></span>
+            <span>بواسطة ${escapeHTML(ipByName)}${ipRoleBadge} · ${escapeHTML(ipWhen)}</span>
+            <button class="unmark-btn" data-ip-cancel="1" data-task-id="${escapeHTML(t.id)}" data-period-key="${escapeHTML(periodKey)}">إلغاء قيد التنفيذ</button>
+          </div>
+        `;
+      }
+
       // سطر المعلَّقة (معلومات فقط، الأزرار في actions row)
       let pendingMeta = '';
       if (kind === 'custom-pending') {
@@ -2554,18 +2678,32 @@
         numCol = `<span class="task-item-num">${n}</span>`;
       }
 
-      // عمود التشييك (مربع أو فراغ)
+      // عمود التشييك (مربع أو فراغ) + زرّ قيد التنفيذ (★ v1.14.0)
       let checkboxCol;
       if (isTickable) {
         const checkboxClass = isDone ? 'task-checkbox is-checked' : 'task-checkbox';
+        // ★ v1.14.0 — زرّ قيد التنفيذ يظهر فقط لو المهمة غير منجزة وغير قيد التنفيذ
+        const ipBtn = (!isDone && !isInProgress) ? `
+          <button class="inprogress-btn" type="button"
+                  data-ip-start="1"
+                  data-task-id="${escapeHTML(t.id)}"
+                  data-period-key="${escapeHTML(periodKey)}"
+                  data-category="${escapeHTML(category)}"
+                  title="قيد التنفيذ">
+            ${ICON_CLOCK}
+          </button>
+        ` : '';
         checkboxCol = `
-          <div class="${checkboxClass}"
-               role="checkbox" aria-checked="${isDone}" tabindex="0"
-               data-doc-id="${escapeHTML(docId)}"
-               data-task-id="${escapeHTML(t.id)}"
-               data-period-key="${escapeHTML(periodKey)}"
-               data-category="${escapeHTML(category)}">
-            ${ICON_CHECK}
+          <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+            ${ipBtn}
+            <div class="${checkboxClass}"
+                 role="checkbox" aria-checked="${isDone}" tabindex="0"
+                 data-doc-id="${escapeHTML(docId)}"
+                 data-task-id="${escapeHTML(t.id)}"
+                 data-period-key="${escapeHTML(periodKey)}"
+                 data-category="${escapeHTML(category)}">
+              ${ICON_CHECK}
+            </div>
           </div>
         `;
       } else {
@@ -2579,6 +2717,7 @@
             <div class="task-item-label">${badges}${escapeHTML(t.label || '')}</div>
             ${hint}
             ${doneMeta}
+            ${inProgressMeta}
             ${pendingMeta}
             ${actionsRow}
           </div>
@@ -2662,11 +2801,37 @@
       document.querySelectorAll('.unmark-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
+          // ★ v1.14.0 — إلغاء «قيد التنفيذ» للمؤقتة
+          if (btn.dataset.tempIpCancel) {
+            unmarkTempTaskInProgress(btn.dataset.tempIpCancel);
+            return;
+          }
+          // ★ v1.14.0 — إلغاء «قيد التنفيذ» للمهام العادية
+          if (btn.dataset.ipCancel) {
+            unmarkTaskInProgress(btn.dataset.taskId, btn.dataset.periodKey);
+            return;
+          }
           if (btn.dataset.tempUnmark) {
             unmarkTempTaskAction(btn.dataset.tempUnmark);
           } else {
             unmarkTask(btn.dataset.docId, btn.dataset.taskId, btn.dataset.periodKey);
           }
+        });
+      });
+
+      // ★ v1.14.0 — أزرار «قيد التنفيذ» (المهام العادية)
+      document.querySelectorAll('.inprogress-btn[data-ip-start]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          markTaskInProgress(btn.dataset.taskId, btn.dataset.periodKey, btn.dataset.category);
+        });
+      });
+
+      // ★ v1.14.0 — أزرار «قيد التنفيذ» (المهام المؤقتة)
+      document.querySelectorAll('.inprogress-btn[data-temp-ip-start]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          markTempTaskInProgress(btn.dataset.tempIpStart);
         });
       });
 
@@ -2748,6 +2913,86 @@
         unmarkTask(docId, taskId, periodKey);
       } else {
         markTask(docId, taskId, periodKey, category);
+      }
+    }
+
+    // ★ v1.14.0 — وضع مهمة في «قيد التنفيذ»
+    async function markTaskInProgress(taskId, periodKey, category) {
+      const docId = taskId + '__' + periodKey;
+      if (state.pendingTasks.has(docId)) return;
+      state.pendingTasks.add(docId);
+      const previousState = state.completions[docId] || null;
+      const localRole = isAdmin ? 'admin' : (isAssignee ? 'assignee' : (isSupervisor ? 'supervisor' : 'assignee'));
+
+      // Optimistic
+      state.completions[docId] = {
+        taskId: taskId,
+        periodKey: periodKey,
+        category: category,
+        done: false,
+        inProgress: true,
+        inProgressByUid: me.uid,
+        inProgressByName: me.name,
+        inProgressByRole: localRole,
+        inProgressAt: new Date().toISOString()
+      };
+      renderTasks();
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=markTaskInProgress`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: taskId, periodKey: periodKey, category: category }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || 'فشل');
+        toast('🔄 المهمة قيد التنفيذ', 'success');
+      } catch (err) {
+        if (previousState) state.completions[docId] = previousState;
+        else delete state.completions[docId];
+        renderTasks();
+        toast('فشل: ' + err.message, 'error', 4500);
+      } finally {
+        state.pendingTasks.delete(docId);
+        renderTasks();
+      }
+    }
+
+    // ★ v1.14.0 — إلغاء «قيد التنفيذ» (المهمة تعود لـ «غير مبدوءة»)
+    async function unmarkTaskInProgress(taskId, periodKey) {
+      const docId = taskId + '__' + periodKey;
+      if (state.pendingTasks.has(docId)) return;
+      state.pendingTasks.add(docId);
+      const previousState = state.completions[docId] || null;
+      delete state.completions[docId];
+      renderTasks();
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=unmarkTaskInProgress`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: taskId, periodKey: periodKey }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || 'فشل');
+        toast('تم الإلغاء', 'success');
+      } catch (err) {
+        if (previousState) state.completions[docId] = previousState;
+        renderTasks();
+        toast('فشل الإلغاء: ' + err.message, 'error', 4500);
+      } finally {
+        state.pendingTasks.delete(docId);
+        renderTasks();
       }
     }
 
@@ -3122,6 +3367,93 @@
         renderTasks();
       } catch (err) {
         toast('فشل تحديث المهام المؤقتة: ' + err.message, 'error');
+      }
+    }
+
+    // ★ v1.14.0 — وضع مهمة مؤقتة في «قيد التنفيذ»
+    async function markTempTaskInProgress(tempId) {
+      const key = 'temp:' + tempId;
+      if (state.pendingTasks.has(key)) return;
+      state.pendingTasks.add(key);
+
+      const idx = state.tempTasks.findIndex(t => t.id === tempId);
+      const previous = idx >= 0 ? { ...state.tempTasks[idx] } : null;
+      const localRole = isAdmin ? 'admin' : (isAssignee ? 'assignee' : (isSupervisor ? 'supervisor' : 'assignee'));
+      if (idx >= 0) {
+        state.tempTasks[idx] = {
+          ...state.tempTasks[idx],
+          inProgress: true,
+          inProgressByUid: me.uid,
+          inProgressByName: me.displayName || me.email || me.name,
+          inProgressByRole: localRole,
+          inProgressAt: new Date().toISOString()
+        };
+        renderTasks();
+      }
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=markTempTaskInProgress`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: tempId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        toast('🔄 المهمة قيد التنفيذ', 'success');
+      } catch (err) {
+        if (idx >= 0 && previous) state.tempTasks[idx] = previous;
+        renderTasks();
+        toast('فشل: ' + err.message, 'error');
+      } finally {
+        state.pendingTasks.delete(key);
+      }
+    }
+
+    // ★ v1.14.0 — إلغاء «قيد التنفيذ» لمهمة مؤقتة
+    async function unmarkTempTaskInProgress(tempId) {
+      const key = 'temp:' + tempId;
+      if (state.pendingTasks.has(key)) return;
+      state.pendingTasks.add(key);
+
+      const idx = state.tempTasks.findIndex(t => t.id === tempId);
+      const previous = idx >= 0 ? { ...state.tempTasks[idx] } : null;
+      if (idx >= 0) {
+        state.tempTasks[idx] = {
+          ...state.tempTasks[idx],
+          inProgress: false,
+          inProgressByUid: null,
+          inProgressByName: null,
+          inProgressByRole: null,
+          inProgressAt: null
+        };
+        renderTasks();
+      }
+
+      try {
+        const user = auth.currentUser;
+        const token = await user.getIdToken();
+        const res = await fetch(`${COMPANIES_API_URL}?action=unmarkTempTaskInProgress`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            token: token,
+            data: { companyId: companyId, taskId: tempId }
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message);
+        toast('تم الإلغاء', 'success');
+      } catch (err) {
+        if (idx >= 0 && previous) state.tempTasks[idx] = previous;
+        renderTasks();
+        toast('فشل الإلغاء: ' + err.message, 'error');
+      } finally {
+        state.pendingTasks.delete(key);
       }
     }
 
