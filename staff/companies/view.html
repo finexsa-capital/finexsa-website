@@ -816,6 +816,32 @@
       color: var(--text-muted);
       font-weight: 500;
     }
+
+    /* ★ v1.12.0 — شارات دور المُشيِّك */
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 1.5px 7px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-inline-start: 4px;
+      vertical-align: middle;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .role-badge.supervisor {
+      background: rgba(245, 158, 11, 0.15);
+      color: #F59E0B;
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+    .role-badge.admin {
+      background: rgba(139, 146, 168, 0.15);
+      color: #B0B7CC;
+      border-color: rgba(139, 146, 168, 0.4);
+    }
     .pending-meta-actions {
       display: flex;
       gap: 6px;
@@ -1459,17 +1485,40 @@
 
     // ═══ تحديد دور المستخدم على هذه الشركة ═══
     // يُحدَّث بعد جلب بيانات الشركة من Firestore
-    let isSupervisorOnly = false;  // المستخدم مشرف فقط (يستعرض ويضيف، لا يعدّل)
+    // ★ v1.12.0 — المشرف الآن يشيّك ويعدّل ويحذف مثل الموظف (شارة الدور تميّزه)
+    //              لذلك isSupervisorOnly = false دائماً (نُبقي المتغير لتفادي كسر باقي الكود)
+    let isSupervisorOnly = false;  // ★ v1.12.0 — معطّل دائماً
     let isAssignee = false;         // المستخدم مسؤول (صلاحيات كاملة على المهام)
+    let isSupervisor = false;       // ★ v1.12.0 — للعلم فقط (شارة الدور)
     function refreshRoleFlags() {
       if (!state.company) {
         isSupervisorOnly = false;
         isAssignee = false;
+        isSupervisor = false;
         return;
       }
       isAssignee = state.company.assigneeUid === me.uid;
-      // المشرف فقط = مشرف وليس مسؤولاً وليس أدمن
-      isSupervisorOnly = !isAdmin && !isAssignee && state.company.supervisorUid === me.uid;
+      isSupervisor = state.company.supervisorUid === me.uid;
+      // ★ v1.12.0 — لم يعد المشرف محظوراً، يعمل مثل المسؤول
+      isSupervisorOnly = false;
+    }
+
+    /**
+     * ★ v1.12.0 — يُرجع HTML شارة الدور بناءً على القيمة المخزّنة في السجل
+     *   role:
+     *     'admin'      → شارة رمادية «إدارة»
+     *     'supervisor' → شارة برتقالية «مشرف»
+     *     'assignee'   → بدون شارة (الموظف العادي)
+     *     غير ذلك      → بدون شارة (سجلات قديمة)
+     */
+    function getRoleBadge(role) {
+      if (role === 'admin') {
+        return '<span class="role-badge admin">إدارة</span>';
+      }
+      if (role === 'supervisor') {
+        return '<span class="role-badge supervisor">مشرف</span>';
+      }
+      return ''; // assignee أو سجل قديم → بدون شارة
     }
 
     // ═══ معرّف الشركة من الرابط ═══
@@ -2320,10 +2369,11 @@
         const doneByName = t.doneByName || '—';
         const doneAt = t.doneAt ? formatRelativeTime(t.doneAt) : '—';
         const remaining = getTempHideRemaining(t.doneAt);
+        const roleBadge = getRoleBadge(t.doneByRole); // ★ v1.12.0
         doneMeta = `
           <div class="task-done-meta">
             <span class="done-tag">${ICON_CHECK} <span>أُنجزت</span></span>
-            <span class="by-info">بواسطة: ${escapeHTML(doneByName)} · ${escapeHTML(doneAt)}</span>
+            <span class="by-info">بواسطة: ${escapeHTML(doneByName)}${roleBadge} · ${escapeHTML(doneAt)}</span>
             ${remaining ? `<span style="color: var(--info, #60A5FA); font-size: 11px;">⏱ ${escapeHTML(remaining)}</span>` : ''}
             ${showUnmark ? `<button class="unmark-btn" data-temp-unmark="${escapeHTML(t.id)}">إلغاء التشييك</button>` : ''}
           </div>
@@ -2455,10 +2505,11 @@
         const byName = completion.lastDoneByName || '—';
         const when = timeAgo(completion.lastDoneAt);
         const showUnmark = canUnmark(completion);
+        const roleBadge = getRoleBadge(completion.lastDoneByRole); // ★ v1.12.0
         doneMeta = `
           <div class="task-done-meta">
             ${ICON_CHECK}
-            <span class="by-name">${escapeHTML(byName)}</span>
+            <span class="by-name">${escapeHTML(byName)}${roleBadge}</span>
             <span class="when">· ${escapeHTML(when)}</span>
             ${showUnmark ? `<button class="unmark-btn" data-doc-id="${escapeHTML(docId)}" data-task-id="${escapeHTML(t.id)}" data-period-key="${escapeHTML(periodKey)}">إلغاء التشييك</button>` : ''}
           </div>
@@ -2690,6 +2741,8 @@
       // Optimistic: حدّث الواجهة فوراً
       state.pendingTasks.add(docId);
       const previousState = state.completions[docId] || null;
+      // ★ v1.12.0 — تحديد دور المستخدم محلياً للشارة الفورية
+      const localRole = isAdmin ? 'admin' : (isAssignee ? 'assignee' : (isSupervisor ? 'supervisor' : 'assignee'));
       state.completions[docId] = {
         taskId: taskId,
         periodKey: periodKey,
@@ -2697,7 +2750,8 @@
         done: true,
         lastDoneAt: new Date().toISOString(),
         lastDoneByUid: me.uid,
-        lastDoneByName: me.name
+        lastDoneByName: me.name,
+        lastDoneByRole: localRole // ★ v1.12.0
       };
       renderTasks();
 
@@ -2729,7 +2783,8 @@
           done: true,
           lastDoneAt: data.lastDoneAt,
           lastDoneByUid: me.uid,
-          lastDoneByName: data.lastDoneByName || me.name
+          lastDoneByName: data.lastDoneByName || me.name,
+          lastDoneByRole: localRole // ★ v1.12.0 — نُبقي الدور المحلي
         };
       } catch (err) {
         // فشل — تراجع
@@ -3063,13 +3118,16 @@
       // optimistic
       const idx = state.tempTasks.findIndex(t => t.id === tempId);
       const previous = idx >= 0 ? { ...state.tempTasks[idx] } : null;
+      // ★ v1.12.0 — تحديد دور المستخدم محلياً للشارة الفورية
+      const localRole = isAdmin ? 'admin' : (isAssignee ? 'assignee' : (isSupervisor ? 'supervisor' : 'assignee'));
       if (idx >= 0) {
         state.tempTasks[idx] = {
           ...state.tempTasks[idx],
           done: true,
           doneAt: new Date().toISOString(),
           doneByUid: me.uid,
-          doneByName: me.displayName || me.email
+          doneByName: me.displayName || me.email,
+          doneByRole: localRole // ★ v1.12.0
         };
         renderTasks();
       }
