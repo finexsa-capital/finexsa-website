@@ -936,10 +936,6 @@
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           <span>التقارير الإدارية</span>
         </a></li>
-        <li><a href="../activity-log.html" class="nav-link">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span>سجل الإنجازات</span>
-        </a></li>
         <li><a href="default-tasks.html" class="nav-link">
           <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>المهام الافتراضية</span>
@@ -1053,6 +1049,21 @@
           <input type="hidden" id="inAssignee" value="">
         </div>
 
+        <!-- ★ v1.13.0 — المسؤول الثاني الاختياري -->
+        <div class="field-group">
+          <label class="field-label" for="staffSearch2">
+            المسؤول الثاني <span class="field-label-hint" style="font-weight: 500; color: var(--text-dim)">— اختياري · صلاحيات متساوية مع المسؤول الأول</span>
+          </label>
+          <div class="modal-search-wrap">
+            <input type="text" id="staffSearch2" class="modal-search-input" placeholder="ابحث بالاسم أو الإيميل…" autocomplete="off">
+          </div>
+          <div class="staff-list" id="staffList2"></div>
+          <input type="hidden" id="inAssignee2" value="">
+          <button type="button" id="clearAssignee2" style="margin-top: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; font-family: inherit; cursor: pointer; display: none;">
+            إلغاء اختيار المسؤول الثاني
+          </button>
+        </div>
+
         <div class="field-group">
           <label class="field-label" for="supSearch">
             المشرف <span class="field-label-hint" style="font-weight: 500; color: var(--text-dim)">— اختياري · يستعرض ويضيف فقط</span>
@@ -1159,6 +1170,22 @@
           <div class="staff-list" id="editStaffList"></div>
           <input type="hidden" id="editAssignee" value="">
           <div id="editAssigneeCurrent" style="margin-top:8px; font-size: 12px; color: var(--text-dim);"></div>
+        </div>
+
+        <!-- ★ v1.13.0 — المسؤول الثاني الاختياري -->
+        <div class="field-group">
+          <label class="field-label" for="editStaffSearch2">
+            المسؤول الثاني <span class="field-label-hint" style="font-weight: 500; color: var(--text-dim)">— اختياري · صلاحيات متساوية مع المسؤول الأول</span>
+          </label>
+          <div class="modal-search-wrap">
+            <input type="text" id="editStaffSearch2" class="modal-search-input" placeholder="ابحث بالاسم أو الإيميل…" autocomplete="off">
+          </div>
+          <div class="staff-list" id="editStaffList2"></div>
+          <input type="hidden" id="editAssignee2" value="">
+          <div id="editAssignee2Current" style="margin-top:8px; font-size: 12px; color: var(--text-dim);"></div>
+          <button type="button" id="editClearAssignee2" style="margin-top: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; font-family: inherit; cursor: pointer; display: none;">
+            إلغاء اختيار المسؤول الثاني
+          </button>
         </div>
 
         <div class="field-group">
@@ -1536,8 +1563,20 @@
           </div>
           <div class="company-assignee">
             <div class="company-assignee-avatar">${assigneeInitials}</div>
-            <span class="company-assignee-name">${escapeHTML(c.assigneeName || '—')}</span>
+            <span class="company-assignee-name">
+              <span style="color: var(--text-dim); font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;">المسؤول الأول:</span>
+              ${escapeHTML(c.assigneeName || '—')}
+            </span>
           </div>
+          ${c.assigneeUid2 ? `
+            <div class="company-assignee" style="margin-top: 4px;">
+              <div class="company-assignee-avatar" style="background: rgba(74, 222, 128, 0.18); color: #86EFAC;">${getInitials(c.assigneeName2 || '')}</div>
+              <span class="company-assignee-name" style="font-size: 12px;">
+                <span style="color: var(--text-dim); font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;">المسؤول الثاني:</span>
+                ${escapeHTML(c.assigneeName2 || '—')}
+              </span>
+            </div>
+          ` : ''}
           ${c.supervisorUid ? `
             <div class="company-assignee" style="margin-top: 4px; opacity: 0.85;">
               <div class="company-assignee-avatar" style="background: rgba(167, 139, 250, 0.18); color: #C4B5FD;">${getInitials(c.supervisorName || '')}</div>
@@ -1567,8 +1606,13 @@
       document.getElementById('inSupervisor').value = '';
       document.getElementById('supSearch').value = '';
       document.getElementById('clearSupervisor').style.display = 'none';
+      // ★ v1.13.0 — تهيئة المسؤول الثاني
+      document.getElementById('inAssignee2').value = '';
+      document.getElementById('staffSearch2').value = '';
+      document.getElementById('clearAssignee2').style.display = 'none';
       populateStaffList('', 'staffList', 'inAssignee', '');
       populateStaffList('', 'supList', 'inSupervisor', '');
+      populateStaffList('', 'staffList2', 'inAssignee2', ''); // ★ v1.13.0
       modal.classList.add('is-open');
       setTimeout(() => document.getElementById('inName').focus(), 200);
     }
@@ -1583,6 +1627,23 @@
     });
     document.getElementById('supSearch').addEventListener('input', (e) => {
       populateStaffList(e.target.value, 'supList', 'inSupervisor', '');
+    });
+    // ★ v1.13.0 — ربط البحث للمسؤول الثاني
+    document.getElementById('staffSearch2').addEventListener('input', (e) => {
+      populateStaffList(e.target.value, 'staffList2', 'inAssignee2', '');
+    });
+    // ★ v1.13.0 — إظهار زر إلغاء المسؤول الثاني
+    document.getElementById('staffList2').addEventListener('click', () => {
+      setTimeout(() => {
+        const has = document.getElementById('inAssignee2').value;
+        document.getElementById('clearAssignee2').style.display = has ? 'inline-block' : 'none';
+      }, 50);
+    });
+    document.getElementById('clearAssignee2').addEventListener('click', () => {
+      document.getElementById('inAssignee2').value = '';
+      document.getElementById('staffSearch2').value = '';
+      document.getElementById('clearAssignee2').style.display = 'none';
+      populateStaffList('', 'staffList2', 'inAssignee2', '');
     });
     // مراقبة اختيار المشرف لإظهار زر الإلغاء
     document.getElementById('supList').addEventListener('click', () => {
@@ -1613,6 +1674,7 @@
     async function saveCompany() {
       const name = document.getElementById('inName').value.trim();
       const assigneeUid = document.getElementById('inAssignee').value;
+      const assigneeUid2 = document.getElementById('inAssignee2').value; // ★ v1.13.0
       const supervisorUid = document.getElementById('inSupervisor').value;
 
       if (!name) {
@@ -1627,9 +1689,22 @@
         toast('لا يمكن أن يكون نفس الشخص مسؤولاً ومشرفاً', 'error', 5000);
         return;
       }
+      // ★ v1.13.0 — تحقّقات المسؤول الثاني
+      if (assigneeUid2) {
+        if (assigneeUid2 === assigneeUid) {
+          toast('لا يمكن أن يكون نفس الشخص مسؤولاً أوّلاً وثانياً', 'error', 5000);
+          return;
+        }
+        if (supervisorUid && assigneeUid2 === supervisorUid) {
+          toast('لا يمكن أن يكون نفس الشخص مسؤولاً ثانياً ومشرفاً', 'error', 5000);
+          return;
+        }
+      }
 
       const assignee = state.staff.find(s => s.uid === assigneeUid);
       const assigneeName = assignee ? (assignee.displayName || assignee.email) : '';
+      const assignee2 = assigneeUid2 ? state.staff.find(s => s.uid === assigneeUid2) : null;
+      const assigneeName2 = assignee2 ? (assignee2.displayName || assignee2.email) : '';
       const supervisor = supervisorUid ? state.staff.find(s => s.uid === supervisorUid) : null;
       const supervisorName = supervisor ? (supervisor.displayName || supervisor.email) : '';
 
@@ -1652,6 +1727,8 @@
               name: name,
               assigneeUid: assigneeUid,
               assigneeName: assigneeName,
+              assigneeUid2: assigneeUid2,       // ★ v1.13.0
+              assigneeName2: assigneeName2,     // ★ v1.13.0
               supervisorUid: supervisorUid,
               supervisorName: supervisorName
             }
@@ -1691,6 +1768,15 @@
       document.getElementById('editAssigneeCurrent').textContent = `الحالي: ${company.assigneeName || '—'}`;
       populateStaffList('', 'editStaffList', 'editAssignee', company.assigneeUid);
 
+      // ★ v1.13.0 — المسؤول الثاني
+      document.getElementById('editAssignee2').value = company.assigneeUid2 || '';
+      document.getElementById('editStaffSearch2').value = company.assigneeName2 || '';
+      document.getElementById('editAssignee2Current').textContent = company.assigneeUid2
+        ? `الحالي: ${company.assigneeName2 || '—'}`
+        : 'لا يوجد مسؤول ثانٍ معيَّن';
+      document.getElementById('editClearAssignee2').style.display = company.assigneeUid2 ? 'inline-block' : 'none';
+      populateStaffList('', 'editStaffList2', 'editAssignee2', company.assigneeUid2);
+
       // المشرف
       document.getElementById('editSupervisor').value = company.supervisorUid || '';
       document.getElementById('editSupSearch').value = company.supervisorName || '';
@@ -1714,6 +1800,30 @@
     document.getElementById('editSupSearch').addEventListener('input', (e) => {
       populateStaffList(e.target.value, 'editSupList', 'editSupervisor', '');
     });
+    // ★ v1.13.0 — البحث للمسؤول الثاني
+    document.getElementById('editStaffSearch2').addEventListener('input', (e) => {
+      populateStaffList(e.target.value, 'editStaffList2', 'editAssignee2', '');
+    });
+    document.getElementById('editStaffList2').addEventListener('click', () => {
+      setTimeout(() => {
+        const has = document.getElementById('editAssignee2').value;
+        document.getElementById('editClearAssignee2').style.display = has ? 'inline-block' : 'none';
+        if (has) {
+          const sel = state.staff.find(s => s.uid === has);
+          document.getElementById('editAssignee2Current').textContent = sel
+            ? `الحالي: ${sel.displayName || sel.email}`
+            : 'الحالي: —';
+        }
+      }, 50);
+    });
+    document.getElementById('editClearAssignee2').addEventListener('click', () => {
+      document.getElementById('editAssignee2').value = '';
+      document.getElementById('editStaffSearch2').value = '';
+      document.getElementById('editClearAssignee2').style.display = 'none';
+      document.getElementById('editAssignee2Current').textContent = 'لا يوجد مسؤول ثانٍ معيَّن';
+      populateStaffList('', 'editStaffList2', 'editAssignee2', '');
+    });
+
     document.getElementById('editSupList').addEventListener('click', () => {
       setTimeout(() => {
         const has = document.getElementById('editSupervisor').value;
@@ -1734,6 +1844,7 @@
       if (!editingCompanyId) return;
       const name = document.getElementById('editName').value.trim();
       const assigneeUid = document.getElementById('editAssignee').value;
+      const assigneeUid2 = document.getElementById('editAssignee2').value; // ★ v1.13.0
       const supervisorUid = document.getElementById('editSupervisor').value;
 
       if (!name) { toast('اسم الشركة مطلوب', 'error'); return; }
@@ -1742,9 +1853,22 @@
         toast('لا يمكن أن يكون نفس الشخص مسؤولاً ومشرفاً', 'error', 5000);
         return;
       }
+      // ★ v1.13.0 — تحقّقات المسؤول الثاني
+      if (assigneeUid2) {
+        if (assigneeUid2 === assigneeUid) {
+          toast('لا يمكن أن يكون نفس الشخص مسؤولاً أوّلاً وثانياً', 'error', 5000);
+          return;
+        }
+        if (supervisorUid && assigneeUid2 === supervisorUid) {
+          toast('لا يمكن أن يكون نفس الشخص مسؤولاً ثانياً ومشرفاً', 'error', 5000);
+          return;
+        }
+      }
 
       const assignee = state.staff.find(s => s.uid === assigneeUid);
       const assigneeName = assignee ? (assignee.displayName || assignee.email) : '';
+      const assignee2 = assigneeUid2 ? state.staff.find(s => s.uid === assigneeUid2) : null;
+      const assigneeName2 = assignee2 ? (assignee2.displayName || assignee2.email) : '';
       const supervisor = supervisorUid ? state.staff.find(s => s.uid === supervisorUid) : null;
       const supervisorName = supervisor ? (supervisor.displayName || supervisor.email) : '';
 
@@ -1768,6 +1892,8 @@
               name: name,
               assigneeUid: assigneeUid,
               assigneeName: assigneeName,
+              assigneeUid2: assigneeUid2,     // ★ v1.13.0
+              assigneeName2: assigneeName2,   // ★ v1.13.0
               supervisorUid: supervisorUid,
               supervisorName: supervisorName
             }

@@ -1497,7 +1497,8 @@
         isSupervisor = false;
         return;
       }
-      isAssignee = state.company.assigneeUid === me.uid;
+      isAssignee = state.company.assigneeUid === me.uid
+                || (state.company.assigneeUid2 && state.company.assigneeUid2 === me.uid); // ★ v1.13.0
       isSupervisor = state.company.supervisorUid === me.uid;
       // ★ v1.12.0 — لم يعد المشرف محظوراً، يعمل مثل المسؤول
       isSupervisorOnly = false;
@@ -1951,13 +1952,26 @@
 
       let html = `
         <div class="meta-item">
-          <span class="meta-label">الموظف المسؤول:</span>
+          <span class="meta-label">المسؤول الأول:</span>
           <span class="assignee-chip">
             <span class="assignee-chip-avatar">${escapeHTML(assigneeInitials)}</span>
             <span class="meta-value">${escapeHTML(c.assigneeName || '—')}</span>
           </span>
         </div>
       `;
+      // ★ v1.13.0 — عرض المسؤول الثاني إن وُجد
+      if (c.assigneeUid2 && c.assigneeName2) {
+        const assignee2Initials = getInitials(c.assigneeName2);
+        html += `
+          <div class="meta-item">
+            <span class="meta-label">المسؤول الثاني:</span>
+            <span class="assignee-chip" style="background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.3);">
+              <span class="assignee-chip-avatar" style="background: rgba(74, 222, 128, 0.25); color: #86EFAC;">${escapeHTML(assignee2Initials)}</span>
+              <span class="meta-value">${escapeHTML(c.assigneeName2)}</span>
+            </span>
+          </div>
+        `;
+      }
       // عرض المشرف إن وُجد
       if (c.supervisorUid && c.supervisorName) {
         const supInitials = getInitials(c.supervisorName);
