@@ -263,6 +263,79 @@
     }
     .search-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
+    /* ★ فلاتر التاريخ */
+    .date-filters {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      padding: 12px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .date-filters-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-inline-end: 4px;
+    }
+    .date-chip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .date-chip:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+    .date-chip.is-active {
+      background: var(--gold);
+      color: var(--bg-void);
+      border-color: var(--gold);
+      font-weight: 800;
+    }
+    .custom-range {
+      display: none;
+      gap: 8px;
+      align-items: center;
+      margin-inline-start: auto;
+      flex-wrap: wrap;
+    }
+    .custom-range.is-open {
+      display: flex;
+    }
+    .custom-range-label {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+    .date-input {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 6px 10px;
+      border-radius: 7px;
+      font-family: inherit;
+      font-size: 12px;
+      color-scheme: dark;
+    }
+    .date-input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
     .btn {
       padding: 11px 18px;
       border: 1px solid var(--border-strong);
@@ -604,7 +677,7 @@
 
         <div class="page-header">
           <h1 class="page-title">سجل إنجازات الموظفين</h1>
-          <p class="page-subtitle">آخر ٣٠ يوم — مجمَّعة حسب الموظف ثم الشركة، الأحدث أولاً</p>
+          <p class="page-subtitle" id="pageSubtitle">مجمَّعة حسب الموظف ثم الشركة، الأحدث أولاً</p>
         </div>
 
         <!-- Stats -->
@@ -643,6 +716,23 @@
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             تنزيل CSV
           </button>
+        </div>
+
+        <!-- ★ فلاتر التاريخ -->
+        <div class="date-filters">
+          <span class="date-filters-label">الفترة:</span>
+          <button class="date-chip is-active" data-range="today">اليوم</button>
+          <button class="date-chip" data-range="yesterday">أمس</button>
+          <button class="date-chip" data-range="7days">آخر ٧ أيام</button>
+          <button class="date-chip" data-range="30days">آخر ٣٠ يوم</button>
+          <button class="date-chip" data-range="custom">مخصّص</button>
+
+          <div class="custom-range" id="customRange">
+            <span class="custom-range-label">من:</span>
+            <input type="date" id="dateFrom" class="date-input">
+            <span class="custom-range-label">إلى:</span>
+            <input type="date" id="dateTo" class="date-input">
+          </div>
         </div>
 
         <!-- Content -->
@@ -766,7 +856,8 @@
         allEntries = data.entries || [];
 
         renderStats();
-        renderEntries(allEntries);
+        // ★ تطبيق الفلتر الافتراضي (اليوم) عند أول عرض
+        applyFilters();
 
       } catch (err) {
         container.innerHTML = `
@@ -894,26 +985,162 @@
       container.innerHTML = html;
     }
 
-    // ─── البحث ───
+    // ─── البحث + فلتر التاريخ ───
+
+    // ★ حالة الفلتر الزمني
+    const dateState = {
+      range: 'today',   // today | yesterday | 7days | 30days | custom
+      from: null,       // Date object
+      to: null          // Date object
+    };
+
+    /**
+     * يحسب نطاق [from, to) بناءً على dateState.range
+     * النطاق دائماً بتوقيت إسطنبول (UTC+3)
+     * يُرجع timestamps بالميلي ثانية
+     */
+    function computeDateRange() {
+      const now = new Date();
+
+      // بداية اليوم بتوقيت إسطنبول
+      const istanbulOffsetMs = 3 * 60 * 60 * 1000;
+      const utcMs = now.getTime();
+      const istanbulMs = utcMs + istanbulOffsetMs;
+      const istanbulDate = new Date(istanbulMs);
+      // بداية اليوم بإسطنبول = منتصف ليلها UTC + 3 ساعات
+      const todayStartUtcMs = Date.UTC(
+        istanbulDate.getUTCFullYear(),
+        istanbulDate.getUTCMonth(),
+        istanbulDate.getUTCDate(),
+        0, 0, 0
+      ) - istanbulOffsetMs;
+      const dayMs = 24 * 60 * 60 * 1000;
+
+      switch (dateState.range) {
+        case 'today':
+          return { from: todayStartUtcMs, to: todayStartUtcMs + dayMs };
+        case 'yesterday':
+          return { from: todayStartUtcMs - dayMs, to: todayStartUtcMs };
+        case '7days':
+          return { from: todayStartUtcMs - 6 * dayMs, to: todayStartUtcMs + dayMs };
+        case '30days':
+          return { from: todayStartUtcMs - 29 * dayMs, to: todayStartUtcMs + dayMs };
+        case 'custom':
+          if (dateState.from && dateState.to) {
+            // dateState.from/to هي Date objects تمثّل بداية ونهاية اليوم بتوقيت محلّي
+            // نحوّل لتوقيت إسطنبول
+            const fromMs = Date.UTC(
+              dateState.from.getFullYear(),
+              dateState.from.getMonth(),
+              dateState.from.getDate(),
+              0, 0, 0
+            ) - istanbulOffsetMs;
+            const toMs = Date.UTC(
+              dateState.to.getFullYear(),
+              dateState.to.getMonth(),
+              dateState.to.getDate(),
+              0, 0, 0
+            ) - istanbulOffsetMs + dayMs;
+            return { from: fromMs, to: toMs };
+          }
+          return null; // غير مكتمل
+        default:
+          return null;
+      }
+    }
+
+    /**
+     * يطبّق الفلتر النصّي + الفلتر الزمني معاً
+     */
     function filterEntries(query) {
-      const q = query.trim().toLowerCase();
-      if (!q) return allEntries;
+      const q = (query || '').trim().toLowerCase();
+      const range = computeDateRange();
 
       return allEntries.filter(e => {
-        return (e.userName || '').toLowerCase().indexOf(q) >= 0
-          || (e.companyName || '').toLowerCase().indexOf(q) >= 0
-          || (e.label || '').toLowerCase().indexOf(q) >= 0
-          || (e.category || '').toLowerCase().indexOf(q) >= 0;
+        // فلتر التاريخ
+        if (range) {
+          const ts = new Date(e.timestamp).getTime();
+          if (ts < range.from || ts >= range.to) return false;
+        }
+
+        // فلتر البحث النصّي
+        if (q) {
+          const matches = (e.userName || '').toLowerCase().indexOf(q) >= 0
+            || (e.companyName || '').toLowerCase().indexOf(q) >= 0
+            || (e.label || '').toLowerCase().indexOf(q) >= 0
+            || (e.category || '').toLowerCase().indexOf(q) >= 0;
+          if (!matches) return false;
+        }
+
+        return true;
       });
     }
 
+    /**
+     * يُعيد عرض القائمة بعد تغيير الفلتر
+     */
+    function applyFilters() {
+      const query = document.getElementById('searchInput').value;
+      const filtered = filterEntries(query);
+      renderEntries(filtered);
+    }
+
     let searchTimer = null;
-    document.getElementById('searchInput').addEventListener('input', (e) => {
+    document.getElementById('searchInput').addEventListener('input', () => {
       clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => {
-        const filtered = filterEntries(e.target.value);
-        renderEntries(filtered);
-      }, 200);
+      searchTimer = setTimeout(applyFilters, 200);
+    });
+
+    // ★ معالجة أزرار النطاقات الزمنية
+    document.querySelectorAll('.date-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const range = chip.dataset.range;
+        dateState.range = range;
+
+        // تحديث الأزرار البصرياً
+        document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('is-active'));
+        chip.classList.add('is-active');
+
+        // إظهار/إخفاء حقلَي التاريخ المخصّص
+        const customBox = document.getElementById('customRange');
+        if (range === 'custom') {
+          customBox.classList.add('is-open');
+          // قيم افتراضية: اليوم
+          const fromEl = document.getElementById('dateFrom');
+          const toEl = document.getElementById('dateTo');
+          if (!fromEl.value) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const isoToday = `${yyyy}-${mm}-${dd}`;
+            // افتراض: من أوّل الشهر إلى اليوم
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const fyyyy = firstDay.getFullYear();
+            const fmm = String(firstDay.getMonth() + 1).padStart(2, '0');
+            const fdd = String(firstDay.getDate()).padStart(2, '0');
+            fromEl.value = `${fyyyy}-${fmm}-${fdd}`;
+            toEl.value = isoToday;
+          }
+          // تحديث dateState
+          dateState.from = fromEl.value ? new Date(fromEl.value) : null;
+          dateState.to = toEl.value ? new Date(toEl.value) : null;
+        } else {
+          customBox.classList.remove('is-open');
+        }
+
+        applyFilters();
+      });
+    });
+
+    // ★ معالجة تغيير حقلَي التاريخ المخصّص
+    document.getElementById('dateFrom').addEventListener('change', (e) => {
+      dateState.from = e.target.value ? new Date(e.target.value) : null;
+      applyFilters();
+    });
+    document.getElementById('dateTo').addEventListener('change', (e) => {
+      dateState.to = e.target.value ? new Date(e.target.value) : null;
+      applyFilters();
     });
 
     // ─── تنزيل CSV ───
