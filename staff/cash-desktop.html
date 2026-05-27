@@ -353,6 +353,41 @@
       color: var(--gold-bright);
     }
 
+    /* ═══ ★ v1.5.0 — بطاقة التحويل + السعر اليدوي ═══ */
+    .conversion-card {
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: rgba(201, 162, 39, 0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: none;
+    }
+    .conversion-card.show { display: block; }
+    .rate-hint-box {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+    .rate-hint-box b { color: var(--gold-bright); }
+    .manual-rate-row {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+    .manual-rate-label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .manual-rate-label b { color: var(--gold-bright); }
+    .manual-rate-input {
+      padding: 9px 12px;
+      font-size: 13.5px;
+      background: var(--bg-deep);
+    }
+
     /* ─── البحث في الحساب المقابل ─── */
     .search-wrap { position: relative; }
     .search-suggestions {
@@ -894,15 +929,18 @@
               <label class="field-label">
                 <span>المبلغ المقابل</span>
               </label>
-              <div class="conversion-toggle" id="conversionToggle">
-                <button type="button" class="is-active" data-mode="direct">المبلغ المقابل مباشرة</button>
-                <button type="button" data-mode="rate">سعر الصرف (مثلاً 44.5)</button>
-              </div>
               <div class="field-row three">
                 <input type="number" id="amountB" class="field-input" placeholder="0" step="any" min="0">
                 <select id="currencyB" class="field-select"></select>
               </div>
-              <div id="rateHint" style="display:none; font-size:11.5px; color:var(--text-dim); margin-top:6px; text-align:left;"></div>
+              <!-- ★ v1.5.0 — بطاقة التحويل (تظهر عند اختلاف العملتين) -->
+              <div class="conversion-card" id="conversionCard">
+                <div class="rate-hint-box" id="rateHint"></div>
+                <div class="manual-rate-row">
+                  <label class="manual-rate-label" id="manualRateLabel" for="manualRateInput">سعر مخصص (اختياري)</label>
+                  <input type="number" id="manualRateInput" class="manual-rate-input field-input" placeholder="0.00" inputmode="decimal" step="any">
+                </div>
+              </div>
             </div>
 
             <!-- 6) البيان -->
@@ -1110,8 +1148,92 @@
       lists: {},
       drafts: [],
       currentDir: null,        // قبض / دفع
-      conversionMode: 'direct' // direct | rate
+      // ★ v1.5.0 — محرّك أسعار الصرف
+      currencyRates: { 'دولار': 1 },
+      baseCurrency: 'دولار',
+      bValueManuallyEdited: false
     };
+
+    // ═══════ ★ v1.5.0 — Helpers للعملات (تطبيع متسامح) ═══════
+    function normalizeCurrencyName(s) {
+      return String(s || '')
+        .trim()
+        .toLowerCase()
+        .replace(/^ال/, '')
+        .replace(/[ةه]/g, 'ه')
+        .replace(/[يى]/g, 'ي')
+        .replace(/[أإآا]/g, 'ا')
+        .replace(/\s+/g, '');
+    }
+
+    function resolveCurrencyKey(name) {
+      if (!name) return null;
+      const t = String(name).trim();
+      if (state.currencyRates.hasOwnProperty(t)) return t;
+      const norm = normalizeCurrencyName(t);
+      for (const k in state.currencyRates) {
+        if (normalizeCurrencyName(k) === norm) return k;
+      }
+      return null;
+    }
+
+    function isBaseCurrency(c) {
+      if (!c) return false;
+      const norm = normalizeCurrencyName(c);
+      return norm === 'دولار' || norm === '$' || norm === 'usd' || norm === 'dollar';
+    }
+
+    // تحويل مبلغ من عملة لأخرى عبر الدولار كأساس (دقّة كاملة بدون تقريب)
+    function convertAmount(amount, fromCurr, toCurr) {
+      const n = Number(amount);
+      if (!n || isNaN(n)) return null;
+      if (fromCurr === toCurr) return n;
+      if (normalizeCurrencyName(fromCurr) === normalizeCurrencyName(toCurr)) return n;
+
+      const rFrom = isBaseCurrency(fromCurr) ? 1
+        : (state.currencyRates[resolveCurrencyKey(fromCurr)] || null);
+      const rTo = isBaseCurrency(toCurr) ? 1
+        : (state.currencyRates[resolveCurrencyKey(toCurr)] || null);
+
+      if (!rFrom || !rTo) return null;
+      return (n / rFrom) * rTo;
+    }
+
+    // ═══════ ★ v1.5.0 — جلب أسعار الصرف (مع كاش localStorage 30 ثانية) ═══════
+    async function loadCurrencyRates() {
+      try {
+        const cached = localStorage.getItem('finexsa_rates');
+        if (cached) {
+          const obj = JSON.parse(cached);
+          if (obj && obj.ts && (Date.now() - obj.ts < 30000)) {
+            state.currencyRates = obj.rates || { 'دولار': 1 };
+            state.baseCurrency = obj.base || 'دولار';
+            return;
+          }
+        }
+      } catch {}
+
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const token = await user.getIdToken();
+        const res = await fetch(`${STAFF_API_URL}?action=getCurrencyRates&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (data.ok) {
+          state.currencyRates = data.rates || { 'دولار': 1 };
+          state.baseCurrency = data.base || 'دولار';
+          try {
+            localStorage.setItem('finexsa_rates', JSON.stringify({
+              rates: state.currencyRates,
+              base: state.baseCurrency,
+              ts: Date.now()
+            }));
+          } catch {}
+        }
+      } catch (err) {
+        console.warn('Failed to load currency rates:', err);
+      }
+    }
 
     // ═══════ تحميل القوائم ═══════
     // ★ NEW v1.2.0 — كاش القوائم في sessionStorage
@@ -1228,84 +1350,107 @@
       });
     });
 
-    // ═══════ تبديل وضع التحويل ═══════
-    document.querySelectorAll('#conversionToggle button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('#conversionToggle button').forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-        state.conversionMode = btn.dataset.mode;
-        updateRateHint();
-      });
-    });
+    // ═══════ ★ v1.5.0 — بطاقة التحويل (إظهار/إخفاء بمطابقة متسامحة) ═══════
+    function updateConversionVisibility() {
+      const currA = document.getElementById('currencyA').value;
+      const currB = document.getElementById('currencyB').value;
+      const card = document.getElementById('conversionCard');
+      if (currA && currB &&
+          currA !== currB &&
+          normalizeCurrencyName(currA) !== normalizeCurrencyName(currB)) {
+        card.classList.add('show');
+      } else {
+        card.classList.remove('show');
+      }
+    }
 
-    function updateRateHint() {
-      const hint = document.getElementById('rateHint');
-      const amountA = parseFloat(document.getElementById('amountA').value) || 0;
-      const amountB = parseFloat(document.getElementById('amountB').value) || 0;
+    // ═══════ ★ v1.5.0 — حساب valB تلقائياً من الأسعار ═══════
+    function recalculateValB() {
+      if (state.bValueManuallyEdited) return;
+
+      const amountAEl = document.getElementById('amountA');
+      const amountBEl = document.getElementById('amountB');
+      const valA = parseFloat(amountAEl.value);
       const currA = document.getElementById('currencyA').value;
       const currB = document.getElementById('currencyB').value;
 
-      if (state.conversionMode === 'rate' && amountA > 0 && currA && currB) {
-        if (currA === currB) {
-          hint.style.display = 'block';
-          hint.style.color = 'var(--text-dim)';
-          hint.textContent = 'العملتان متطابقتان، لا حاجة لسعر صرف';
-        } else if (amountB > 0) {
-          // حساب وعرض المبلغ المقابل المتوقع
-          const result = computeFromRate(amountA, currA, currB, amountB);
-          hint.style.display = 'block';
-          hint.style.color = 'var(--gold)';
-          hint.textContent = `سيُحفظ المقابل: ${formatNumber(result)} ${currB}`;
+      if (!valA || !currA || !currB) {
+        amountBEl.value = '';
+        return;
+      }
+
+      // نفس العملة (تطبيع متسامح)
+      if (currA === currB || normalizeCurrencyName(currA) === normalizeCurrencyName(currB)) {
+        amountBEl.value = valA;
+        return;
+      }
+
+      // سعر يدوي (إن وُجد) له الأولوية
+      const manualRate = parseFloat(document.getElementById('manualRateInput').value);
+      if (manualRate && manualRate > 0) {
+        let converted;
+        if (isBaseCurrency(currA)) {
+          converted = valA * manualRate;
+        } else if (isBaseCurrency(currB)) {
+          converted = valA / manualRate;
         } else {
-          hint.style.display = 'block';
-          hint.style.color = 'var(--text-dim)';
-          hint.textContent = 'أدخل سعر الصرف (مثلاً 44.5 للدولار/الليرة)';
+          converted = valA * manualRate;
         }
-      } else if (state.conversionMode === 'direct' && currA && currB && currA !== currB && amountA > 0 && amountB > 0) {
-        hint.style.display = 'block';
-        hint.style.color = 'var(--text-dim)';
-        const stronger = strongerCurrency(currA, currB);
-        let rate;
-        if (stronger === currA) rate = (amountB / amountA);
-        else rate = (amountA / amountB);
-        hint.textContent = `سعر الصرف الضمني: ${formatNumber(rate, 4)} (${stronger === currA ? currA + '/' + currB : currB + '/' + currA})`;
+        amountBEl.value = converted;
+        return;
+      }
+
+      // السعر الرسمي (عبر الدولار)
+      const converted = convertAmount(valA, currA, currB);
+      if (converted !== null && !isNaN(converted)) {
+        amountBEl.value = converted; // دقّة كاملة
+      }
+    }
+
+    // ═══════ ★ v1.5.0 — عرض السعر المرجعي + توجيه السعر اليدوي ═══════
+    function updateRateHint() {
+      const hint = document.getElementById('rateHint');
+      const label = document.getElementById('manualRateLabel');
+      const manualInput = document.getElementById('manualRateInput');
+      const currA = document.getElementById('currencyA').value;
+      const currB = document.getElementById('currencyB').value;
+
+      if (!currA || !currB ||
+          currA === currB ||
+          normalizeCurrencyName(currA) === normalizeCurrencyName(currB)) {
+        return;
+      }
+
+      const baseA = isBaseCurrency(currA);
+      const baseB = isBaseCurrency(currB);
+      const BASE = state.baseCurrency;
+
+      if (baseA || baseB) {
+        const nonBase = baseA ? currB : currA;
+        const key = resolveCurrencyKey(nonBase);
+        const rate = key ? state.currencyRates[key] : null;
+        if (rate) {
+          hint.innerHTML = `💵 السعر المرجعي: <b dir="ltr">1 ${BASE} = ${formatNumber(rate, 4)} ${nonBase}</b>`;
+        } else {
+          hint.innerHTML = `⚠️ لا يوجد سعر مرجعي لـ <b>${nonBase}</b> — أدخل سعراً يدوياً`;
+        }
+        label.innerHTML = `سعر مخصص (كم <b>${nonBase}</b> لكل <b>1 ${BASE}</b>؟)`;
+        manualInput.placeholder = rate ? String(rate) : '0.00';
       } else {
-        hint.style.display = 'none';
+        const keyA = resolveCurrencyKey(currA);
+        const keyB = resolveCurrencyKey(currB);
+        const rA = keyA ? state.currencyRates[keyA] : null;
+        const rB = keyB ? state.currencyRates[keyB] : null;
+        if (rA && rB) {
+          const cross = (1 / rA) * rB;
+          hint.innerHTML = `🔄 التحويل عبر ${BASE} — السعر التقديري: <b dir="ltr">1 ${currA} = ${formatNumber(cross, 4)} ${currB}</b>`;
+          manualInput.placeholder = formatNumber(cross, 4);
+        } else {
+          hint.innerHTML = `⚠️ لا يوجد سعر مرجعي لإحدى العملتين — أدخل سعراً يدوياً`;
+          manualInput.placeholder = '0.00';
+        }
+        label.innerHTML = `سعر مخصص (كم <b>${currB}</b> لكل <b>1 ${currA}</b>؟)`;
       }
-    }
-
-    /**
-     * يحدد العملة الأقوى بين عملتين
-     * الترتيب: يورو > دولار > ليرة تركية > ليرة سورية
-     */
-    function strongerCurrency(c1, c2) {
-      const rank = (c) => {
-        const s = (c || '').toLowerCase();
-        if (s.includes('يورو') || s.includes('eur')) return 4;
-        if (s.includes('دولار') || s.includes('usd') || s.includes('$')) return 3;
-        if (s.includes('ليرة تركي') || s.includes('try') || s.includes('tl')) return 2;
-        if (s.includes('ليرة سوري') || s.includes('syp')) return 1;
-        return 0;
-      };
-      return rank(c1) >= rank(c2) ? c1 : c2;
-    }
-
-    /**
-     * يحسب المبلغ المقابل من سعر الصرف
-     * sourceAmount: المبلغ في عملة المصدر
-     * sourceCurr: عملة المصدر
-     * destCurr: العملة المقابلة
-     * rate: سعر الصرف (الكبير دائماً، أي قيمة العملة الأقوى بالأضعف)
-     */
-    function computeFromRate(sourceAmount, sourceCurr, destCurr, rate) {
-      if (sourceCurr === destCurr) return sourceAmount;
-      const stronger = strongerCurrency(sourceCurr, destCurr);
-      // إذا المصدر هو الأقوى → اضرب
-      if (stronger === sourceCurr) {
-        return sourceAmount * rate;
-      }
-      // إذا المصدر هو الأضعف → اقسم
-      return sourceAmount / rate;
     }
 
     // ═══════ تغيير الصندوق ═══════
@@ -1409,11 +1554,35 @@
       items.forEach((it, i) => it.classList.toggle('is-highlighted', i === highlightIdx));
     }
 
-    // ═══════ مزامنة العملات ═══════
-    document.getElementById('amountA').addEventListener('input', updateRateHint);
-    document.getElementById('amountB').addEventListener('input', updateRateHint);
-    document.getElementById('currencyA').addEventListener('change', updateRateHint);
-    document.getElementById('currencyB').addEventListener('change', updateRateHint);
+    // ═══════ ★ v1.5.0 — أحداث الإدخال ═══════
+    document.getElementById('amountA').addEventListener('input', () => {
+      state.bValueManuallyEdited = false;
+      recalculateValB();
+      updateRateHint();
+    });
+
+    document.getElementById('amountB').addEventListener('input', (e) => {
+      if (e.isTrusted) state.bValueManuallyEdited = true;
+      updateRateHint();
+    });
+
+    document.getElementById('manualRateInput').addEventListener('input', () => {
+      state.bValueManuallyEdited = false;
+      recalculateValB();
+    });
+
+    document.getElementById('currencyA').addEventListener('change', () => {
+      state.bValueManuallyEdited = false;
+      updateConversionVisibility();
+      updateRateHint();
+      recalculateValB();
+    });
+    document.getElementById('currencyB').addEventListener('change', () => {
+      state.bValueManuallyEdited = false;
+      updateConversionVisibility();
+      updateRateHint();
+      recalculateValB();
+    });
 
     // ═══════ تاريخ افتراضي = اليوم ═══════
     function setTodayDate() {
@@ -1432,6 +1601,7 @@
       const currentBox = document.getElementById('boxSelect').value;
       document.getElementById('amountA').value = '';
       document.getElementById('amountB').value = '';
+      document.getElementById('manualRateInput').value = ''; // ★ v1.5.0
       document.getElementById('accCP').value = '';
       const note = document.getElementById('note');
       note.value = '';
@@ -1442,6 +1612,8 @@
         document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('is-active'));
         state.currentDir = null;
       }
+      state.bValueManuallyEdited = false; // ★ v1.5.0
+      updateConversionVisibility(); // ★ v1.5.0
       updateRateHint();
     }
 
@@ -1470,6 +1642,7 @@
       const error = validateForm();
       if (error) { toast(error, 'error'); return; }
 
+      const manualRateRaw = parseFloat(document.getElementById('manualRateInput').value);
       const draft = {
         id: 'd_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         box: document.getElementById('boxSelect').value,
@@ -1482,7 +1655,7 @@
         note: document.getElementById('note').value.trim(),
         date: document.getElementById('dateInput').value,
         currentUser: staffData.email,
-        conversionMode: state.conversionMode
+        manualRate: (manualRateRaw && manualRateRaw > 0) ? manualRateRaw : undefined // ★ v1.5.0
       };
 
       state.drafts.push(draft);
@@ -1573,15 +1746,8 @@
         if (!user) throw new Error('انتهت الجلسة');
         const token = await user.getIdToken();
 
-        // إذا كان وضع سعر الصرف، نحوّل valB من سعر صرف إلى مبلغ مقابل فعلي
-        const drafts = state.drafts.map(d => {
-          if (d.conversionMode === 'rate' && d.currA !== d.currB) {
-            return { ...d, valB: computeFromRate(d.valA, d.currA, d.currB, d.valB) };
-          }
-          // لا نرسل حقل conversionMode للـ Backend
-          const { conversionMode, ...rest } = d;
-          return rest;
-        });
+        // ★ v1.5.0 — valB محسوب مسبقاً، نُرسل الـ drafts كما هي
+        const drafts = state.drafts;
 
         const res = await fetch(`${STAFF_API_URL}?action=saveBatch`, {
           method: 'POST',
@@ -1637,7 +1803,7 @@
 
     // ═══════ Init ═══════
     onAuthStateChanged(auth, (user) => {
-      if (user) loadLists();
+      if (user) { loadLists(); loadCurrencyRates(); } // ★ v1.5.0
     });
 
     // ★ NEW v1.2.0 — زر مزامنة القوائم
