@@ -238,6 +238,62 @@
       pointer-events: none;
     }
 
+    /* ═══ ★ المعادن الثمينة ═══ */
+    .metals-list { display: grid; gap: 12px; }
+    .metal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metal-card::before {
+      content: ""; position: absolute; inset: 0 auto 0 0; width: 3px;
+      background: linear-gradient(180deg, var(--gold) 0%, transparent 100%);
+    }
+    .metal-card.gold::before { background: linear-gradient(180deg, #FFD700 0%, #C9A227 100%); }
+    .metal-card.silver::before { background: linear-gradient(180deg, #E5E5E5 0%, #A8A8A8 100%); }
+    .metal-card.platinum::before { background: linear-gradient(180deg, #E5E4E2 0%, #B0B0B0 100%); }
+    .metal-card.palladium::before { background: linear-gradient(180deg, #CED0DD 0%, #8B8B9E 100%); }
+    .metal-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 10px; gap: 10px;
+    }
+    .metal-name { font-size: 16px; font-weight: 800; color: var(--text-primary); }
+    .metal-iso {
+      padding: 2px 8px; background: var(--gold-muted); color: var(--gold-bright);
+      border-radius: 5px; font-size: 10.5px; font-weight: 800;
+      font-family: 'Courier New', monospace;
+    }
+    .metal-gram {
+      font-size: 20px; font-weight: 900; color: var(--gold-bright);
+      direction: ltr; text-align: left; font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+    .metal-gram-label { font-size: 11px; color: var(--text-dim); margin-bottom: 8px; }
+    .metal-ounce {
+      padding-top: 9px; border-top: 1px dashed var(--border);
+      font-size: 11px; color: var(--text-muted); direction: ltr; text-align: right;
+    }
+    .metal-ounce b { color: var(--gold); font-weight: 700; }
+    .karats-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+    .karats-table th {
+      text-align: right; padding: 6px 8px; background: var(--bg-deep);
+      color: var(--gold); font-weight: 700; font-size: 10.5px;
+      border-bottom: 1px solid var(--border-strong);
+    }
+    .karats-table td {
+      padding: 7px 8px; border-bottom: 1px solid var(--border); font-size: 12px;
+    }
+    .karats-table tr:last-child td { border-bottom: none; }
+    .karats-table .karat-name { font-weight: 700; color: var(--text-primary); }
+    .karats-table .karat-value {
+      direction: ltr; text-align: left; font-weight: 800;
+      color: var(--gold-bright); font-variant-numeric: tabular-nums;
+    }
+    .karat-purity { font-size: 9.5px; color: var(--text-dim); font-family: 'Courier New', monospace; }
+
     .archive-group {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -427,6 +483,15 @@
         </div>
       </div>
 
+      <!-- ★ المعادن الثمينة بالغرام -->
+      <div id="metalsSection" style="display:none;">
+        <div class="section-head">
+          <span class="section-title">💎 المعادن الثمينة</span>
+          <span class="section-sub">بالغرام</span>
+        </div>
+        <div class="metals-list" id="metalsGrid"></div>
+      </div>
+
       <!-- الأرشيف -->
       <div class="section-head">
         <span class="section-title">📂 الأرشيف</span>
@@ -479,6 +544,31 @@
       base: 'دولار',
       previousRates: {} // اسم → السعر السابق (للسهم الاتجاهي)
     };
+
+    // ★ ثوابت المعادن الثمينة
+    const GRAMS_PER_OUNCE = 31.1035;
+    const METALS_ISO = ['XAU', 'XAG', 'XPT', 'XPD'];
+    const METALS_INFO = {
+      'XAU': { ar: 'الذهب',     cls: 'gold' },
+      'XAG': { ar: 'الفضة',     cls: 'silver' },
+      'XPT': { ar: 'البلاتين',  cls: 'platinum' },
+      'XPD': { ar: 'البلاديوم', cls: 'palladium' }
+    };
+    const GOLD_KARATS = [
+      { name: 'عيار 24', purity: '99.9%', factor: 24/24 },
+      { name: 'عيار 22', purity: '91.6%', factor: 22/24 },
+      { name: 'عيار 21', purity: '87.5%', factor: 21/24 },
+      { name: 'عيار 18', purity: '75.0%', factor: 18/24 },
+      { name: 'عيار 14', purity: '58.3%', factor: 14/24 }
+    ];
+    function metalRateToOuncePrice(apiRate) {
+      if (!apiRate || apiRate <= 0) return null;
+      return 1 / apiRate;
+    }
+    function metalRateToGramPrice(apiRate) {
+      const o = metalRateToOuncePrice(apiRate);
+      return o ? o / GRAMS_PER_OUNCE : null;
+    }
 
     // ═══════ Utilities ═══════
     function formatNumber(n, decimals) {
@@ -585,6 +675,7 @@
         }
 
         renderCurrent();
+        renderMetals();
         renderCalculator();
         renderArchive();
         updateFreshness();
@@ -665,6 +756,73 @@
       }).join('');
 
       container.innerHTML = html;
+    }
+
+    // ═══════ ★ Render Metals (بالغرام + عيارات الذهب) ═══════
+    function renderMetals() {
+      const section = document.getElementById('metalsSection');
+      const grid = document.getElementById('metalsGrid');
+
+      const metals = state.current.filter(r =>
+        METALS_ISO.indexOf((r.iso || '').toUpperCase()) !== -1
+      );
+
+      if (!metals.length) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      metals.sort((a, b) => {
+        if (a.iso === 'XAU') return -1;
+        if (b.iso === 'XAU') return 1;
+        return 0;
+      });
+
+      grid.innerHTML = metals.map(m => {
+        const iso = (m.iso || '').toUpperCase();
+        const info = METALS_INFO[iso];
+        const ounceUSD = metalRateToOuncePrice(m.rate);
+        const gramUSD  = metalRateToGramPrice(m.rate);
+        if (!ounceUSD || !gramUSD) return '';
+
+        if (iso === 'XAU') {
+          const karatRows = GOLD_KARATS.map(k => `
+            <tr>
+              <td class="karat-name">${escapeHTML(k.name)} <span class="karat-purity">(${k.purity})</span></td>
+              <td class="karat-value">${formatNumber(gramUSD * k.factor, 2)} <small style="color:var(--text-dim); font-size:10px;">USD</small></td>
+            </tr>
+          `).join('');
+
+          return `
+            <div class="metal-card gold">
+              <div class="metal-head">
+                <div class="metal-name">${escapeHTML(info.ar)}</div>
+                <span class="metal-iso">${iso}</span>
+              </div>
+              <div class="metal-gram">${formatNumber(gramUSD, 2)} <small style="color:var(--text-muted); font-size:12px; font-weight:600;">USD/g</small></div>
+              <div class="metal-gram-label">سعر الغرام · عيار 24 (نقي)</div>
+              <table class="karats-table">
+                <thead><tr><th>العيار</th><th style="text-align:left;">السعر / غرام</th></tr></thead>
+                <tbody>${karatRows}</tbody>
+              </table>
+              <div class="metal-ounce">1 أونصة ترويّة = <b>${formatNumber(ounceUSD, 2)} USD</b></div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="metal-card ${info.cls}">
+            <div class="metal-head">
+              <div class="metal-name">${escapeHTML(info.ar)}</div>
+              <span class="metal-iso">${iso}</span>
+            </div>
+            <div class="metal-gram">${formatNumber(gramUSD, 3)} <small style="color:var(--text-muted); font-size:12px; font-weight:600;">USD/g</small></div>
+            <div class="metal-gram-label">سعر الغرام</div>
+            <div class="metal-ounce">1 أونصة ترويّة = <b>${formatNumber(ounceUSD, 2)} USD</b></div>
+          </div>
+        `;
+      }).filter(Boolean).join('');
     }
 
     // ═══════ Calculator ═══════
