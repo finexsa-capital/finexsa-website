@@ -519,15 +519,16 @@
               <tr>
                 <th>العملة</th>
                 <th>ISO</th>
-                <th style="text-align:left;">السعر مقابل الدولار</th>
+                <th style="text-align:left;">المُكافِئ<br><small style="font-weight:500; color:var(--text-dim); font-size:10.5px;">1 دولار = X</small></th>
+                <th style="text-align:left;">المُعادِل<br><small style="font-weight:500; color:var(--text-dim); font-size:10.5px;">1 عملة = X دولار</small></th>
                 <th>الاتجاه</th>
               </tr>
             </thead>
             <tbody id="ratesBody">
-              <tr class="loading-skeleton"><td colspan="4"><div class="skeleton-bar"></div></td></tr>
-              <tr class="loading-skeleton"><td colspan="4"><div class="skeleton-bar"></div></td></tr>
-              <tr class="loading-skeleton"><td colspan="4"><div class="skeleton-bar"></div></td></tr>
-              <tr class="loading-skeleton"><td colspan="4"><div class="skeleton-bar"></div></td></tr>
+              <tr class="loading-skeleton"><td colspan="5"><div class="skeleton-bar"></div></td></tr>
+              <tr class="loading-skeleton"><td colspan="5"><div class="skeleton-bar"></div></td></tr>
+              <tr class="loading-skeleton"><td colspan="5"><div class="skeleton-bar"></div></td></tr>
+              <tr class="loading-skeleton"><td colspan="5"><div class="skeleton-bar"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -547,6 +548,18 @@
 
           <label class="calc-label" for="calcFrom">من عملة</label>
           <select id="calcFrom" class="calc-select"></select>
+
+          <div style="display:flex; justify-content:center; margin: -4px 0 8px;">
+            <button type="button" id="calcSwap" title="تبديل العملتَين"
+              style="width:38px; height:38px; border-radius:50%; background:var(--gold-muted); border:1px solid var(--border-strong); color:var(--gold-bright); cursor:pointer; display:grid; place-items:center; transition:all 0.2s ease;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="17 1 21 5 17 9"/>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                <polyline points="7 23 3 19 7 15"/>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+              </svg>
+            </button>
+          </div>
 
           <label class="calc-label" for="calcTo">إلى عملة</label>
           <select id="calcTo" class="calc-select"></select>
@@ -767,7 +780,7 @@
     const count = document.getElementById('ratesCount');
 
     if (!state.current.length) {
-      body.innerHTML = `<tr><td colspan="4" class="empty-cell">لا توجد أسعار</td></tr>`;
+      body.innerHTML = `<tr><td colspan="6" class="empty-cell">لا توجد أسعار</td></tr>`;
       count.textContent = '0';
       return;
     }
@@ -775,25 +788,43 @@
     count.textContent = `${state.current.length} عملة`;
 
     body.innerHTML = state.current.map(r => {
+      const isBase = normalizeCurrencyName(r.name) === 'دولار';
       const prev = state.previousRates[normalizeCurrencyName(r.name)];
+
+      // ★ عكس اتجاه السهم: للعملات غير الدولار، الرقم يصعد = العملة هبطت
       let trendHtml = '<span class="trend-pill flat">━</span>';
-      if (prev && prev > 0 && r.rate > 0) {
-        const change = ((r.rate - prev) / prev) * 100;
-        const absChange = Math.abs(change);
+      if (!isBase && prev && prev > 0 && r.rate > 0) {
+        const numChange = ((r.rate - prev) / prev) * 100;
+        const absChange = Math.abs(numChange);
         if (absChange < 0.01) {
           trendHtml = '<span class="trend-pill flat">━</span>';
-        } else if (change > 0) {
-          trendHtml = `<span class="trend-pill up">▲ ${formatNumber(absChange, 2)}%</span>`;
-        } else {
+        } else if (numChange > 0) {
+          // الرقم صعد → العملة هبطت → سهم أحمر
           trendHtml = `<span class="trend-pill down">▼ ${formatNumber(absChange, 2)}%</span>`;
+        } else {
+          // الرقم نزل → العملة ارتفعت → سهم أخضر
+          trendHtml = `<span class="trend-pill up">▲ ${formatNumber(absChange, 2)}%</span>`;
         }
       }
+
+      // ★ المُكافِئ = السعر (X من العملة لكل 1 دولار) — من العمود C
+      // ★ المُعادِل = العمود G (X دولار لكل 1 من العملة)
+      const mukafi = r.rate;
+      const muadel = r.equivalent != null ? r.equivalent : (r.rate > 0 ? 1 / r.rate : null);
+
+      const mukafiHtml = isBase
+        ? '<span style="color:var(--text-dim);">—</span>'
+        : formatNumber(mukafi, 4);
+      const muadelHtml = isBase
+        ? '<span style="color:var(--text-dim);">—</span>'
+        : (muadel != null ? formatNumber(muadel, 6) : '—');
 
       return `
         <tr>
           <td><span class="currency-name">${escapeHTML(r.name)}</span></td>
           <td>${r.iso ? `<span class="currency-iso">${escapeHTML(r.iso)}</span>` : '—'}</td>
-          <td class="rate-value">${formatNumber(r.rate, 4)}</td>
+          <td class="rate-value" title="1 دولار = X من ${escapeHTML(r.name)}">${mukafiHtml}</td>
+          <td class="rate-value" title="1 ${escapeHTML(r.name)} = X دولار" style="font-size:14px;">${muadelHtml}</td>
           <td>${trendHtml}</td>
         </tr>
       `;
@@ -838,6 +869,16 @@
   document.getElementById('calcAmount').addEventListener('input', recalculateCalc);
   document.getElementById('calcFrom').addEventListener('change', recalculateCalc);
   document.getElementById('calcTo').addEventListener('change', recalculateCalc);
+
+  // ★ زرّ تبديل العملتَين
+  document.getElementById('calcSwap').addEventListener('click', () => {
+    const fromSel = document.getElementById('calcFrom');
+    const toSel = document.getElementById('calcTo');
+    const tmp = fromSel.value;
+    fromSel.value = toSel.value;
+    toSel.value = tmp;
+    recalculateCalc();
+  });
 
   // ─── Archive ───
   function populateArchiveFilter() {

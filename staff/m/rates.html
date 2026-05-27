@@ -120,6 +120,39 @@
     .rc-trend.down { background: rgba(255, 107, 107, 0.12); color: var(--error); }
     .rc-trend.flat { background: var(--bg-deep); color: var(--text-dim); }
 
+    /* ★ المُكافِئ والمُعادِل */
+    .rc-equiv {
+      grid-column: 1 / -1;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      display: grid;
+      gap: 5px;
+    }
+    .rc-equiv-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 11.5px;
+    }
+    .rc-equiv-label {
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+    .rc-equiv-val {
+      color: var(--text-muted);
+      direction: ltr;
+      text-align: left;
+      font-variant-numeric: tabular-nums;
+    }
+    .rc-equiv-val b {
+      color: var(--gold-bright);
+      font-weight: 800;
+    }
+
     .rc-update { color: var(--text-dim); font-size: 10.5px; }
 
     /* ─── الحاسبة السريعة ─── */
@@ -374,8 +407,18 @@
           <input type="number" class="calc-field" id="calcAmount" placeholder="0" inputmode="decimal" step="any" value="1">
           <select class="calc-select" id="calcFrom"></select>
         </div>
-        <div class="calc-arrow">↓</div>
-        <div class="calc-row" style="margin-top:10px;">
+        <div style="display:flex; justify-content:center; margin: 8px 0 4px;">
+          <button type="button" id="calcSwap" title="تبديل العملتَين"
+            style="width:38px; height:38px; border-radius:50%; background:var(--gold-muted); border:1px solid var(--border-strong); color:var(--gold-bright); cursor:pointer; display:grid; place-items:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"/>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+              <polyline points="7 23 3 19 7 15"/>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="calc-row" style="margin-top:6px;">
           <div class="calc-result" id="calcResult">
             <div class="cr-label">المعادل</div>
             <div id="calcResultValue">0</div>
@@ -562,17 +605,22 @@
       }
 
       const html = state.current.map(r => {
+        const isBase = normalizeCurrencyName(r.name) === 'دولار';
         const prev = state.previousRates[normalizeCurrencyName(r.name)];
+
+        // ★ عكس اتجاه السهم
         let trendHtml = '';
-        if (prev && prev > 0 && r.rate > 0) {
-          const change = ((r.rate - prev) / prev) * 100;
-          const absChange = Math.abs(change);
+        if (!isBase && prev && prev > 0 && r.rate > 0) {
+          const numChange = ((r.rate - prev) / prev) * 100;
+          const absChange = Math.abs(numChange);
           if (absChange < 0.01) {
             trendHtml = '<span class="rc-trend flat">━</span>';
-          } else if (change > 0) {
-            trendHtml = `<span class="rc-trend up">▲ ${formatNumber(absChange, 2)}%</span>`;
-          } else {
+          } else if (numChange > 0) {
+            // الرقم صعد → العملة هبطت → أحمر
             trendHtml = `<span class="rc-trend down">▼ ${formatNumber(absChange, 2)}%</span>`;
+          } else {
+            // الرقم نزل → العملة ارتفعت → أخضر
+            trendHtml = `<span class="rc-trend up">▲ ${formatNumber(absChange, 2)}%</span>`;
           }
         }
 
@@ -581,7 +629,23 @@
           ? `<span class="rc-status ${isAuto ? 'auto' : 'manual'}">${escapeHTML(r.status)}</span>`
           : '';
 
-        const updateLine = r.lastUpdate ? `<span class="rc-update">آخر تحديث: ${escapeHTML(formatDate(r.lastUpdate))}</span>` : '';
+        const updateLine = r.lastUpdate ? `<span class="rc-update">${escapeHTML(formatDate(r.lastUpdate))}</span>` : '';
+
+        // ★ المُكافِئ + المُعادِل
+        const mukafi = r.rate;
+        const muadel = r.equivalent != null ? r.equivalent : (r.rate > 0 ? 1 / r.rate : null);
+        const equivBlock = isBase ? '' : `
+          <div class="rc-equiv">
+            <div class="rc-equiv-row">
+              <span class="rc-equiv-label">المُكافِئ</span>
+              <span class="rc-equiv-val">1 دولار = <b>${formatNumber(mukafi, 4)}</b> ${escapeHTML(r.name)}</span>
+            </div>
+            <div class="rc-equiv-row">
+              <span class="rc-equiv-label">المُعادِل</span>
+              <span class="rc-equiv-val">1 ${escapeHTML(r.name)} = <b>${muadel != null ? formatNumber(muadel, 6) : '—'}</b> دولار</span>
+            </div>
+          </div>
+        `;
 
         return `
           <div class="rate-card">
@@ -595,6 +659,7 @@
               ${trendHtml}
               ${updateLine}
             </div>
+            ${equivBlock}
           </div>
         `;
       }).join('');
@@ -649,6 +714,16 @@
     document.getElementById('calcAmount').addEventListener('input', recalculateCalc);
     document.getElementById('calcFrom').addEventListener('change', recalculateCalc);
     document.getElementById('calcTo').addEventListener('change', recalculateCalc);
+
+    // ★ زرّ تبديل العملتَين
+    document.getElementById('calcSwap').addEventListener('click', () => {
+      const fromSel = document.getElementById('calcFrom');
+      const toSel = document.getElementById('calcTo');
+      const tmp = fromSel.value;
+      fromSel.value = toSel.value;
+      toSel.value = tmp;
+      recalculateCalc();
+    });
 
     // ═══════ Render: Archive ═══════
     function renderArchive() {

@@ -743,14 +743,15 @@
                   <tr>
                     <th>العملة</th>
                     <th>ISO</th>
-                    <th>السعر مقابل الدولار</th>
+                    <th title="1 دولار = X من العملة">المُكافِئ</th>
+                    <th title="1 من العملة = X دولار">المُعادِل</th>
                     <th>الاتجاه</th>
                     <th>الوضع</th>
                     <th>آخر تحديث</th>
                   </tr>
                 </thead>
                 <tbody id="ratesBody">
-                  <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-dim);">جاري التحميل…</td></tr>
+                  <tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-dim);">جاري التحميل…</td></tr>
                 </tbody>
               </table>
             </div>
@@ -766,7 +767,19 @@
               <input type="number" id="calcAmount" class="field-input" placeholder="0" inputmode="decimal" step="any" value="1" style="margin-bottom:12px; font-weight:700; direction:ltr; text-align:left;">
 
               <label class="field-label" style="font-size:11.5px; margin-bottom:6px; display:block;">من</label>
-              <select id="calcFrom" class="field-select" style="margin-bottom:12px;"></select>
+              <select id="calcFrom" class="field-select" style="margin-bottom:8px;"></select>
+
+              <div style="display:flex; justify-content:center; margin: 4px 0 4px;">
+                <button type="button" id="calcSwap" title="تبديل العملتَين"
+                  style="width:36px; height:36px; border-radius:50%; background:var(--gold-muted); border:1px solid var(--border-strong); color:var(--gold-bright); cursor:pointer; display:grid; place-items:center; transition:all 0.2s ease;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 1 21 5 17 9"/>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7 23 3 19 7 15"/>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                  </svg>
+                </button>
+              </div>
 
               <label class="field-label" style="font-size:11.5px; margin-bottom:6px; display:block;">إلى</label>
               <select id="calcTo" class="field-select" style="margin-bottom:16px;"></select>
@@ -1096,7 +1109,7 @@
       const count = document.getElementById('ratesCount');
 
       if (!state.current.length) {
-        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-dim);">لا توجد أسعار</td></tr>`;
+        body.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-dim);">لا توجد أسعار</td></tr>`;
         count.textContent = '0';
         return;
       }
@@ -1104,19 +1117,35 @@
       count.textContent = `${state.current.length} عملة`;
 
       body.innerHTML = state.current.map(r => {
+        const isBase = normalizeCurrencyName(r.name) === 'دولار';
         const prev = state.previousRates[normalizeCurrencyName(r.name)];
-        let trendHtml = '<span class="trend-pill flat">—</span>';
-        if (prev && prev > 0 && r.rate > 0) {
-          const change = ((r.rate - prev) / prev) * 100;
-          const absChange = Math.abs(change);
+
+        // ★ عكس اتجاه السهم: الرقم يصعد للعملة غير الدولار = العملة هبطت
+        let trendHtml = '<span class="trend-pill flat">━</span>';
+        if (!isBase && prev && prev > 0 && r.rate > 0) {
+          const numChange = ((r.rate - prev) / prev) * 100;
+          const absChange = Math.abs(numChange);
           if (absChange < 0.01) {
             trendHtml = '<span class="trend-pill flat">━</span>';
-          } else if (change > 0) {
-            trendHtml = `<span class="trend-pill up">▲ ${formatNumber(absChange, 2)}%</span>`;
-          } else {
+          } else if (numChange > 0) {
+            // الرقم صعد → العملة هبطت → سهم أحمر
             trendHtml = `<span class="trend-pill down">▼ ${formatNumber(absChange, 2)}%</span>`;
+          } else {
+            // الرقم نزل → العملة ارتفعت → سهم أخضر
+            trendHtml = `<span class="trend-pill up">▲ ${formatNumber(absChange, 2)}%</span>`;
           }
         }
+
+        // ★ المُكافِئ = السعر (العمود C) | المُعادِل = العمود G
+        const mukafi = r.rate;
+        const muadel = r.equivalent != null ? r.equivalent : (r.rate > 0 ? 1 / r.rate : null);
+
+        const mukafiHtml = isBase
+          ? '<span style="color:var(--text-dim);">—</span>'
+          : formatNumber(mukafi, 4);
+        const muadelHtml = isBase
+          ? '<span style="color:var(--text-dim);">—</span>'
+          : (muadel != null ? formatNumber(muadel, 6) : '—');
 
         const isAuto = (r.status || '').includes('تلقا') || (r.status || '').toLowerCase().includes('auto');
         const statusBadge = r.status
@@ -1129,7 +1158,8 @@
           <tr>
             <td><b>${escapeHTML(r.name)}</b></td>
             <td>${r.iso ? `<span class="rate-iso-pill">${escapeHTML(r.iso)}</span>` : '—'}</td>
-            <td class="rate-value-cell">${formatNumber(r.rate, 4)}</td>
+            <td class="rate-value-cell" title="1 دولار = X من ${escapeHTML(r.name)}">${mukafiHtml}</td>
+            <td class="rate-value-cell" title="1 ${escapeHTML(r.name)} = X دولار" style="font-size:13.5px;">${muadelHtml}</td>
             <td>${trendHtml}</td>
             <td>${statusBadge}</td>
             <td style="color:var(--text-muted); font-size:12.5px;">${updateStr}</td>
@@ -1183,6 +1213,16 @@
     document.getElementById('calcAmount').addEventListener('input', recalculateCalc);
     document.getElementById('calcFrom').addEventListener('change', recalculateCalc);
     document.getElementById('calcTo').addEventListener('change', recalculateCalc);
+
+    // ★ زرّ تبديل العملتَين
+    document.getElementById('calcSwap').addEventListener('click', () => {
+      const fromSel = document.getElementById('calcFrom');
+      const toSel = document.getElementById('calcTo');
+      const tmp = fromSel.value;
+      fromSel.value = toSel.value;
+      toSel.value = tmp;
+      recalculateCalc();
+    });
 
     // ═══════ Archive: Filter dropdown ═══════
     function populateArchiveFilter() {
