@@ -5,7 +5,7 @@
  * - عند الفشل، يستخدم النسخة المحفوظة محلياً
  */
 
-const CACHE_VERSION = 'finexsa-staff-v2';
+const CACHE_VERSION = 'finexsa-staff-v3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
