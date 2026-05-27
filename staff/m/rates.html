@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0A0E1A">
+  <title>أسعار الصرف — FINEXSA</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="m.css">
+
+  <style>
+    /* ═══ صفحة أسعار الصرف ═══ */
+
+    .rates-page { padding: 16px 14px 90px; position: relative; z-index: 1; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 18px 0 12px;
+      padding: 0 2px;
+    }
+    .section-head:first-child { margin-top: 0; }
+    .section-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: 0.3px;
+    }
+    .section-sub {
+      font-size: 11.5px;
+      color: var(--text-dim);
+    }
+
+    /* ─── بطاقات الأسعار الحالية ─── */
+    .rate-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      gap: 6px 14px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .rate-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold) 0%, transparent 100%);
+    }
+    .rate-card .rc-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .rate-card .rc-iso {
+      display: inline-block;
+      margin-right: 8px;
+      padding: 2px 7px;
+      background: var(--gold-muted);
+      color: var(--gold-bright);
+      border-radius: 5px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-family: 'Courier New', monospace;
+    }
+    .rate-card .rc-rate {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--gold-bright);
+      letter-spacing: -0.3px;
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+      text-align: left;
+    }
+    .rate-card .rc-meta {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .rc-status {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 10.5px;
+    }
+    .rc-status.auto { background: rgba(96, 165, 250, 0.12); color: var(--info); }
+    .rc-status.manual { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+
+    .rc-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 10.5px;
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+    }
+    .rc-trend.up { background: rgba(74, 222, 128, 0.12); color: var(--success); }
+    .rc-trend.down { background: rgba(255, 107, 107, 0.12); color: var(--error); }
+    .rc-trend.flat { background: var(--bg-deep); color: var(--text-dim); }
+
+    .rc-update { color: var(--text-dim); font-size: 10.5px; }
+
+    /* ─── الحاسبة السريعة ─── */
+    .calculator-card {
+      background: linear-gradient(135deg, rgba(30, 42, 90, 0.4), rgba(201, 162, 39, 0.06));
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .calc-row {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .calc-row:last-child { margin-bottom: 0; }
+    .calc-field {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      width: 100%;
+      direction: ltr;
+      text-align: left;
+    }
+    .calc-field:focus { outline: none; border-color: var(--gold); }
+    .calc-select {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      width: 100%;
+    }
+    .calc-result {
+      grid-column: 1 / -1;
+      background: var(--bg-void);
+      border: 1px dashed var(--gold);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--gold-bright);
+      letter-spacing: -0.3px;
+      direction: ltr;
+    }
+    .calc-result .cr-label { color: var(--text-muted); font-size: 11px; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.5px; }
+    .calc-arrow {
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font-size: 18px;
+    }
+
+    /* ─── الأرشيف ─── */
+    .search-wrap { position: relative; margin-bottom: 12px; }
+    .search-input {
+      width: 100%;
+      padding: 11px 40px 11px 14px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13.5px;
+    }
+    .search-input:focus { outline: none; border-color: var(--gold); }
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    .archive-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .archive-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      user-select: none;
+    }
+    .archive-head:active { background: var(--bg-card-hover); }
+    .archive-date {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--gold-bright);
+      font-variant-numeric: tabular-nums;
+    }
+    .archive-count {
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .archive-chevron {
+      transition: transform 0.25s ease;
+      color: var(--text-muted);
+    }
+    .archive-group.is-open .archive-chevron { transform: rotate(180deg); }
+
+    .archive-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .archive-group.is-open .archive-body { max-height: 800px; }
+
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .archive-row .ar-name { color: var(--text-primary); font-weight: 700; }
+    .archive-row .ar-iso {
+      display: inline-block;
+      margin-right: 6px;
+      padding: 1px 5px;
+      background: var(--gold-muted);
+      color: var(--gold-bright);
+      border-radius: 4px;
+      font-size: 9.5px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+    }
+    .archive-row .ar-rate {
+      color: var(--gold-bright);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+      font-size: 13.5px;
+    }
+
+    /* ─── حالات فارغة/تحميل ─── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-card-hover) 50%, var(--bg-card) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s linear infinite;
+      border-radius: 12px;
+      height: 78px;
+      margin-bottom: 10px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+    }
+    .empty-state svg { width: 48px; height: 48px; opacity: 0.4; margin-bottom: 10px; }
+
+    /* ─── شارة تاريخ التحديث الكبيرة ─── */
+    .freshness-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .freshness-badge.fresh { color: var(--success); border-color: rgba(74, 222, 128, 0.25); }
+    .freshness-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+    .freshness-badge.fresh .dot { background: var(--success); }
+  </style>
+</head>
+<body>
+
+  <!-- Loader -->
+  <div class="app-loader" id="appLoader">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header with-safe">
+    <div class="header-left">
+      <button class="icon-btn" onclick="window.location.href='index.html'" aria-label="رجوع">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1 class="app-title">أسعار الصرف</h1>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="btnRefresh" aria-label="تحديث">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-content">
+    <div class="rates-page">
+
+      <!-- شارة التحديث -->
+      <div class="section-head">
+        <span class="section-title">📊 الأسعار الحالية</span>
+        <span class="freshness-badge" id="freshnessBadge">
+          <span class="dot"></span>
+          <span id="freshnessText">جاري التحميل…</span>
+        </span>
+      </div>
+
+      <!-- بطاقات الأسعار -->
+      <div id="ratesContainer">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
+
+      <!-- الحاسبة -->
+      <div class="section-head">
+        <span class="section-title">🧮 حاسبة سريعة</span>
+        <span class="section-sub">دقّة كاملة</span>
+      </div>
+      <div class="calculator-card">
+        <div class="calc-row">
+          <input type="number" class="calc-field" id="calcAmount" placeholder="0" inputmode="decimal" step="any" value="1">
+          <select class="calc-select" id="calcFrom"></select>
+        </div>
+        <div class="calc-arrow">↓</div>
+        <div class="calc-row" style="margin-top:10px;">
+          <div class="calc-result" id="calcResult">
+            <div class="cr-label">المعادل</div>
+            <div id="calcResultValue">0</div>
+          </div>
+          <select class="calc-select" id="calcTo" style="align-self: stretch;"></select>
+        </div>
+      </div>
+
+      <!-- الأرشيف -->
+      <div class="section-head">
+        <span class="section-title">📂 الأرشيف</span>
+        <span class="section-sub" id="archiveCount">—</span>
+      </div>
+
+      <div class="search-wrap">
+        <input type="text" class="search-input" id="archiveSearch" placeholder="ابحث بالتاريخ أو العملة…">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+
+      <div id="archiveContainer">
+        <div class="empty-state">جاري التحميل…</div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Toast container -->
+  <div id="toastContainer" style="position: fixed; bottom: 80px; left: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 8px; pointer-events: none;"></div>
+
+  <!-- Firebase & App Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDynBPUjrpBHmPc6EGwHyOZmkEiv-pNhR0",
+      authDomain: "finexsa-capital.firebaseapp.com",
+      projectId: "finexsa-capital",
+      storageBucket: "finexsa-capital.firebasestorage.app",
+      messagingSenderId: "225933147484",
+      appId: "1:225933147484:web:b71f87f0705553062ed599",
+      measurementId: "G-8V2H675WN1"
+    };
+
+    const STAFF_API_URL = 'https://script.google.com/macros/s/AKfycbyNz55961uxn0OTfj55vrpxvX6HCMybXOxpkotlLBOr5rmUieyTR_g4cCAvOSc_oUvN/exec';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ═══════ State ═══════
+    const state = {
+      current: [],   // { name, iso, rate, status, lastUpdate, notes, equivalent }
+      archive: [],   // [{ date, rates: [...] }]
+      base: 'دولار',
+      previousRates: {} // اسم → السعر السابق (للسهم الاتجاهي)
+    };
+
+    // ═══════ Utilities ═══════
+    function formatNumber(n, decimals) {
+      if (n == null || isNaN(n)) return '0';
+      const d = decimals != null ? decimals : (Math.abs(n) >= 100 ? 2 : 4);
+      return Number(n).toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: d
+      });
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return iso;
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${day}/${m}/${y}`;
+    }
+
+    function timeAgo(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return iso;
+      const diff = Date.now() - d.getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'الآن';
+      if (mins < 60) return `قبل ${mins} د`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `قبل ${hrs} س`;
+      const days = Math.floor(hrs / 24);
+      return `قبل ${days} يوم`;
+    }
+
+    function escapeHTML(s) {
+      return String(s || '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+      );
+    }
+
+    function toast(msg, type = 'info', duration = 3000) {
+      const colors = {
+        info:    { bg: '#1A2440', fg: '#60A5FA' },
+        success: { bg: '#0F2A1E', fg: '#4ADE80' },
+        error:   { bg: '#2A0F12', fg: '#FF6B6B' }
+      };
+      const c = colors[type] || colors.info;
+      const el = document.createElement('div');
+      el.style.cssText = `background:${c.bg}; color:${c.fg}; padding:10px 14px; border-radius:10px; font-size:13px; font-weight:700; pointer-events:auto; border:1px solid ${c.fg}33; box-shadow:0 4px 16px rgba(0,0,0,0.4); animation: slideUp 0.25s ease;`;
+      el.textContent = msg;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => el.remove(), 250);
+      }, duration);
+    }
+
+    // تطبيع متسامح
+    function normalizeCurrencyName(s) {
+      return String(s || '').trim().toLowerCase()
+        .replace(/^ال/, '')
+        .replace(/[ةه]/g, 'ه')
+        .replace(/[يى]/g, 'ي')
+        .replace(/[أإآا]/g, 'ا')
+        .replace(/\s+/g, '');
+    }
+
+    // ═══════ API ═══════
+    async function apiCall(action) {
+      const user = auth.currentUser;
+      if (!user) throw new Error('انتهت الجلسة');
+      const token = await user.getIdToken();
+      const res = await fetch(`${STAFF_API_URL}?action=${action}&token=${encodeURIComponent(token)}`);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.message || 'فشل الطلب');
+      return data;
+    }
+
+    async function loadAll(force = false) {
+      try {
+        if (force) {
+          try { localStorage.removeItem('finexsa_rates'); } catch {}
+        }
+
+        const [ratesData, archiveData] = await Promise.all([
+          apiCall('getCurrencyRates'),
+          apiCall('getCurrencyArchive')
+        ]);
+
+        state.current = ratesData.fullData || [];
+        state.base = ratesData.base || 'دولار';
+        state.archive = archiveData.dates || [];
+
+        // حساب الأسعار السابقة من الأرشيف (لأسهم الاتجاه)
+        state.previousRates = {};
+        if (state.archive.length >= 2) {
+          // الأسعار من اليوم قبل الأخير
+          const prev = state.archive[1];
+          (prev.rates || []).forEach(r => {
+            state.previousRates[normalizeCurrencyName(r.name)] = r.rate;
+          });
+        }
+
+        renderCurrent();
+        renderCalculator();
+        renderArchive();
+        updateFreshness();
+      } catch (err) {
+        console.error(err);
+        toast('فشل الجلب: ' + err.message, 'error');
+        document.getElementById('ratesContainer').innerHTML =
+          `<div class="empty-state">⚠️ تعذّر التحميل<br><small style="color:var(--text-dim)">${escapeHTML(err.message)}</small></div>`;
+      }
+    }
+
+    // ═══════ Render: Current Rates ═══════
+    function renderCurrent() {
+      const container = document.getElementById('ratesContainer');
+      if (!state.current.length) {
+        container.innerHTML = `<div class="empty-state">لا توجد أسعار متاحة</div>`;
+        return;
+      }
+
+      const html = state.current.map(r => {
+        const prev = state.previousRates[normalizeCurrencyName(r.name)];
+        let trendHtml = '';
+        if (prev && prev > 0 && r.rate > 0) {
+          const change = ((r.rate - prev) / prev) * 100;
+          const absChange = Math.abs(change);
+          if (absChange < 0.01) {
+            trendHtml = '<span class="rc-trend flat">━</span>';
+          } else if (change > 0) {
+            trendHtml = `<span class="rc-trend up">▲ ${formatNumber(absChange, 2)}%</span>`;
+          } else {
+            trendHtml = `<span class="rc-trend down">▼ ${formatNumber(absChange, 2)}%</span>`;
+          }
+        }
+
+        const isAuto = (r.status || '').includes('تلقا') || (r.status || '').toLowerCase().includes('auto');
+        const statusBadge = r.status
+          ? `<span class="rc-status ${isAuto ? 'auto' : 'manual'}">${escapeHTML(r.status)}</span>`
+          : '';
+
+        const updateLine = r.lastUpdate ? `<span class="rc-update">آخر تحديث: ${escapeHTML(formatDate(r.lastUpdate))}</span>` : '';
+
+        return `
+          <div class="rate-card">
+            <div class="rc-name">
+              ${escapeHTML(r.name)}
+              ${r.iso ? `<span class="rc-iso">${escapeHTML(r.iso)}</span>` : ''}
+            </div>
+            <div class="rc-rate">${formatNumber(r.rate, 4)}</div>
+            <div class="rc-meta">
+              ${statusBadge}
+              ${trendHtml}
+              ${updateLine}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    // ═══════ Calculator ═══════
+    function renderCalculator() {
+      const fromSel = document.getElementById('calcFrom');
+      const toSel = document.getElementById('calcTo');
+      const opts = state.current.map(r =>
+        `<option value="${escapeHTML(r.name)}">${escapeHTML(r.name)} ${r.iso ? '(' + escapeHTML(r.iso) + ')' : ''}</option>`
+      ).join('');
+      fromSel.innerHTML = opts;
+      toSel.innerHTML = opts;
+
+      // افتراضي: من دولار → ليرة تركية (إن وُجدت)
+      const baseIdx = state.current.findIndex(r => normalizeCurrencyName(r.name) === 'دولار');
+      const tlIdx = state.current.findIndex(r =>
+        normalizeCurrencyName(r.name).includes('ليرهتركيه') ||
+        (r.iso || '').toUpperCase() === 'TRY'
+      );
+      if (baseIdx >= 0) fromSel.selectedIndex = baseIdx;
+      if (tlIdx >= 0) toSel.selectedIndex = tlIdx;
+
+      recalculateCalc();
+    }
+
+    function recalculateCalc() {
+      const amt = parseFloat(document.getElementById('calcAmount').value) || 0;
+      const fromCurr = document.getElementById('calcFrom').value;
+      const toCurr = document.getElementById('calcTo').value;
+      const resultEl = document.getElementById('calcResultValue');
+
+      if (!amt || !fromCurr || !toCurr) {
+        resultEl.textContent = '0';
+        return;
+      }
+
+      const fromObj = state.current.find(r => r.name === fromCurr);
+      const toObj = state.current.find(r => r.name === toCurr);
+      if (!fromObj || !toObj || !fromObj.rate || !toObj.rate) {
+        resultEl.textContent = '—';
+        return;
+      }
+
+      const converted = (amt / fromObj.rate) * toObj.rate;
+      resultEl.innerHTML = `${formatNumber(converted, 4)} <span style="color:var(--text-muted); font-size:12px; font-weight:600;">${escapeHTML(toCurr)}</span>`;
+    }
+
+    document.getElementById('calcAmount').addEventListener('input', recalculateCalc);
+    document.getElementById('calcFrom').addEventListener('change', recalculateCalc);
+    document.getElementById('calcTo').addEventListener('change', recalculateCalc);
+
+    // ═══════ Render: Archive ═══════
+    function renderArchive() {
+      const container = document.getElementById('archiveContainer');
+      const countEl = document.getElementById('archiveCount');
+      const search = (document.getElementById('archiveSearch').value || '').trim().toLowerCase();
+      const searchNorm = normalizeCurrencyName(search);
+
+      let groups = state.archive;
+      if (search) {
+        groups = groups
+          .map(g => {
+            const dateMatch = g.date.toLowerCase().includes(search);
+            if (dateMatch) return g;
+            const filtered = (g.rates || []).filter(r =>
+              normalizeCurrencyName(r.name).includes(searchNorm) ||
+              (r.iso || '').toLowerCase().includes(search)
+            );
+            return filtered.length ? { date: g.date, rates: filtered } : null;
+          })
+          .filter(Boolean);
+      }
+
+      countEl.textContent = `${state.archive.length} يوم`;
+
+      if (!groups.length) {
+        container.innerHTML = `<div class="empty-state">${search ? 'لا توجد نتائج' : 'لا يوجد أرشيف'}</div>`;
+        return;
+      }
+
+      const html = groups.map((g, idx) => `
+        <div class="archive-group ${idx === 0 ? 'is-open' : ''}" data-date="${escapeHTML(g.date)}">
+          <div class="archive-head" onclick="this.parentElement.classList.toggle('is-open')">
+            <span class="archive-date">${escapeHTML(formatDate(g.date))}</span>
+            <span class="archive-count">
+              ${g.rates.length} عملة
+              <svg class="archive-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+          <div class="archive-body">
+            ${g.rates.map(r => `
+              <div class="archive-row">
+                <div>
+                  <span class="ar-name">${escapeHTML(r.name)}</span>
+                  ${r.iso ? `<span class="ar-iso">${escapeHTML(r.iso)}</span>` : ''}
+                </div>
+                <span class="ar-rate">${formatNumber(r.rate, 4)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = html;
+    }
+
+    document.getElementById('archiveSearch').addEventListener('input', renderArchive);
+
+    // ═══════ Freshness Badge ═══════
+    function updateFreshness() {
+      const badge = document.getElementById('freshnessBadge');
+      const text = document.getElementById('freshnessText');
+      if (!state.current.length) {
+        text.textContent = 'لا توجد بيانات';
+        badge.classList.remove('fresh');
+        return;
+      }
+
+      // ابحث عن أحدث تاريخ تحديث في القائمة
+      let latest = null;
+      state.current.forEach(r => {
+        if (r.lastUpdate) {
+          const d = new Date(r.lastUpdate);
+          if (!isNaN(d) && (!latest || d > latest)) latest = d;
+        }
+      });
+
+      if (!latest) {
+        text.textContent = 'محدّث الآن';
+        badge.classList.add('fresh');
+        return;
+      }
+
+      const ageHours = (Date.now() - latest.getTime()) / 3600000;
+      text.textContent = ageHours < 24 ? `محدّث ${timeAgo(latest.toISOString())}` : `قديم ${timeAgo(latest.toISOString())}`;
+      if (ageHours < 24) badge.classList.add('fresh');
+      else badge.classList.remove('fresh');
+    }
+
+    // ═══════ Refresh Button ═══════
+    document.getElementById('btnRefresh').addEventListener('click', async () => {
+      const btn = document.getElementById('btnRefresh');
+      btn.style.opacity = '0.5';
+      btn.disabled = true;
+      try {
+        await loadAll(true);
+        toast('✓ تمّ التحديث', 'success');
+      } finally {
+        btn.style.opacity = '';
+        btn.disabled = false;
+      }
+    });
+
+    // ═══════ Init ═══════
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.replace('login.html');
+        return;
+      }
+      document.getElementById('appLoader').classList.add('is-hidden');
+      await loadAll();
+    });
+  </script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
