@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary Meta Tags -->
+<title>أسعار الصرف اللحظية — FINEXSA Capital</title>
+<meta name="title" content="أسعار الصرف اللحظية — FINEXSA Capital">
+<meta name="description" content="أسعار صرف العملات اللحظية مع الأرشيف اليومي وحاسبة تحويل دقيقة. الدولار، اليورو، الليرة التركية، الليرة السورية، الدينار الأردني.">
+<meta name="keywords" content="أسعار الصرف, تحويل العملات, ليرة تركية, ليرة سورية, دولار, يورو, FINEXSA">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://finexsacapital.com/rates.html">
+<meta property="og:title" content="أسعار الصرف اللحظية — FINEXSA Capital">
+<meta property="og:description" content="أسعار صرف العملات اللحظية مع الأرشيف وحاسبة تحويل دقيقة.">
+<meta property="og:site_name" content="FINEXSA Capital">
+<meta property="og:locale" content="ar_AR">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+
+<!-- Favicons -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5Q5NLD2WW5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5Q5NLD2WW5');
+</script>
+
+<style>
+  /* ═══════ Rates Page — يستخدم نفس design tokens من styles.css ═══════ */
+
+  .rates-hero {
+    position: relative;
+    padding: 140px 0 60px;
+    text-align: center;
+    z-index: 1;
+  }
+  .rates-hero .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+  .rates-hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    background: var(--gold-muted);
+    border: 1px solid var(--border-strong);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--gold-bright);
+    font-weight: 700;
+    margin-bottom: 24px;
+  }
+  .rates-hero-tag .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    box-shadow: 0 0 0 0 rgba(230, 188, 63, 0.7);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(230, 188, 63, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(230, 188, 63, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(230, 188, 63, 0); }
+  }
+  .rates-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+  .rates-hero h1 .accent { color: var(--gold-bright); font-style: italic; }
+  .rates-hero p {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 680px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ═══════ Layout ═══════ */
+  .rates-section {
+    position: relative;
+    z-index: 1;
+    padding: 40px 0 100px;
+  }
+  .rates-section .container {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .section-head h2 .accent { color: var(--gold-bright); font-style: italic; }
+  .section-head-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .section-head-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .freshness-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+  .freshness-pill .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+  }
+  .freshness-pill.fresh { color: #4ADE80; border-color: rgba(74, 222, 128, 0.3); }
+  .freshness-pill.fresh .dot { background: #4ADE80; }
+  .btn-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--gold-muted);
+    border: 1px solid var(--border-strong);
+    border-radius: 100px;
+    color: var(--gold-bright);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-refresh:hover { background: var(--gold); color: var(--bg-void); }
+  .btn-refresh:disabled { opacity: 0.5; cursor: wait; }
+
+  /* ═══════ Top grid: rates + calculator ═══════ */
+  .top-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 24px;
+    margin-bottom: 56px;
+  }
+  @media (max-width: 980px) {
+    .top-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Rates Cards Grid ─── */
+  .rates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .rate-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .rate-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+  }
+  .rate-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--gold) 0%, transparent 100%);
+  }
+  .rate-card .rc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .rate-card .rc-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+  .rate-card .rc-iso {
+    display: inline-block;
+    padding: 3px 9px;
+    background: var(--gold-muted);
+    color: var(--gold-bright);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    font-family: 'Courier New', monospace;
+  }
+  .rate-card .rc-value {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--gold-bright);
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    text-align: left;
+    margin-bottom: 4px;
+    font-family: var(--font-display);
+  }
+  .rate-card .rc-label {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .rate-card .rc-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+  }
+  .rc-trend.up   { background: rgba(74, 222, 128, 0.12); color: #4ADE80; }
+  .rc-trend.down { background: rgba(255, 107, 107, 0.12); color: #FF6B6B; }
+  .rc-trend.flat { background: var(--bg-deep); color: var(--text-dim); }
+
+  /* ─── Calculator ─── */
+  .calculator-card {
+    background: linear-gradient(135deg, rgba(30, 42, 90, 0.5), rgba(201, 162, 39, 0.06));
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 26px;
+    align-self: start;
+    position: sticky;
+    top: 100px;
+  }
+  .calculator-card h3 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 18px;
+  }
+  .calc-field {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .calc-field:focus { outline: none; border-color: var(--gold); }
+  .calc-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+  .calc-amount {
+    direction: ltr;
+    text-align: left;
+    font-size: 18px;
+  }
+  .calc-result {
+    background: var(--bg-void);
+    border: 1px dashed var(--gold);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    margin-top: 4px;
+  }
+  .calc-result-label {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  .calc-result-value {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold-bright);
+    direction: ltr;
+    font-variant-numeric: tabular-nums;
+  }
+  .calc-result-currency {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-family: var(--font-arabic);
+    font-weight: 600;
+  }
+
+  /* ─── Archive ─── */
+  .archive-section {
+    margin-top: 56px;
+  }
+  .archive-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .archive-controls input,
+  .archive-controls select {
+    padding: 11px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .archive-controls input { flex: 1; min-width: 200px; }
+  .archive-controls select { min-width: 180px; }
+  .archive-controls input:focus,
+  .archive-controls select:focus { outline: none; border-color: var(--gold); }
+
+  .archive-table-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .archive-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .archive-table th {
+    text-align: right;
+    padding: 14px 20px;
+    background: var(--bg-deep);
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border-strong);
+    letter-spacing: 0.3px;
+  }
+  .archive-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+  .archive-table tbody tr:hover {
+    background: var(--bg-card-hover);
+  }
+  .archive-table tbody tr:last-child td { border-bottom: none; }
+  .ar-date {
+    font-weight: 700;
+    color: var(--gold-bright);
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    text-align: right;
+  }
+  .ar-name { font-weight: 700; }
+  .ar-rate {
+    font-weight: 800;
+    color: var(--gold-bright);
+    direction: ltr;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+  }
+  .ar-source {
+    color: var(--text-dim);
+    font-size: 12.5px;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-card-hover) 50%, var(--bg-card) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    border-radius: var(--radius);
+    height: 160px;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  .empty-cell {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* تنبيه بسيط لزوّار الموقع */
+  .info-note {
+    margin-top: 24px;
+    padding: 14px 18px;
+    background: rgba(96, 165, 250, 0.06);
+    border-right: 3px solid #60A5FA;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .info-note strong { color: #60A5FA; }
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     NAVIGATION
+     ============================================ -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">⚖</div>
+      <div class="brand-text">
+        <span class="brand-name">FINEXSA</span>
+        <span class="brand-sub">Capital</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#home">الرئيسية</a></li>
+      <li><a href="index.html#about">من نحن</a></li>
+      <li><a href="index.html#services">خدماتنا</a></li>
+      <li><a href="index.html#team">فريقنا</a></li>
+      <li><a href="rates.html" class="active">أسعار الصرف</a></li>
+      <li><a href="index.html#finexsa-one">FINEXSA One</a></li>
+      <li><a href="index.html#contact">اتصل بنا</a></li>
+    </ul>
+    <a href="login.html" class="nav-cta">
+      <span>🔐</span>
+      <span>دخول العملاء</span>
+    </a>
+    <button class="burger-btn" id="burger-btn" aria-label="القائمة" type="button">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer Menu -->
+<div class="mobile-drawer-overlay" id="drawer-overlay"></div>
+<aside class="mobile-drawer" id="mobile-drawer">
+  <ul class="mobile-drawer-links">
+    <li><a href="index.html#home">الرئيسية</a></li>
+    <li><a href="index.html#about">من نحن</a></li>
+    <li><a href="index.html#services">خدماتنا</a></li>
+    <li><a href="index.html#team">فريقنا</a></li>
+    <li><a href="rates.html">أسعار الصرف</a></li>
+    <li><a href="index.html#finexsa-one">FINEXSA One</a></li>
+    <li><a href="index.html#contact">اتصل بنا</a></li>
+  </ul>
+  <a href="login.html" class="mobile-drawer-cta">🔐 دخول العملاء</a>
+  <div class="mobile-drawer-contact">
+    <div class="mobile-drawer-contact-label">تواصل سريع</div>
+    <a href="https://wa.me/905362323310" target="_blank" rel="noopener">💬 واتساب — تركيا</a>
+    <a href="tel:+963994470219">📞 هاتف — دمشق</a>
+    <a href="mailto:info@finexsacapitalnet.com">📧 info@finexsacapitalnet.com</a>
+  </div>
+</aside>
+
+<script>
+(function() {
+  const burger = document.getElementById('burger-btn');
+  const drawer = document.getElementById('mobile-drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const links = drawer ? drawer.querySelectorAll('a') : [];
+  function toggle() {
+    burger.classList.toggle('is-open');
+    drawer.classList.toggle('is-open');
+    overlay.classList.toggle('is-open');
+    document.body.classList.toggle('drawer-open');
+  }
+  function close() {
+    burger.classList.remove('is-open');
+    drawer.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.classList.remove('drawer-open');
+  }
+  if (burger) burger.addEventListener('click', toggle);
+  if (overlay) overlay.addEventListener('click', close);
+  links.forEach(l => l.addEventListener('click', close));
+})();
+</script>
+
+<!-- ============================================
+     HERO
+     ============================================ -->
+<section class="rates-hero">
+  <div class="container">
+    <div class="rates-hero-tag">
+      <span class="live-dot"></span>
+      <span>أسعار صرف لحظية</span>
+    </div>
+    <h1>
+      أسعار الصرف <span class="accent">اللحظية</span><br>
+      مع أرشيف يومي
+    </h1>
+    <p>
+      آخر أسعار صرف العملات الرئيسية مقابل الدولار الأمريكي، محدّثة من مصادرنا المحاسبية، مع حاسبة تحويل دقيقة وأرشيف يومي للمقارنة عبر الزمن.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================
+     CURRENT RATES + CALCULATOR
+     ============================================ -->
+<section class="rates-section">
+  <div class="container">
+
+    <div class="section-head">
+      <div>
+        <h2>الأسعار <span class="accent">الحالية</span></h2>
+        <div class="section-head-sub">مقابل الدولار الأمريكي</div>
+      </div>
+      <div class="section-head-actions">
+        <span class="freshness-pill" id="freshnessBadge">
+          <span class="dot"></span>
+          <span id="freshnessText">جاري التحميل…</span>
+        </span>
+        <button class="btn-refresh" id="btnRefresh">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          تحديث
+        </button>
+      </div>
+    </div>
+
+    <div class="top-grid">
+      <!-- Rates Cards -->
+      <div class="rates-grid" id="ratesGrid">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
+
+      <!-- Calculator -->
+      <div class="calculator-card">
+        <h3>حاسبة <span style="color:var(--gold-bright); font-style:italic;">التحويل</span></h3>
+        <label class="calc-label" for="calcAmount">المبلغ</label>
+        <input type="number" id="calcAmount" class="calc-field calc-amount" placeholder="0" inputmode="decimal" step="any" value="1">
+        <label class="calc-label" for="calcFrom">من عملة</label>
+        <select id="calcFrom" class="calc-field"></select>
+        <label class="calc-label" for="calcTo">إلى عملة</label>
+        <select id="calcTo" class="calc-field" style="margin-bottom:18px;"></select>
+        <div class="calc-result">
+          <div class="calc-result-label">المعادل</div>
+          <div class="calc-result-value" id="calcResultValue">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== ARCHIVE ====== -->
+    <div class="archive-section">
+      <div class="section-head">
+        <div>
+          <h2>الأرشيف <span class="accent">اليومي</span></h2>
+          <div class="section-head-sub" id="archiveSub">سجل أسعار الصرف اليومية</div>
+        </div>
+      </div>
+
+      <div class="archive-controls">
+        <input type="text" id="archiveSearch" placeholder="🔍 ابحث بالتاريخ أو اسم العملة…">
+        <select id="archiveCurrencyFilter">
+          <option value="">كل العملات</option>
+        </select>
+      </div>
+
+      <div class="archive-table-wrap">
+        <table class="archive-table">
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>اسم العملة</th>
+              <th>ISO</th>
+              <th style="text-align:left;">السعر</th>
+              <th>المصدر</th>
+            </tr>
+          </thead>
+          <tbody id="archiveBody">
+            <tr><td colspan="5" class="empty-cell">جاري التحميل…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-note">
+        <strong>ℹ️ ملاحظة:</strong> الأسعار المعروضة هي لأغراض المعلومات والمحاسبة الداخلية لدى FINEXSA Capital، وقد تختلف عن أسعار الصرافة الفعلية في الأسواق. لتنفيذ معاملات مالية حقيقية، يُرجى التواصل مع جهة صرافة مرخّصة.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================
+     FOOTER
+     ============================================ -->
+<footer class="footer" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="brand">
+          <div class="brand-mark">⚖</div>
+          <div class="brand-text">
+            <span class="brand-name">FINEXSA</span>
+            <span class="brand-sub">Capital</span>
+          </div>
+        </a>
+        <p class="footer-brand-text">
+          شركة خدمات محاسبية احترافية متخصصة في التحليل المالي والتدقيق والاستشارات. نقدّم حلولاً تساعد الشركات على النمو باتخاذ قرارات مبنية على البيانات.
+        </p>
+      </div>
+
+      <div>
+        <h4>روابط سريعة</h4>
+        <ul class="footer-links">
+          <li><a href="index.html#home">الرئيسية</a></li>
+          <li><a href="index.html#about">من نحن</a></li>
+          <li><a href="index.html#services">خدماتنا</a></li>
+          <li><a href="rates.html">أسعار الصرف</a></li>
+          <li><a href="index.html#team">فريقنا</a></li>
+          <li><a href="index.html#finexsa-one">FINEXSA One</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>خدماتنا</h4>
+        <ul class="footer-links">
+          <li><a href="services/reports.html">التقارير المالية</a></li>
+          <li><a href="services/audit.html">التدقيق والمراجعة</a></li>
+          <li><a href="services/feasibility.html">دراسات الجدوى</a></li>
+          <li><a href="services/accounting.html">المحاسبة المالية</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>تواصل معنا</h4>
+        <div class="footer-contact">
+          <div style="margin-bottom: 14px;">
+            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:13px;">الفرع الرئيسي</strong>
+            <div>📍 إسطنبول — تركيا — مارتر</div>
+            <div style="direction: ltr; text-align: right;">📱 <a href="tel:+905362323310">+90 536 232 3310</a></div>
+          </div>
+          <div style="margin-bottom: 14px;">
+            <strong style="color:var(--gold); display:block; margin-bottom:4px; font-size:13px;">الفرع الثاني</strong>
+            <div>📍 دمشق — سوريا — الحجاز</div>
+            <div style="direction: ltr; text-align: right;">📱 <a href="tel:+963994470219">+963 994 470 219</a></div>
+          </div>
+          <div>📧 <a href="mailto:info@finexsacapitalnet.com">info@finexsacapitalnet.com</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 <strong style="color:var(--text-primary)">FINEXSA Capital</strong>. جميع الحقوق محفوظة.</div>
+      <div><a href="privacy.html">سياسة الخصوصية</a> · <a href="terms.html">الشروط والأحكام</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================
+     LOGIC
+     ============================================ -->
+<script>
+  const STAFF_API_URL = 'https://script.google.com/macros/s/AKfycbyNz55961uxn0OTfj55vrpxvX6HCMybXOxpkotlLBOr5rmUieyTR_g4cCAvOSc_oUvN/exec';
+
+  const state = {
+    current: [],
+    archive: [],
+    previousRates: {}
+  };
+
+  // ─── Helpers ───
+  function normalizeCurrencyName(s) {
+    return String(s || '').trim().toLowerCase()
+      .replace(/^ال/, '')
+      .replace(/[ةه]/g, 'ه')
+      .replace(/[يى]/g, 'ي')
+      .replace(/[أإآا]/g, 'ا')
+      .replace(/\s+/g, '');
+  }
+
+  function formatNumber(n, decimals) {
+    if (n === null || n === undefined || n === '') return '—';
+    const num = Number(n);
+    if (isNaN(num)) return String(n);
+    const d = decimals != null ? decimals : (Math.abs(num) >= 100 ? 2 : 4);
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: d, minimumFractionDigits: 0 }).format(num);
+  }
+
+  function formatDate(s) {
+    if (!s) return '—';
+    const parts = String(s).split('-');
+    if (parts.length !== 3) return s;
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    const diff = Date.now() - d.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'الآن';
+    if (mins < 60) return `قبل ${mins} د`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `قبل ${hrs} س`;
+    const days = Math.floor(hrs / 24);
+    return `قبل ${days} يوم`;
+  }
+
+  function escapeHTML(s) {
+    return String(s || '').replace(/[&<>"']/g, c =>
+      ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c])
+    );
+  }
+
+  // ─── API ───
+  async function apiCall(action) {
+    const res = await fetch(`${STAFF_API_URL}?action=${action}`);
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.message || 'فشل الطلب');
+    return data;
+  }
+
+  async function loadAll() {
+    try {
+      const [ratesData, archiveData] = await Promise.all([
+        apiCall('publicCurrencyRates'),
+        apiCall('publicCurrencyArchive')
+      ]);
+
+      state.current = ratesData.fullData || [];
+      state.archive = archiveData.dates || [];
+
+      // أسعار اليوم قبل الأخير للأسهم
+      state.previousRates = {};
+      if (state.archive.length >= 2) {
+        (state.archive[1].rates || []).forEach(r => {
+          state.previousRates[normalizeCurrencyName(r.name)] = r.rate;
+        });
+      }
+
+      renderCurrent();
+      renderCalculator();
+      populateArchiveFilter();
+      renderArchive();
+      updateFreshness();
+    } catch (err) {
+      console.error(err);
+      document.getElementById('ratesGrid').innerHTML =
+        `<div style="grid-column:1/-1; padding:40px; text-align:center; color:#FF6B6B; background:var(--bg-card); border-radius:var(--radius);">⚠️ تعذّر تحميل الأسعار<br><small style="color:var(--text-dim); margin-top:8px; display:block;">${escapeHTML(err.message)}</small></div>`;
+      document.getElementById('archiveBody').innerHTML =
+        `<tr><td colspan="5" class="empty-cell" style="color:#FF6B6B;">تعذّر تحميل الأرشيف</td></tr>`;
+    }
+  }
+
+  // ─── Render Current ───
+  function renderCurrent() {
+    const grid = document.getElementById('ratesGrid');
+    if (!state.current.length) {
+      grid.innerHTML = `<div class="empty-cell" style="grid-column:1/-1;">لا توجد أسعار</div>`;
+      return;
+    }
+
+    grid.innerHTML = state.current.map(r => {
+      const prev = state.previousRates[normalizeCurrencyName(r.name)];
+      let trendHtml = '<span class="rc-trend flat">━ لا تغيير</span>';
+      if (prev && prev > 0 && r.rate > 0) {
+        const change = ((r.rate - prev) / prev) * 100;
+        const absChange = Math.abs(change);
+        if (absChange < 0.01) {
+          trendHtml = '<span class="rc-trend flat">━ لا تغيير</span>';
+        } else if (change > 0) {
+          trendHtml = `<span class="rc-trend up">▲ ${formatNumber(absChange, 2)}%</span>`;
+        } else {
+          trendHtml = `<span class="rc-trend down">▼ ${formatNumber(absChange, 2)}%</span>`;
+        }
+      }
+
+      return `
+        <div class="rate-card">
+          <div class="rc-head">
+            <div class="rc-name">${escapeHTML(r.name)}</div>
+            ${r.iso ? `<span class="rc-iso">${escapeHTML(r.iso)}</span>` : ''}
+          </div>
+          <div class="rc-value">${formatNumber(r.rate, 4)}</div>
+          <div class="rc-label">${escapeHTML(r.name)} مقابل 1 دولار</div>
+          ${trendHtml}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ─── Calculator ───
+  function renderCalculator() {
+    const fromSel = document.getElementById('calcFrom');
+    const toSel = document.getElementById('calcTo');
+    const opts = state.current.map(r =>
+      `<option value="${escapeHTML(r.name)}">${escapeHTML(r.name)} ${r.iso ? '(' + escapeHTML(r.iso) + ')' : ''}</option>`
+    ).join('');
+    fromSel.innerHTML = opts;
+    toSel.innerHTML = opts;
+
+    const baseIdx = state.current.findIndex(r => normalizeCurrencyName(r.name) === 'دولار');
+    const tlIdx = state.current.findIndex(r =>
+      (r.iso || '').toUpperCase() === 'TRY' || normalizeCurrencyName(r.name).includes('ليرهتركيه')
+    );
+    if (baseIdx >= 0) fromSel.selectedIndex = baseIdx;
+    if (tlIdx >= 0) toSel.selectedIndex = tlIdx;
+
+    recalculateCalc();
+  }
+
+  function recalculateCalc() {
+    const amt = parseFloat(document.getElementById('calcAmount').value) || 0;
+    const fromCurr = document.getElementById('calcFrom').value;
+    const toCurr = document.getElementById('calcTo').value;
+    const resultEl = document.getElementById('calcResultValue');
+
+    if (!amt || !fromCurr || !toCurr) { resultEl.textContent = '0'; return; }
+    const fromObj = state.current.find(r => r.name === fromCurr);
+    const toObj = state.current.find(r => r.name === toCurr);
+    if (!fromObj || !toObj || !fromObj.rate || !toObj.rate) { resultEl.textContent = '—'; return; }
+
+    const converted = (amt / fromObj.rate) * toObj.rate;
+    resultEl.innerHTML = `${formatNumber(converted, 4)} <span class="calc-result-currency">${escapeHTML(toCurr)}</span>`;
+  }
+
+  document.getElementById('calcAmount').addEventListener('input', recalculateCalc);
+  document.getElementById('calcFrom').addEventListener('change', recalculateCalc);
+  document.getElementById('calcTo').addEventListener('change', recalculateCalc);
+
+  // ─── Archive ───
+  function populateArchiveFilter() {
+    const sel = document.getElementById('archiveCurrencyFilter');
+    const currencies = new Set();
+    state.archive.forEach(g => (g.rates || []).forEach(r => currencies.add(r.name)));
+    const sorted = Array.from(currencies).sort();
+    sel.innerHTML = '<option value="">كل العملات</option>' +
+      sorted.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+  }
+
+  function renderArchive() {
+    const body = document.getElementById('archiveBody');
+    const sub = document.getElementById('archiveSub');
+    const search = (document.getElementById('archiveSearch').value || '').trim().toLowerCase();
+    const searchNorm = normalizeCurrencyName(search);
+    const currFilter = document.getElementById('archiveCurrencyFilter').value;
+
+    const rows = [];
+    state.archive.forEach(g => {
+      (g.rates || []).forEach(r => {
+        if (currFilter && r.name !== currFilter) return;
+        if (search) {
+          const matches =
+            g.date.toLowerCase().includes(search) ||
+            normalizeCurrencyName(r.name).includes(searchNorm) ||
+            (r.iso || '').toLowerCase().includes(search);
+          if (!matches) return;
+        }
+        rows.push({ date: g.date, ...r });
+      });
+    });
+
+    sub.textContent = `${rows.length} سجلّ من ${state.archive.length} يوم`;
+
+    if (!rows.length) {
+      body.innerHTML = `<tr><td colspan="5" class="empty-cell">${search || currFilter ? 'لا توجد نتائج مطابقة' : 'لا يوجد أرشيف بعد'}</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = rows.map(r => `
+      <tr>
+        <td class="ar-date">${escapeHTML(formatDate(r.date))}</td>
+        <td class="ar-name">${escapeHTML(r.name)}</td>
+        <td>${r.iso ? `<span class="rc-iso">${escapeHTML(r.iso)}</span>` : '—'}</td>
+        <td class="ar-rate">${formatNumber(r.rate, 4)}</td>
+        <td class="ar-source">${escapeHTML(r.source || '—')}</td>
+      </tr>
+    `).join('');
+  }
+
+  document.getElementById('archiveSearch').addEventListener('input', renderArchive);
+  document.getElementById('archiveCurrencyFilter').addEventListener('change', renderArchive);
+
+  // ─── Freshness ───
+  function updateFreshness() {
+    const badge = document.getElementById('freshnessBadge');
+    const text = document.getElementById('freshnessText');
+    if (!state.current.length) {
+      text.textContent = 'لا توجد بيانات';
+      badge.classList.remove('fresh');
+      return;
+    }
+    let latest = null;
+    state.current.forEach(r => {
+      if (r.lastUpdate) {
+        const d = new Date(r.lastUpdate);
+        if (!isNaN(d) && (!latest || d > latest)) latest = d;
+      }
+    });
+    if (!latest) {
+      text.textContent = 'محدّث';
+      badge.classList.add('fresh');
+      return;
+    }
+    const ageHours = (Date.now() - latest.getTime()) / 3600000;
+    text.textContent = ageHours < 24 ? `محدّث · ${timeAgo(latest.toISOString())}` : `قديم · ${timeAgo(latest.toISOString())}`;
+    if (ageHours < 24) badge.classList.add('fresh');
+    else badge.classList.remove('fresh');
+  }
+
+  // ─── Refresh ───
+  document.getElementById('btnRefresh').addEventListener('click', async () => {
+    const btn = document.getElementById('btnRefresh');
+    btn.disabled = true;
+    try {
+      await loadAll();
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ─── Init ───
+  loadAll();
+
+  // تحديث تلقائي كل ٣ دقائق
+  setInterval(loadAll, 180000);
+</script>
+
+</body>
+</html>
