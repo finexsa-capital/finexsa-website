@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>رفع البيانات المالية — FINEXSA Capital</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/client.css" />
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+</head>
+
+<body class="client-body">
+  <div class="client-shell">
+    <header class="client-topbar">
+      <a class="client-brand" href="./dashboard.html">
+        <div class="client-brand-mark">⚖</div>
+        <div class="client-brand-title">
+          <strong>FINEXSA Client Portal</strong>
+          <span id="client-name">جاري التحميل...</span>
+        </div>
+      </a>
+
+      <nav class="client-nav">
+        <a href="./dashboard.html">الرئيسية</a>
+        <a href="./companies.html">الشركات</a>
+        <a href="../login.html">التقارير القديمة</a>
+        <button id="logout-btn" type="button">خروج</button>
+      </nav>
+    </header>
+
+    <main class="client-main">
+      <div id="page-alert" class="client-alert is-hidden"></div>
+
+      <section class="client-page-head">
+        <div>
+          <a id="back-company-link" class="client-back" href="./companies.html">← العودة إلى الشركة</a>
+          <h1 class="client-title">رفع البيانات المالية</h1>
+          <p id="import-context" class="client-subtitle">جاري تحميل بيانات الشركة والسنة المالية...</p>
+        </div>
+
+        <div class="client-actions">
+          <a class="client-btn secondary" href="./templates/FINEXSA_Financial_Import_Template.xlsx" download>تحميل قالب Excel</a>
+        </div>
+      </section>
+
+      <section class="client-grid cols-2">
+        <article class="client-card gold">
+          <h2>تعليمات القالب</h2>
+          <p>
+            في هذه المرحلة نقرأ الملف ونعرض Preview فقط. لا يتم حفظ البيانات نهائياً ولا تشغيل MIZAN بعد.
+          </p>
+
+          <div class="client-actions">
+            <span class="client-badge active">Milestone 3</span>
+            <span class="client-badge">Excel Preview</span>
+          </div>
+        </article>
+
+        <article class="client-card">
+          <h2>الأعمدة المطلوبة</h2>
+          <p style="direction:ltr;text-align:left;">
+            Account Name, Opening Balance, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
+          </p>
+        </article>
+      </section>
+
+      <section class="client-card" style="margin-top:18px;">
+        <form id="import-form" class="client-form">
+          <div class="client-field">
+            <label for="excel-file">اختر ملف Excel</label>
+            <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" required />
+          </div>
+
+          <div class="client-actions">
+            <button id="preview-btn" class="client-btn" type="submit">قراءة الملف وعرض Preview</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="import-result" class="is-hidden" style="margin-top:18px;">
+        <div class="client-grid cols-3">
+          <article class="client-card client-kpi">
+            <h3>اسم الملف</h3>
+            <p id="file-name">—</p>
+          </article>
+
+          <article class="client-card client-kpi">
+            <h3>الصفحة المقروءة</h3>
+            <p id="sheet-name">—</p>
+          </article>
+
+          <article class="client-card client-kpi">
+            <h3>عدد الحسابات</h3>
+            <span id="rows-count" class="num">—</span>
+          </article>
+        </div>
+
+        <div class="client-card" style="margin-top:18px;">
+          <h2>فحص الأعمدة</h2>
+          <p class="client-subtitle">عدد الأعمدة المقروءة: <strong id="headers-count">—</strong></p>
+          <div id="missing-headers" class="client-alert is-hidden"></div>
+        </div>
+
+        <div class="client-card" style="margin-top:18px;">
+          <h2>الملاحظات والتحذيرات</h2>
+          <div id="warnings-list" class="client-grid"></div>
+        </div>
+
+        <div class="client-card" style="margin-top:18px;">
+          <div class="client-page-head" style="margin-bottom:12px;">
+            <div>
+              <h2 style="margin:0;">Preview الحسابات</h2>
+              <p id="preview-limit-note" class="client-subtitle"></p>
+            </div>
+            <span class="client-badge">لا يوجد حفظ نهائي بعد</span>
+          </div>
+
+          <div style="overflow:auto;">
+            <table class="client-table">
+              <thead>
+                <tr>
+                  <th>سطر Excel</th>
+                  <th>اسم الحساب</th>
+                  <th>رقم الحساب</th>
+                  <th>الرصيد الافتتاحي</th>
+                  <th>إجمالي الأشهر</th>
+                  <th>التصنيف</th>
+                  <th>القسم</th>
+                </tr>
+              </thead>
+              <tbody id="preview-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { requireClientAuth, logout, profileDisplayName } from "./js/client-auth.js";
+    import { getClientCompany, getFiscalYear } from "./js/client-api.js";
+    import { qs, setText, showAlert, clearAlert, setLoading, toast } from "./js/client-ui.js";
+    import { parseExcelFile, renderImportPreview } from "./js/client-import.js";
+
+    const params = new URLSearchParams(location.search);
+    const companyId = params.get("companyId");
+    const yearId = params.get("yearId");
+
+    let currentUser = null;
+    let currentCompany = null;
+    let currentYear = null;
+
+    qs("#logout-btn").addEventListener("click", logout);
+
+    requireClientAuth(async ({ user, profile }) => {
+      currentUser = user;
+      setText("#client-name", profileDisplayName(profile, user));
+
+      if (!companyId || !yearId) {
+        showAlert("رابط رفع البيانات ناقص. يجب اختيار شركة وسنة مالية أولاً.");
+        return;
+      }
+
+      try {
+        currentCompany = await getClientCompany(companyId, currentUser.uid);
+        currentYear = await getFiscalYear(companyId, yearId);
+
+        qs("#back-company-link").href = `./company.html?id=${encodeURIComponent(companyId)}`;
+        setText("#import-context", `${currentCompany.companyName || "شركة"} · السنة المالية ${currentYear.yearName || ""}`);
+      } catch (error) {
+        console.error(error);
+        showAlert(error.message || "تعذر تحميل بيانات الشركة أو السنة المالية.");
+      }
+    });
+
+    qs("#import-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearAlert();
+
+      const btn = qs("#preview-btn");
+      setLoading(btn, true, "جاري قراءة الملف...");
+
+      try {
+        const file = qs("#excel-file").files[0];
+        const result = await parseExcelFile(file);
+        renderImportPreview(result);
+        toast("تم قراءة الملف وعرض المعاينة.", "success");
+      } catch (error) {
+        console.error(error);
+        showAlert(error.message || "تعذر قراءة الملف.");
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>

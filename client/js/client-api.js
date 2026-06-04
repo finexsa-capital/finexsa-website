@@ -100,6 +100,28 @@ export async function listFiscalYears(companyId) {
   }
 }
 
+
+export async function getFiscalYear(companyId, fiscalYearId) {
+  if (!companyId) throw new Error("معرّف الشركة مفقود.");
+  if (!fiscalYearId) throw new Error("معرّف السنة المالية مفقود.");
+
+  const ref = doc(
+    db,
+    CLIENT_CONFIG.collections.clientCompanies,
+    companyId,
+    "fiscal_years",
+    fiscalYearId
+  );
+
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    throw new Error("لم يتم العثور على السنة المالية.");
+  }
+
+  return { id: snap.id, ...snap.data() };
+}
+
 export async function createFiscalYear(companyId, payload) {
   if (!companyId) throw new Error("معرّف الشركة مفقود.");
 

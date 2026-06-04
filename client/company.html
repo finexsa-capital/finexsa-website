@@ -232,7 +232,7 @@
           <td>${openingLabel(y.openingSource)}</td>
           <td>${y.allMonthsActive === false ? "مخصص" : "كلها فعّالة"}</td>
           <td><span class="client-badge">${statusLabel(y.status)}</span></td>
-          <td><span class="client-badge active">رفع Excel — قريباً</span></td>
+          <td><a class="client-badge active" href="./import.html?companyId=${encodeURIComponent(companyId)}&yearId=${encodeURIComponent(y.id)}">رفع Excel</a></td>
         </tr>
       `).join("");
 
