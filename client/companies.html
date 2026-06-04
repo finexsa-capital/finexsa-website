@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شركاتي — FINEXSA Capital</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/client.css" />
+</head>
+
+<body class="client-body">
+  <div class="client-shell">
+    <header class="client-topbar">
+      <a class="client-brand" href="./dashboard.html">
+        <div class="client-brand-mark">⚖</div>
+        <div class="client-brand-title">
+          <strong>FINEXSA Client Portal</strong>
+          <span id="client-name">جاري التحميل...</span>
+        </div>
+      </a>
+
+      <nav class="client-nav">
+        <a href="./dashboard.html">الرئيسية</a>
+        <a class="active" href="./companies.html">الشركات</a>
+        <a href="../login.html">التقارير القديمة</a>
+        <button id="logout-btn" type="button">خروج</button>
+      </nav>
+    </header>
+
+    <main class="client-main">
+      <div id="page-alert" class="client-alert is-hidden"></div>
+
+      <section class="client-page-head">
+        <div>
+          <h1 class="client-title">شركاتي</h1>
+          <p class="client-subtitle">
+            هذه الصفحة ستكون نقطة البداية لكل شركة: السنوات المالية، رفع Excel، Mapping، Validation، ثم توليد التقارير.
+          </p>
+        </div>
+
+        <button id="open-company-modal" class="client-btn" type="button">+ إضافة شركة</button>
+      </section>
+
+      <section class="client-card">
+        <div id="companies-loading" class="client-empty">
+          <span class="icon">⏳</span>
+          جاري تحميل الشركات...
+        </div>
+
+        <div id="companies-empty" class="client-empty is-hidden">
+          <span class="icon">🏢</span>
+          <strong>لا توجد شركات بعد</strong>
+          <p style="margin-top:8px;">ابدأ بإضافة أول شركة للانتقال لاحقاً إلى السنة المالية ورفع البيانات.</p>
+        </div>
+
+        <div id="companies-table-wrap" class="is-hidden">
+          <table class="client-table">
+            <thead>
+              <tr>
+                <th>اسم الشركة</th>
+                <th>الدولة</th>
+                <th>العملة</th>
+                <th>طريقة الجرد</th>
+                <th>الحالة</th>
+                <th>الخطوة التالية</th>
+              </tr>
+            </thead>
+            <tbody id="companies-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="company-modal" class="client-modal-backdrop is-hidden">
+    <section class="client-modal">
+      <div class="client-modal-head">
+        <h2>إضافة شركة جديدة</h2>
+        <button id="close-company-modal" class="client-close" type="button">×</button>
+      </div>
+
+      <form id="company-form" class="client-form">
+        <div class="client-field">
+          <label for="companyName">اسم الشركة</label>
+          <input id="companyName" name="companyName" type="text" placeholder="مثال: شركة النور التجارية" required />
+        </div>
+
+        <div class="client-grid cols-2">
+          <div class="client-field">
+            <label for="country">الدولة</label>
+            <input id="country" name="country" type="text" value="Türkiye" />
+          </div>
+
+          <div class="client-field">
+            <label for="baseCurrency">العملة الأساسية</label>
+            <select id="baseCurrency" name="baseCurrency">
+              <option value="USD">USD — دولار</option>
+              <option value="TRY">TRY — ليرة تركية</option>
+              <option value="EUR">EUR — يورو</option>
+              <option value="SYP">SYP — ليرة سورية</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="client-field">
+          <label for="businessType">نوع النشاط</label>
+          <input id="businessType" name="businessType" type="text" placeholder="تجارة، خدمات، مطاعم، تصنيع..." />
+        </div>
+
+        <div class="client-field">
+          <label for="inventoryPolicy">طريقة الجرد</label>
+          <select id="inventoryPolicy" name="inventoryPolicy">
+            <option value="periodic">جرد دوري</option>
+            <option value="perpetual" disabled>جرد مستمر — لاحقاً</option>
+          </select>
+        </div>
+
+        <label class="client-checkline">
+          <input id="hasDepartments" name="hasDepartments" type="checkbox" />
+          يوجد أقسام أو مراكز تكلفة
+        </label>
+
+        <label class="client-checkline">
+          <input id="hasTarget" name="hasTarget" type="checkbox" />
+          أريد إدخال Target لاحقاً
+        </label>
+
+        <div class="client-actions">
+          <button id="save-company-btn" class="client-btn" type="submit">حفظ الشركة</button>
+          <button id="cancel-company-btn" class="client-btn secondary" type="button">إلغاء</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script type="module">
+    import { requireClientAuth, logout, profileDisplayName } from "./js/client-auth.js";
+    import { listClientCompanies, createClientCompany } from "./js/client-api.js";
+    import { qs, setText, showAlert, clearAlert, toast, setLoading, formatDate } from "./js/client-ui.js";
+
+    let currentUser = null;
+    let currentProfile = null;
+
+    qs("#logout-btn").addEventListener("click", logout);
+    qs("#open-company-modal").addEventListener("click", openModal);
+    qs("#close-company-modal").addEventListener("click", closeModal);
+    qs("#cancel-company-btn").addEventListener("click", closeModal);
+
+    requireClientAuth(async ({ user, profile }) => {
+      currentUser = user;
+      currentProfile = profile;
+      setText("#client-name", profileDisplayName(profile, user));
+      await loadCompanies();
+    });
+
+    async function loadCompanies() {
+      clearAlert();
+      qs("#companies-loading").classList.remove("is-hidden");
+      qs("#companies-empty").classList.add("is-hidden");
+      qs("#companies-table-wrap").classList.add("is-hidden");
+
+      try {
+        const companies = await listClientCompanies(currentUser.uid);
+        renderCompanies(companies);
+      } catch (error) {
+        console.error(error);
+        qs("#companies-loading").classList.add("is-hidden");
+        showAlert("تعذر تحميل الشركات. إذا ظهرت هذه الرسالة في أول اختبار، راجع Firestore Rules أو الفهرس المطلوب.", "warning");
+      }
+    }
+
+    function renderCompanies(companies) {
+      qs("#companies-loading").classList.add("is-hidden");
+
+      if (!companies.length) {
+        qs("#companies-empty").classList.remove("is-hidden");
+        return;
+      }
+
+      const rows = companies.map((c) => `
+        <tr>
+          <td><strong>${escapeHtml(c.companyName || "—")}</strong></td>
+          <td>${escapeHtml(c.country || "—")}</td>
+          <td>${escapeHtml(c.baseCurrency || "—")}</td>
+          <td>${c.inventoryPolicy === "periodic" ? "جرد دوري" : escapeHtml(c.inventoryPolicy || "—")}</td>
+          <td><span class="client-badge ${c.active === false ? "" : "active"}">${c.active === false ? "معطلة" : "نشطة"}</span></td>
+          <td><span class="client-badge">السنة المالية — قريباً</span></td>
+        </tr>
+      `).join("");
+
+      qs("#companies-table-body").innerHTML = rows;
+      qs("#companies-table-wrap").classList.remove("is-hidden");
+    }
+
+    qs("#company-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const btn = qs("#save-company-btn");
+      setLoading(btn, true, "جاري الحفظ...");
+
+      try {
+        const payload = {
+          companyName: qs("#companyName").value,
+          country: qs("#country").value,
+          baseCurrency: qs("#baseCurrency").value,
+          businessType: qs("#businessType").value,
+          inventoryPolicy: qs("#inventoryPolicy").value,
+          hasDepartments: qs("#hasDepartments").checked,
+          hasTarget: qs("#hasTarget").checked
+        };
+
+        await createClientCompany(currentUser.uid, payload);
+        toast("تمت إضافة الشركة بنجاح.", "success");
+        closeModal();
+        qs("#company-form").reset();
+        qs("#country").value = "Türkiye";
+        await loadCompanies();
+      } catch (error) {
+        console.error(error);
+        toast(error.message || "تعذر حفظ الشركة.", "error");
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    function openModal() {
+      qs("#company-modal").classList.remove("is-hidden");
+      setTimeout(() => qs("#companyName").focus(), 50);
+    }
+
+    function closeModal() {
+      qs("#company-modal").classList.add("is-hidden");
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>

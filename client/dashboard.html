@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة العميل — FINEXSA Capital</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/client.css" />
+</head>
+
+<body class="client-body">
+  <div class="client-shell">
+    <header class="client-topbar">
+      <a class="client-brand" href="./dashboard.html">
+        <div class="client-brand-mark">⚖</div>
+        <div class="client-brand-title">
+          <strong>FINEXSA Client Portal</strong>
+          <span id="client-name">جاري التحميل...</span>
+        </div>
+      </a>
+
+      <nav class="client-nav">
+        <a class="active" href="./dashboard.html">الرئيسية</a>
+        <a href="./companies.html">الشركات</a>
+        <a href="../login.html">التقارير القديمة</a>
+        <button id="logout-btn" type="button">خروج</button>
+      </nav>
+    </header>
+
+    <main class="client-main">
+      <div id="page-alert" class="client-alert is-hidden"></div>
+
+      <section class="client-page-head">
+        <div>
+          <h1 class="client-title">أهلاً بك في بوابة العملاء</h1>
+          <p class="client-subtitle">
+            هذه أول نسخة من بوابة FINEXSA الجديدة. الهدف الآن هو تجهيز الأساس: العميل، الشركات، ثم لاحقاً رفع Excel وتشغيل MIZAN.
+          </p>
+        </div>
+
+        <div class="client-actions">
+          <a class="client-btn" href="./companies.html">إدارة الشركات</a>
+        </div>
+      </section>
+
+      <section class="client-grid cols-3">
+        <article class="client-card client-kpi gold">
+          <h3>الشركات</h3>
+          <p>عدد الشركات المرتبطة بحسابك.</p>
+          <span id="companies-count" class="num">—</span>
+        </article>
+
+        <article class="client-card client-kpi">
+          <h3>التقارير</h3>
+          <p>سيتم تفعيل الأرشيف بعد ربط MIZAN.</p>
+          <span class="num">قريباً</span>
+        </article>
+
+        <article class="client-card client-kpi">
+          <h3>حالة النظام</h3>
+          <p>Milestone 1 — Client Portal Skeleton</p>
+          <span class="num">نشط</span>
+        </article>
+      </section>
+
+      <section class="client-grid cols-2" style="margin-top:18px;">
+        <article class="client-card">
+          <h2>الخطوة التالية</h2>
+          <p>
+            بعد تثبيت الدخول والشركات، سنضيف إنشاء السنة المالية ثم رفع Excel ومرحلة Mapping للحسابات.
+          </p>
+          <div class="client-actions">
+            <a class="client-btn secondary" href="./companies.html">فتح الشركات</a>
+          </div>
+        </article>
+
+        <article class="client-card">
+          <h2>عارض التقارير القديم</h2>
+          <p>
+            بقي العارض القديم كما هو مؤقتاً حتى لا نكسر التقارير الموجودة حالياً.
+          </p>
+          <div class="client-actions">
+            <a class="client-btn secondary" href="../login.html">فتح العارض القديم</a>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { requireClientAuth, logout, profileDisplayName } from "./js/client-auth.js";
+    import { listClientCompanies } from "./js/client-api.js";
+    import { qs, setText, showAlert } from "./js/client-ui.js";
+
+    qs("#logout-btn").addEventListener("click", logout);
+
+    requireClientAuth(async ({ user, profile }) => {
+      setText("#client-name", profileDisplayName(profile, user));
+
+      try {
+        const companies = await listClientCompanies(user.uid);
+        setText("#companies-count", companies.length);
+      } catch (error) {
+        console.error(error);
+        setText("#companies-count", "—");
+        showAlert("تعذر تحميل عدد الشركات. قد تحتاج صلاحيات Firestore للسماح بالقراءة.", "warning");
+      }
+    });
+  </script>
+</body>
+</html>

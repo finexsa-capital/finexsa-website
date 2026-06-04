@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دخول العملاء — FINEXSA Capital</title>
+  <meta name="description" content="بوابة عملاء FINEXSA لتوليد وإدارة التقارير المالية." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/client.css" />
+</head>
+
+<body class="client-body">
+  <main class="client-login-wrap">
+    <section class="client-login-card">
+      <a class="client-back" href="../index.html">← العودة للموقع</a>
+
+      <div class="client-login-logo">
+        <div class="client-brand-mark">⚖</div>
+        <h1 class="client-title">بوابة العملاء</h1>
+        <p class="client-subtitle">إدارة شركاتك وتقاريرك المالية من مكان واحد</p>
+      </div>
+
+      <div id="page-alert" class="client-alert is-hidden"></div>
+
+      <form id="client-login-form" class="client-form" autocomplete="on">
+        <div class="client-field">
+          <label for="email">البريد الإلكتروني</label>
+          <input id="email" name="email" type="email" placeholder="client@example.com" required />
+        </div>
+
+        <div class="client-field">
+          <label for="password">كلمة المرور</label>
+          <input id="password" name="password" type="password" placeholder="••••••••" required />
+        </div>
+
+        <button id="login-btn" class="client-btn" type="submit">دخول</button>
+      </form>
+
+      <div class="client-actions">
+        <a class="client-link-btn" href="../login.html">فتح عارض التقارير القديم</a>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { loginWithEmail, redirectIfLoggedIn, translateAuthError } from "./js/client-auth.js";
+    import { qs, setLoading, showAlert, clearAlert } from "./js/client-ui.js";
+    import { CLIENT_CONFIG } from "./js/client-config.js";
+
+    redirectIfLoggedIn();
+
+    const params = new URLSearchParams(location.search);
+    const error = params.get("error");
+    if (error === "inactive") showAlert("الحساب غير مفعّل. يرجى التواصل مع الإدارة.");
+    if (error === "no-profile") showAlert("لم يتم العثور على ملف العميل داخل النظام.");
+    if (error === "auth") showAlert("تعذر التحقق من الجلسة. يرجى تسجيل الدخول من جديد.");
+
+    qs("#client-login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearAlert();
+
+      const btn = qs("#login-btn");
+      setLoading(btn, true, "جاري الدخول...");
+
+      try {
+        const email = qs("#email").value.trim();
+        const password = qs("#password").value;
+        await loginWithEmail(email, password);
+        window.location.href = CLIENT_CONFIG.routes.dashboard;
+      } catch (err) {
+        console.error(err);
+        showAlert(translateAuthError(err));
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>
