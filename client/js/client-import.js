@@ -1,11 +1,36 @@
 // FINEXSA Client Portal — Excel Import Preview
-// Milestone 3: client-side Excel parsing + preview only. No MIZAN run yet.
+// Milestone 3.5: Arabic-facing template + Code_Map-ready structure.
+// This stage reads Arabic or English headers, previews data, and prepares for Mapping.
+// No final save and no MIZAN run yet.
 
-import { qs, showAlert, clearAlert, toast } from "./client-ui.js";
+import { qs } from "./client-ui.js";
 
-export const REQUIRED_HEADERS = [
-  "Account Name",
-  "Opening Balance",
+export const FIELD_ALIASES = {
+  accountName: ["اسم الحساب", "Account Name", "account name", "الحساب"],
+  accountNumber: ["رقم الحساب", "Account Number", "account number", "كود الحساب"],
+  openingBalance: ["الرصيد الافتتاحي", "Opening Balance", "opening balance", "افتتاحي"],
+
+  Jan: ["كانون الثاني", "يناير", "Jan", "January"],
+  Feb: ["شباط", "فبراير", "Feb", "February"],
+  Mar: ["آذار", "مارس", "Mar", "March"],
+  Apr: ["نيسان", "أبريل", "Apr", "April"],
+  May: ["أيار", "مايو", "May"],
+  Jun: ["حزيران", "يونيو", "Jun", "June"],
+  Jul: ["تموز", "يوليو", "Jul", "July"],
+  Aug: ["آب", "أغسطس", "Aug", "August"],
+  Sep: ["أيلول", "سبتمبر", "Sep", "September"],
+  Oct: ["تشرين الأول", "أكتوبر", "Oct", "October"],
+  Nov: ["تشرين الثاني", "نوفمبر", "Nov", "November"],
+  Dec: ["كانون الأول", "ديسمبر", "Dec", "December"],
+
+  classification: ["التصنيف المالي", "Classification", "التصنيف", "Financial Classification"],
+  department: ["القسم", "Department", "مركز التكلفة"],
+  notes: ["ملاحظات", "Notes", "بيان"]
+};
+
+export const REQUIRED_FIELDS = [
+  "accountName",
+  "openingBalance",
   "Jan",
   "Feb",
   "Mar",
@@ -20,29 +45,50 @@ export const REQUIRED_HEADERS = [
   "Dec"
 ];
 
-export const OPTIONAL_HEADERS = [
-  "Account Number",
-  "Classification",
-  "Department",
-  "Notes"
-];
+export const FIELD_LABELS_AR = {
+  accountName: "اسم الحساب",
+  accountNumber: "رقم الحساب",
+  openingBalance: "الرصيد الافتتاحي",
+  Jan: "كانون الثاني",
+  Feb: "شباط",
+  Mar: "آذار",
+  Apr: "نيسان",
+  May: "أيار",
+  Jun: "حزيران",
+  Jul: "تموز",
+  Aug: "آب",
+  Sep: "أيلول",
+  Oct: "تشرين الأول",
+  Nov: "تشرين الثاني",
+  Dec: "كانون الأول",
+  classification: "التصنيف المالي",
+  department: "القسم",
+  notes: "ملاحظات"
+};
+
+export const MONTH_KEYS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 export function normalizeHeader(value) {
   return String(value == null ? "" : value)
     .trim()
     .replace(/\s+/g, " ")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
     .toLowerCase();
 }
 
-export function findHeader(headers, wanted) {
-  const normalizedWanted = normalizeHeader(wanted);
-  return headers.find((h) => normalizeHeader(h) === normalizedWanted) || "";
+export function findHeader(headers, fieldKey) {
+  const aliases = FIELD_ALIASES[fieldKey] || [fieldKey];
+  const normalizedAliases = aliases.map(normalizeHeader);
+
+  return headers.find((h) => normalizedAliases.includes(normalizeHeader(h))) || "";
 }
 
 export function validateHeaders(headers) {
   const missing = [];
-  REQUIRED_HEADERS.forEach((h) => {
-    if (!findHeader(headers, h)) missing.push(h);
+  REQUIRED_FIELDS.forEach((fieldKey) => {
+    if (!findHeader(headers, fieldKey)) missing.push(FIELD_LABELS_AR[fieldKey] || fieldKey);
   });
   return missing;
 }
@@ -78,12 +124,13 @@ export async function parseExcelFile(file) {
   const buffer = await file.arrayBuffer();
   const workbook = window.XLSX.read(buffer, { type: "array" });
   const firstSheetName = workbook.SheetNames[0];
+
   if (!firstSheetName) throw new Error("ملف Excel لا يحتوي أي صفحات.");
 
   const sheet = workbook.Sheets[firstSheetName];
   const rows = window.XLSX.utils.sheet_to_json(sheet, {
     defval: "",
-    raw: FalseToJsTrue()
+    raw: false
   });
 
   if (!rows.length) {
@@ -108,32 +155,32 @@ export async function parseExcelFile(file) {
   };
 }
 
-// Small helper to avoid Python auto-capitalization confusion in generated text.
-function FalseToJsTrue() {
-  return false;
-}
-
 function normalizeRow(row, headers, excelRowNumber) {
-  const get = (header) => {
-    const found = findHeader(headers, header);
+  const get = (fieldKey) => {
+    const found = findHeader(headers, fieldKey);
     return found ? row[found] : "";
   };
 
-  const monthKeys = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const months = {};
-  monthKeys.forEach((m) => {
+  MONTH_KEYS.forEach((m) => {
     months[m] = normalizeAmount(get(m));
   });
 
   return {
     excelRowNumber,
-    accountName: String(get("Account Name") || "").trim(),
-    accountNumber: String(get("Account Number") || "").trim(),
-    openingBalance: normalizeAmount(get("Opening Balance")),
+    accountName: String(get("accountName") || "").trim(),
+    accountNumber: String(get("accountNumber") || "").trim(),
+    openingBalance: normalizeAmount(get("openingBalance")),
     months,
-    classification: String(get("Classification") || "").trim(),
-    department: String(get("Department") || "").trim(),
-    notes: String(get("Notes") || "").trim()
+    classification: String(get("classification") || "").trim(),
+    department: String(get("department") || "").trim(),
+    notes: String(get("notes") || "").trim(),
+
+    // Reserved for Milestone 4 Mapping. Do not expose to client yet.
+    mappedCode: "",
+    aggregateCode: "",
+    contributionRule: "",
+    aggregationSign: ""
   };
 }
 
@@ -143,7 +190,7 @@ function buildWarnings(rows, missingHeaders) {
   if (missingHeaders.length) {
     warnings.push({
       type: "error",
-      message: `يوجد أعمدة مطلوبة مفقودة: ${missingHeaders.join(", ")}`
+      message: `يوجد أعمدة مطلوبة مفقودة: ${missingHeaders.join("، ")}`
     });
   }
 
@@ -166,7 +213,7 @@ function buildWarnings(rows, missingHeaders) {
       if (Number.isNaN(row.months[m])) {
         warnings.push({
           type: "warning",
-          message: `السطر ${row.excelRowNumber}: قيمة ${m} ليست رقماً واضحاً.`
+          message: `السطر ${row.excelRowNumber}: قيمة ${FIELD_LABELS_AR[m]} ليست رقماً واضحاً.`
         });
       }
     });
@@ -174,7 +221,7 @@ function buildWarnings(rows, missingHeaders) {
     if (!row.classification) {
       warnings.push({
         type: "warning",
-        message: `السطر ${row.excelRowNumber}: الحساب غير مصنف بعد وسيحتاج Mapping.`
+        message: `السطر ${row.excelRowNumber}: الحساب غير مصنف بعد وسيحتاج ربطاً في شاشة Mapping.`
       });
     }
   });
@@ -192,7 +239,7 @@ export function renderImportPreview(result) {
   const missingBox = qs("#missing-headers");
   if (result.missingHeaders.length) {
     missingBox.className = "client-alert";
-    missingBox.textContent = "أعمدة مطلوبة مفقودة: " + result.missingHeaders.join(", ");
+    missingBox.textContent = "أعمدة مطلوبة مفقودة: " + result.missingHeaders.join("، ");
     missingBox.classList.remove("is-hidden");
   } else {
     missingBox.className = "client-alert success";
@@ -206,7 +253,7 @@ export function renderImportPreview(result) {
   try {
     sessionStorage.setItem("finexsa_import_preview", JSON.stringify(result));
   } catch (_) {
-    // Preview may be large. Not critical at Milestone 3.
+    // Preview may be large. Not critical at Milestone 3.5.
   }
 }
 
