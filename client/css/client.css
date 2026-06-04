@@ -513,3 +513,18 @@ a { color: inherit; text-decoration: none; }
     grid-template-columns: 1fr;
   }
 }
+
+
+.client-page-head .client-back {
+  margin-bottom: 14px;
+}
+
+.client-table a.client-badge {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.client-table a.client-badge:hover {
+  transform: translateY(-1px);
+  border-color: var(--client-gold);
+}

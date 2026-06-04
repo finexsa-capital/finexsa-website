@@ -187,7 +187,7 @@
           <td>${escapeHtml(c.baseCurrency || "—")}</td>
           <td>${c.inventoryPolicy === "periodic" ? "جرد دوري" : escapeHtml(c.inventoryPolicy || "—")}</td>
           <td><span class="client-badge ${c.active === false ? "" : "active"}">${c.active === false ? "معطلة" : "نشطة"}</span></td>
-          <td><span class="client-badge">السنة المالية — قريباً</span></td>
+          <td><a class="client-badge active" href="./company.html?id=${encodeURIComponent(c.id)}">فتح الشركة</a></td>
         </tr>
       `).join("");
 

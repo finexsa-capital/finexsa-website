@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تفاصيل الشركة — FINEXSA Capital</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/client.css" />
+</head>
+
+<body class="client-body">
+  <div class="client-shell">
+    <header class="client-topbar">
+      <a class="client-brand" href="./dashboard.html">
+        <div class="client-brand-mark">⚖</div>
+        <div class="client-brand-title">
+          <strong>FINEXSA Client Portal</strong>
+          <span id="client-name">جاري التحميل...</span>
+        </div>
+      </a>
+
+      <nav class="client-nav">
+        <a href="./dashboard.html">الرئيسية</a>
+        <a href="./companies.html">الشركات</a>
+        <a href="../login.html">التقارير القديمة</a>
+        <button id="logout-btn" type="button">خروج</button>
+      </nav>
+    </header>
+
+    <main class="client-main">
+      <div id="page-alert" class="client-alert is-hidden"></div>
+
+      <section class="client-page-head">
+        <div>
+          <a class="client-back" href="./companies.html">← العودة إلى الشركات</a>
+          <h1 id="company-title" class="client-title">تفاصيل الشركة</h1>
+          <p id="company-subtitle" class="client-subtitle">جاري تحميل بيانات الشركة...</p>
+        </div>
+
+        <button id="open-year-modal" class="client-btn" type="button">+ إضافة سنة مالية</button>
+      </section>
+
+      <section class="client-grid cols-3">
+        <article class="client-card client-kpi gold">
+          <h3>العملة الأساسية</h3>
+          <p>العملة المعتمدة لعرض التقارير.</p>
+          <span id="base-currency" class="num">—</span>
+        </article>
+
+        <article class="client-card client-kpi">
+          <h3>طريقة الجرد</h3>
+          <p>سيتم استخدامها لاحقاً عند تشغيل MIZAN.</p>
+          <span id="inventory-policy" class="num">—</span>
+        </article>
+
+        <article class="client-card client-kpi">
+          <h3>السنوات المالية</h3>
+          <p>عدد السنوات المرتبطة بهذه الشركة.</p>
+          <span id="years-count" class="num">—</span>
+        </article>
+      </section>
+
+      <section class="client-card" style="margin-top:18px;">
+        <div class="client-page-head" style="margin-bottom:14px;">
+          <div>
+            <h2 style="margin:0;">السنوات المالية</h2>
+            <p class="client-subtitle">الخطوة التالية بعد إنشاء السنة ستكون رفع Excel وربط الحسابات.</p>
+          </div>
+        </div>
+
+        <div id="years-loading" class="client-empty">
+          <span class="icon">⏳</span>
+          جاري تحميل السنوات المالية...
+        </div>
+
+        <div id="years-empty" class="client-empty is-hidden">
+          <span class="icon">📅</span>
+          <strong>لا توجد سنوات مالية بعد</strong>
+          <p style="margin-top:8px;">أضف سنة مالية مثل 2026 للانتقال لاحقاً إلى رفع البيانات.</p>
+        </div>
+
+        <div id="years-table-wrap" class="is-hidden">
+          <table class="client-table">
+            <thead>
+              <tr>
+                <th>السنة</th>
+                <th>البداية</th>
+                <th>النهاية</th>
+                <th>الرصيد الافتتاحي</th>
+                <th>الشهور</th>
+                <th>الحالة</th>
+                <th>الخطوة التالية</th>
+              </tr>
+            </thead>
+            <tbody id="years-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="year-modal" class="client-modal-backdrop is-hidden">
+    <section class="client-modal">
+      <div class="client-modal-head">
+        <h2>إضافة سنة مالية</h2>
+        <button id="close-year-modal" class="client-close" type="button">×</button>
+      </div>
+
+      <form id="year-form" class="client-form">
+        <div class="client-field">
+          <label for="yearName">اسم السنة</label>
+          <input id="yearName" name="yearName" type="text" placeholder="مثال: 2026" required />
+        </div>
+
+        <div class="client-grid cols-2">
+          <div class="client-field">
+            <label for="startDate">تاريخ البداية</label>
+            <input id="startDate" name="startDate" type="date" required />
+          </div>
+
+          <div class="client-field">
+            <label for="endDate">تاريخ النهاية</label>
+            <input id="endDate" name="endDate" type="date" required />
+          </div>
+        </div>
+
+        <div class="client-field">
+          <label for="openingSource">مصدر الرصيد الافتتاحي</label>
+          <select id="openingSource" name="openingSource">
+            <option value="manual">إدخال يدوي</option>
+            <option value="previous_year">من سنة سابقة</option>
+            <option value="imported_file">من ملف مستورد</option>
+            <option value="approved_report">من تقرير معتمد سابقاً</option>
+          </select>
+        </div>
+
+        <label class="client-checkline">
+          <input id="allMonthsActive" name="allMonthsActive" type="checkbox" checked />
+          كل أشهر السنة فعّالة
+        </label>
+
+        <div class="client-field">
+          <label for="notes">ملاحظات</label>
+          <input id="notes" name="notes" type="text" placeholder="اختياري" />
+        </div>
+
+        <div class="client-actions">
+          <button id="save-year-btn" class="client-btn" type="submit">حفظ السنة</button>
+          <button id="cancel-year-btn" class="client-btn secondary" type="button">إلغاء</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script type="module">
+    import { requireClientAuth, logout, profileDisplayName } from "./js/client-auth.js";
+    import { getClientCompany, listFiscalYears, createFiscalYear } from "./js/client-api.js";
+    import { qs, setText, showAlert, clearAlert, toast, setLoading } from "./js/client-ui.js";
+
+    const params = new URLSearchParams(location.search);
+    const companyId = params.get("id");
+
+    let currentUser = null;
+    let currentCompany = null;
+
+    qs("#logout-btn").addEventListener("click", logout);
+    qs("#open-year-modal").addEventListener("click", openModal);
+    qs("#close-year-modal").addEventListener("click", closeModal);
+    qs("#cancel-year-btn").addEventListener("click", closeModal);
+
+    requireClientAuth(async ({ user, profile }) => {
+      currentUser = user;
+      setText("#client-name", profileDisplayName(profile, user));
+
+      if (!companyId) {
+        showAlert("معرّف الشركة مفقود. ارجع إلى صفحة الشركات واختر شركة من القائمة.");
+        return;
+      }
+
+      await loadCompany();
+      await loadYears();
+    });
+
+    async function loadCompany() {
+      clearAlert();
+
+      try {
+        currentCompany = await getClientCompany(companyId, currentUser.uid);
+
+        setText("#company-title", currentCompany.companyName || "تفاصيل الشركة");
+        setText("#company-subtitle", `${currentCompany.country || "—"} · ${currentCompany.businessType || "نشاط غير محدد"}`);
+        setText("#base-currency", currentCompany.baseCurrency || "—");
+        setText("#inventory-policy", currentCompany.inventoryPolicy === "periodic" ? "دوري" : (currentCompany.inventoryPolicy || "—"));
+      } catch (error) {
+        console.error(error);
+        showAlert(error.message || "تعذر تحميل بيانات الشركة.");
+      }
+    }
+
+    async function loadYears() {
+      qs("#years-loading").classList.remove("is-hidden");
+      qs("#years-empty").classList.add("is-hidden");
+      qs("#years-table-wrap").classList.add("is-hidden");
+
+      try {
+        const years = await listFiscalYears(companyId);
+        renderYears(years);
+      } catch (error) {
+        console.error(error);
+        qs("#years-loading").classList.add("is-hidden");
+        showAlert("تعذر تحميل السنوات المالية. راجع صلاحيات Firestore إذا كانت أول تجربة.", "warning");
+      }
+    }
+
+    function renderYears(years) {
+      qs("#years-loading").classList.add("is-hidden");
+      setText("#years-count", years.length);
+
+      if (!years.length) {
+        qs("#years-empty").classList.remove("is-hidden");
+        return;
+      }
+
+      const rows = years.map((y) => `
+        <tr>
+          <td><strong>${escapeHtml(y.yearName || "—")}</strong></td>
+          <td>${escapeHtml(y.startDate || "—")}</td>
+          <td>${escapeHtml(y.endDate || "—")}</td>
+          <td>${openingLabel(y.openingSource)}</td>
+          <td>${y.allMonthsActive === false ? "مخصص" : "كلها فعّالة"}</td>
+          <td><span class="client-badge">${statusLabel(y.status)}</span></td>
+          <td><span class="client-badge active">رفع Excel — قريباً</span></td>
+        </tr>
+      `).join("");
+
+      qs("#years-table-body").innerHTML = rows;
+      qs("#years-table-wrap").classList.remove("is-hidden");
+    }
+
+    qs("#year-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const btn = qs("#save-year-btn");
+      setLoading(btn, true, "جاري الحفظ...");
+
+      try {
+        const payload = {
+          yearName: qs("#yearName").value,
+          startDate: qs("#startDate").value,
+          endDate: qs("#endDate").value,
+          openingSource: qs("#openingSource").value,
+          allMonthsActive: qs("#allMonthsActive").checked,
+          notes: qs("#notes").value,
+          status: "draft"
+        };
+
+        await createFiscalYear(companyId, payload);
+        toast("تمت إضافة السنة المالية بنجاح.", "success");
+        closeModal();
+        qs("#year-form").reset();
+        qs("#allMonthsActive").checked = true;
+        await loadYears();
+      } catch (error) {
+        console.error(error);
+        toast(error.message || "تعذر حفظ السنة المالية.", "error");
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    function openModal() {
+      qs("#year-modal").classList.remove("is-hidden");
+
+      const currentYear = new Date().getFullYear();
+      qs("#yearName").value = currentYear;
+      qs("#startDate").value = `${currentYear}-01-01`;
+      qs("#endDate").value = `${currentYear}-12-31`;
+
+      setTimeout(() => qs("#yearName").focus(), 50);
+    }
+
+    function closeModal() {
+      qs("#year-modal").classList.add("is-hidden");
+    }
+
+    function statusLabel(status) {
+      const s = String(status || "draft");
+      if (s === "draft") return "مسودة";
+      if (s === "active") return "نشطة";
+      if (s === "under_review") return "قيد المراجعة";
+      if (s === "locked") return "مقفلة";
+      if (s === "closed") return "مغلقة";
+      return s;
+    }
+
+    function openingLabel(source) {
+      const s = String(source || "manual");
+      if (s === "manual") return "يدوي";
+      if (s === "previous_year") return "سنة سابقة";
+      if (s === "imported_file") return "ملف مستورد";
+      if (s === "approved_report") return "تقرير معتمد";
+      return s;
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
