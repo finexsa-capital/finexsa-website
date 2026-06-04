@@ -2899,3 +2899,164 @@ html[dir="ltr"] .service-card:hover .service-link-arrow {
 html[dir="ltr"] .back-link {
   flex-direction: row-reverse;
 }
+
+
+
+/* ============================================================
+   FINEXSA Brand Palette Refresh — June 2026
+   Palette:
+   #1F2933 — main dark navy
+   #FCF6F0 — warm ivory
+   #9CA3AF — cool gray
+   #F9F9F7 — light surface
+   #C2A46D — muted gold
+   ============================================================ */
+
+:root {
+  --finexsa-navy: #1F2933;
+  --finexsa-ivory: #FCF6F0;
+  --finexsa-gray: #9CA3AF;
+  --finexsa-surface: #F9F9F7;
+  --finexsa-gold: #C2A46D;
+
+  --finexsa-navy-rgb: 31, 41, 51;
+  --finexsa-ivory-rgb: 252, 246, 240;
+  --finexsa-gray-rgb: 156, 163, 175;
+  --finexsa-surface-rgb: 249, 249, 247;
+  --finexsa-gold-rgb: 194, 164, 109;
+
+  --primary: #1F2933;
+  --primary-dark: #151C24;
+  --secondary: #C2A46D;
+  --accent: #C2A46D;
+  --gold: #C2A46D;
+  --bg-dark: #1F2933;
+  --bg-light: #FCF6F0;
+  --surface: #F9F9F7;
+  --muted: #9CA3AF;
+  --text-dark: #1F2933;
+  --text-light: #FCF6F0;
+  --border-soft: rgba(31, 41, 51, 0.12);
+  --shadow-soft: 0 22px 60px rgba(31, 41, 51, 0.12);
+}
+
+/* Public site brand override */
+body {
+  color: var(--finexsa-navy);
+  background-color: var(--finexsa-surface);
+}
+
+body,
+.main-bg,
+.page-bg {
+  background:
+    radial-gradient(circle at 85% 8%, rgba(var(--finexsa-gold-rgb), 0.16), transparent 34%),
+    linear-gradient(180deg, var(--finexsa-ivory), var(--finexsa-surface));
+}
+
+header,
+.navbar,
+.site-header,
+.header,
+.footer,
+.site-footer,
+footer {
+  background-color: var(--finexsa-navy);
+  color: var(--finexsa-ivory);
+}
+
+.hero,
+.hero-section,
+.section-dark,
+.dark-section {
+  background:
+    radial-gradient(circle at 80% 18%, rgba(var(--finexsa-gold-rgb), 0.22), transparent 32%),
+    linear-gradient(135deg, #1F2933 0%, #17212B 100%);
+  color: var(--finexsa-ivory);
+}
+
+.card,
+.service-card,
+.feature-card,
+.team-card,
+.rate-card,
+.branch-card,
+.stat-card,
+.form-card,
+.panel,
+.glass-card {
+  background: rgba(var(--finexsa-surface-rgb), 0.92);
+  color: var(--finexsa-navy);
+  border-color: rgba(var(--finexsa-navy-rgb), 0.10);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn,
+.button,
+.primary-btn,
+.btn-primary,
+.cta-button,
+.cta,
+button[type="submit"] {
+  background: linear-gradient(135deg, #C2A46D, #D5BC84);
+  color: #1F2933;
+  border-color: rgba(var(--finexsa-gold-rgb), 0.65);
+  box-shadow: 0 14px 30px rgba(var(--finexsa-gold-rgb), 0.18);
+}
+
+.btn:hover,
+.button:hover,
+.primary-btn:hover,
+.btn-primary:hover,
+.cta-button:hover,
+.cta:hover,
+button[type="submit"]:hover {
+  background: linear-gradient(135deg, #D0B77E, #C2A46D);
+  color: #1F2933;
+}
+
+.btn-secondary,
+.secondary-btn,
+.outline-btn,
+.btn-outline {
+  background: transparent;
+  color: var(--finexsa-gold);
+  border-color: rgba(var(--finexsa-gold-rgb), 0.56);
+}
+
+a {
+  color: inherit;
+}
+
+a:hover {
+  color: var(--finexsa-gold);
+}
+
+input,
+select,
+textarea {
+  background: var(--finexsa-surface);
+  color: var(--finexsa-navy);
+  border-color: rgba(var(--finexsa-navy-rgb), 0.16);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--finexsa-gold);
+  box-shadow: 0 0 0 4px rgba(var(--finexsa-gold-rgb), 0.18);
+}
+
+.badge,
+.tag,
+.label,
+.pill {
+  background: rgba(var(--finexsa-gold-rgb), 0.14);
+  color: var(--finexsa-navy);
+  border-color: rgba(var(--finexsa-gold-rgb), 0.35);
+}
+
+hr,
+.divider {
+  border-color: rgba(var(--finexsa-navy-rgb), 0.10);
+}

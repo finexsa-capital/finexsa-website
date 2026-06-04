@@ -542,3 +542,214 @@ a { color: inherit; text-decoration: none; }
   direction: ltr;
   display: inline-block;
 }
+
+
+
+/* ============================================================
+   FINEXSA Client Portal Palette Refresh — June 2026
+   ============================================================ */
+
+:root {
+  --client-bg: #1F2933;
+  --client-bg-2: #17212B;
+  --client-card: rgba(249, 249, 247, 0.96);
+  --client-card-2: rgba(252, 246, 240, 0.96);
+  --client-border: rgba(194, 164, 109, 0.38);
+  --client-border-soft: rgba(31, 41, 51, 0.13);
+  --client-gold: #C2A46D;
+  --client-gold-2: #D5BC84;
+  --client-text: #1F2933;
+  --client-muted: #6E7783;
+  --client-dim: #9CA3AF;
+  --client-danger: #B65E5E;
+  --client-success: #3A8A68;
+  --client-warning: #B58A34;
+  --client-radius: 18px;
+  --client-shadow: 0 24px 70px rgba(31, 41, 51, 0.15);
+}
+
+body.client-body {
+  color: #1F2933;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(194, 164, 109, 0.18), transparent 34%),
+    linear-gradient(180deg, #FCF6F0 0%, #F9F9F7 100%);
+}
+
+.client-topbar {
+  background: rgba(31, 41, 51, 0.94);
+  border-bottom: 1px solid rgba(194, 164, 109, 0.22);
+  color: #FCF6F0;
+}
+
+.client-brand-mark {
+  background: linear-gradient(135deg, #1F2933, #293747);
+  border-color: rgba(194, 164, 109, 0.50);
+  color: #C2A46D;
+}
+
+.client-brand-title strong {
+  color: #FCF6F0;
+}
+
+.client-brand-title span {
+  color: rgba(252, 246, 240, 0.72);
+}
+
+.client-nav a,
+.client-nav button,
+.client-link-btn {
+  background: rgba(252, 246, 240, 0.05);
+  color: rgba(252, 246, 240, 0.78);
+  border-color: rgba(252, 246, 240, 0.12);
+}
+
+.client-nav a:hover,
+.client-nav a.active,
+.client-nav button:hover,
+.client-link-btn:hover {
+  background: rgba(194, 164, 109, 0.14);
+  border-color: rgba(194, 164, 109, 0.55);
+  color: #F9F9F7;
+}
+
+.client-login-card,
+.client-modal {
+  background: linear-gradient(145deg, rgba(249, 249, 247, 0.98), rgba(252, 246, 240, 0.98));
+  color: #1F2933;
+  border-color: rgba(194, 164, 109, 0.45);
+  box-shadow: 0 30px 80px rgba(31, 41, 51, 0.22);
+}
+
+.client-card {
+  background: linear-gradient(145deg, rgba(249, 249, 247, 0.96), rgba(252, 246, 240, 0.94));
+  color: #1F2933;
+  border-color: rgba(31, 41, 51, 0.10);
+  box-shadow: 0 22px 56px rgba(31, 41, 51, 0.11);
+}
+
+.client-card.gold {
+  border-color: rgba(194, 164, 109, 0.48);
+  background:
+    linear-gradient(145deg, rgba(252, 246, 240, 0.98), rgba(249, 249, 247, 0.96));
+}
+
+.client-title,
+.client-card h2,
+.client-card h3,
+.client-modal-head h2 {
+  color: #1F2933;
+}
+
+.client-subtitle,
+.client-card p,
+.client-empty,
+.client-table td {
+  color: #5D6672;
+}
+
+.client-kpi .num {
+  color: #C2A46D;
+}
+
+.client-field label {
+  color: #1F2933;
+}
+
+.client-field input,
+.client-field select {
+  background: rgba(255, 255, 255, 0.72);
+  color: #1F2933;
+  border-color: rgba(31, 41, 51, 0.14);
+}
+
+.client-field input:focus,
+.client-field select:focus {
+  border-color: #C2A46D;
+  box-shadow: 0 0 0 4px rgba(194, 164, 109, 0.16);
+}
+
+.client-btn {
+  background: linear-gradient(135deg, #C2A46D, #D5BC84);
+  color: #1F2933;
+  border-color: rgba(194, 164, 109, 0.62);
+  box-shadow: 0 16px 34px rgba(194, 164, 109, 0.20);
+}
+
+.client-btn.secondary {
+  background: rgba(31, 41, 51, 0.05);
+  color: #1F2933;
+  border-color: rgba(31, 41, 51, 0.14);
+}
+
+.client-btn.danger {
+  background: rgba(182, 94, 94, 0.10);
+  color: #8B3D3D;
+  border-color: rgba(182, 94, 94, 0.24);
+}
+
+.client-alert {
+  border-color: rgba(182, 94, 94, 0.26);
+  color: #7F3434;
+  background: rgba(182, 94, 94, 0.09);
+}
+
+.client-alert.success {
+  border-color: rgba(58, 138, 104, 0.26);
+  color: #24664A;
+  background: rgba(58, 138, 104, 0.09);
+}
+
+.client-alert.warning {
+  border-color: rgba(181, 138, 52, 0.28);
+  color: #7B5C1F;
+  background: rgba(194, 164, 109, 0.13);
+}
+
+.client-empty {
+  border-color: rgba(31, 41, 51, 0.14);
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.client-table th {
+  color: #1F2933;
+  background: rgba(194, 164, 109, 0.16);
+}
+
+.client-table th,
+.client-table td {
+  border-bottom-color: rgba(31, 41, 51, 0.09);
+}
+
+.client-badge {
+  color: #5D6672;
+  border-color: rgba(31, 41, 51, 0.13);
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.client-badge.active {
+  color: #1F2933;
+  border-color: rgba(194, 164, 109, 0.42);
+  background: rgba(194, 164, 109, 0.20);
+}
+
+.client-back {
+  color: #5D6672;
+  background: rgba(255, 255, 255, 0.44);
+  border-color: rgba(31, 41, 51, 0.12);
+}
+
+.client-modal-backdrop {
+  background: rgba(31, 41, 51, 0.70);
+}
+
+.client-close {
+  background: rgba(31, 41, 51, 0.05);
+  color: #1F2933;
+  border-color: rgba(31, 41, 51, 0.13);
+}
+
+.client-toast {
+  background: rgba(31, 41, 51, 0.96);
+  color: #FCF6F0;
+  border-color: rgba(194, 164, 109, 0.48);
+}
