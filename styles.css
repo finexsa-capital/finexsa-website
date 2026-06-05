@@ -3,22 +3,29 @@
    ============================================ */
 
 :root {
-  /* Palette — deep midnight + antique gold */
-  --bg-void:       #0A0E1A;
-  --bg-deep:       #0F1220;
-  --bg-card:       #141827;
-  --bg-card-hover: #1A1F32;
-  --navy:          #1E2A5A;
-  --navy-light:    #2A3A7A;
-  --gold:          #C9A227;
-  --gold-bright:   #E6BC3F;
-  --gold-muted:    rgba(201, 162, 39, 0.15);
-  --text-primary:  #EDEEF2;
-  --text-muted:    #8B92A8;
-  --text-dim:      #5C6378;
-  --border:        rgba(201, 162, 39, 0.12);
-  --border-strong: rgba(201, 162, 39, 0.35);
-  --shadow-gold:   0 20px 60px -20px rgba(201, 162, 39, 0.25);
+  /* ===== FINEXSA Brand Palette — single source of truth ===== */
+  --brand-primary:   #1F2933;  /* dark base + headings */
+  --brand-secondary: #FCF6F0;  /* elegant light surface */
+  --brand-neutral:   #9CA3AF;  /* muted / dividers */
+  --brand-base:      #F9F9F7;  /* near-white text on dark */
+  --brand-accent:    #C2A46D;  /* antique gold accent */
+
+  /* Palette — refined dark (mapped to brand) */
+  --bg-void:       #161D24;
+  --bg-deep:       #1A222B;
+  --bg-card:       var(--brand-primary);
+  --bg-card-hover: #28323D;
+  --navy:          #28323D;
+  --navy-light:    #34414E;
+  --gold:          var(--brand-accent);
+  --gold-bright:   #D4B985;
+  --gold-muted:    rgba(194, 164, 109, 0.15);
+  --text-primary:  var(--brand-base);
+  --text-muted:    var(--brand-neutral);
+  --text-dim:      #6B7480;
+  --border:        rgba(194, 164, 109, 0.12);
+  --border-strong: rgba(194, 164, 109, 0.32);
+  --shadow-gold:   0 20px 60px -20px rgba(194, 164, 109, 0.22);
 
   /* Typography */
   --font-arabic:   'Tajawal', -apple-system, sans-serif;
@@ -1323,7 +1330,7 @@ a { text-decoration: none; color: inherit; }
   line-height: 1;
   letter-spacing: -0.02em;
   margin-bottom: 10px;
-  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 50%, #8B6F1A 100%);
+  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 50%, #8A7444 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
